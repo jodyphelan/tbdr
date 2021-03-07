@@ -1,0 +1,167 @@
+{% import 'utils.html' as utils %}
+
+{% extends 'base.html' %}
+
+{% block header %}
+
+
+<style media="screen">
+#mapid { height: 500px; }
+
+.info {
+	padding: 6px 8px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+.info h4 {
+	margin: 0 0 5px;
+	color: #777;
+}
+
+.legend {
+	line-height: 18px;
+	color: #555;
+}
+
+.legend i {
+	width: 18px;
+	height: 18px;
+	float: left;
+	margin-right: 8px;
+	opacity: 0.7;
+}
+</style>
+
+<script type="text/javascript">
+$( function() {
+
+} );
+
+
+</script>
+
+
+{% endblock %}
+
+{% block title %}
+	Browse
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        <div class="card border-dark shadow">
+            <div class="card-header text-center bg-dark text-white">
+              <strong>Sample selector</strong>
+            </div>
+            <div class="card-body text-center">
+                <form method="post" enctype=multipart/form-data>
+					<div class="form-row">
+						<div class="col-md-4">
+
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Lineage</label>
+							    <select name="lineage" multiple class="form-control" id="exampleFormControlSelect2">
+									{% for d in lineages %}
+										<option>{{d}}</option>
+									{% endfor %}
+							    </select>
+						  	</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Drug resistance</label>
+							    <select name="drtype" multiple class="form-control" id="exampleFormControlSelect2">
+							      	<option>Sensitive</option>
+							      	<option>Pre-MDR</option>
+							      	<option>MDR</option>
+							      	<option>Pre-XDR</option>
+							      	<option>XDR</option>
+									<option>Other</option>
+							    </select>
+						  	</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Country</label>
+							    <select name="country" multiple class="form-control" id="exampleFormControlSelect2">
+							      	{% for c in countries %}
+										<option>{{c}}</option>
+									{% endfor %}
+							    </select>
+						  	</div>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Spoligptype</label>
+							    <input name="spoligotype" multiple class="form-control" id="exampleFormControlSelect2" placeholder="Binary spoligotype (0/1)">
+						  	</div>
+						</div>
+					</div>
+
+                    <button type="submit" class="btn btn-primary"  id="single_sample_submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+{% if data %}
+	{{ utils.drtype_box(data) }}
+
+	<div class="row justify-content-md-center">
+	    <div class="col-md-8">
+	        {{ utils.draw_map(geojson) }}
+	    </div>
+	</div>
+
+
+
+	<div class="row justify-content-md-center">
+		<div class="col-md-6">
+			{{ utils.counter_table(data,"lineage")}}
+		</div>
+		<div class="col-md-6">
+			{{ utils.counter_table(data,"spoligotype")}}
+		</div>
+
+	</div>
+
+	<div class="row justify-content-md-center">
+		<div class="col-md-8">
+			{% if data|length >= 1000 %}
+
+				<div class="card border-dark shadow">
+					<div class="card-header text-center bg-dark text-white">
+					  	<strong>Samples</strong>
+					</div>
+					<div class="card-body">
+						<div class="mb-3">
+							This table has <b>{{ data|length}}</b> rows and could cause your browser to crash if rendered.
+						</div>
+						<form method="post" enctype=multipart/form-data>
+							<input type="text" name="query_values" value="{{query}}" style="display: none;">
+							<button class="btn btn-primary" name="query" type="submit">
+								Download CSV
+							</button>
+						</form>
+					</div>
+				</div>
+
+			{% else %}
+
+				{{ utils.generic_table(data,{"sample_link":"ID","drtype":"Drug resistance","country":"Country","lineage":"Lineage","spoligotype":"Spoligotype"},"Samples")}}
+			{% endif %}
+		<div>
+	<div>
+{% endif %}
+
+
+
+{% endblock %}

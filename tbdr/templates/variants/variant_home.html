@@ -1,0 +1,155 @@
+{% import 'utils.html' as utils %}
+
+{% extends 'base.html' %}
+
+{% block header %}
+
+
+<style media="screen">
+#mapid { height: 500px; }
+
+.info {
+	padding: 6px 8px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+.info h4 {
+	margin: 0 0 5px;
+	color: #777;
+}
+
+.legend {
+	line-height: 18px;
+	color: #555;
+}
+
+.legend i {
+	width: 18px;
+	height: 18px;
+	float: left;
+	margin-right: 8px;
+	opacity: 0.7;
+}
+</style>
+
+<script type="text/javascript">
+$( function() {
+
+} );
+
+
+</script>
+
+
+{% endblock %}
+
+{% block title %}
+	Upload -
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        <div class="card border-dark">
+            <div class="card-header text-center">
+                <strong>Variant selector</strong>
+            </div>
+            <div class="card-body text-center">
+                <form method="post" enctype=multipart/form-data>
+					<div class="form-row">
+						<div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Gene</label>
+							    <select name="gene" multiple class="form-control" id="exampleFormControlSelect2">
+									{% for d in genes %}
+										<option>{{d}}</option>
+									{% endfor %}
+							    </select>
+						  	</div>
+						</div>
+                        <div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Locus tag</label>
+							    <select name="locus_tag" multiple class="form-control" id="exampleFormControlSelect2">
+									{% for d in locus_tags %}
+										<option>{{d}}</option>
+									{% endfor %}
+							    </select>
+						  	</div>
+						</div>
+                        <div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Variant types</label>
+							    <select name="type" multiple class="form-control" id="exampleFormControlSelect2">
+									{% for d in variant_types %}
+										<option>{{d["type"]}}</option>
+									{% endfor %}
+							    </select>
+						  	</div>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-md-4">
+							<div class="form-group">
+							    <label for="exampleFormControlSelect2">Mutation</label>
+							    <input name="change" multiple class="form-control" id="exampleFormControlSelect2" placeholder="p.Ser450Leu">
+                                <small class="form-text text-muted">
+                                    Mutations must follow the HGVS nomenclature. <a data-toggle="collapse" href="#mutation_format_collapse" role="button">More info?</a>
+                                </small>
+						  	</div>
+						</div>
+                        <div class="col-md-8 collapse multi-collapse" id="mutation_format_collapse">
+                            <div class="alert alert-primary text-left" style="font-size: 15px">
+                                <div class="">
+                                    Mutations must follow the HGVS nomenclature. Information on this format can be found <a href="https://varnomen.hgvs.org/">here</a>.
+                                </div>
+                                <div class="">
+                                    The following types of mutations are currently allowed:
+                                    <ul>
+                                        <li><b>Amino acid substitutions:</b> Example: S450L in rpoB would be p.Ser450Leu</li>
+                                        <li><b>Deletions in genes:</b> Example: Deletion of nucleotide 758 in tlyA would be c.758del</li>
+                                        <li><b>Insertion in genes:</b> Example: Insertion of GT between nucleotide 1850 and 1851 in katG would be c.1850_1851insGT</li>
+                                        <li><b>SNPs in non-coding RNAs:</b> Example: A to G at position 1401 in rrs would be r.1401a>g</li>
+                                        <li><b>SNPs in gene promoters:</b> Example: A to G 7 bases 5' of the start codon in pncA c.-7A>G</li>
+                                    </ul>
+                                    <b>Important! The mutations and resulting library files are in reference to the H37Rv (NC_000962.3/AL123456.3) reference genome.</b>
+
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                        </div>
+					</div>
+
+                    <button type="submit" class="btn btn-primary"  id="single_sample_submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+{% if data!=None %}
+	<div class="row justify-content-md-center">
+		<div class="col-md-8">
+			{{ utils.generic_table(data,{"gene":"Gene","locus_tag":"Locus tag","variant_link":"Change","type":"Type","drugs":"Associated resistance"},"Results")}}
+		<div>
+	<div>
+
+{% endif %}
+
+
+
+
+
+
+
+{% endblock %}

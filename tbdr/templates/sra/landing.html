@@ -1,0 +1,112 @@
+{% import 'utils.html' as utils %}
+
+{% extends 'base.html' %}
+
+{% block header %}
+
+<script src="{{ url_for('static', filename='odometer.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='odometer-theme-minimal.css') }}"></link>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+<style media="screen">
+    #mapid { height: 500px; }
+
+    .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
+    .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+    }
+
+    .legend {
+        line-height: 18px;
+        color: #555;
+    }
+
+    .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+    }
+
+</style>
+
+
+{% endblock %}
+
+{% block title %}
+	SRA
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        <div class="card border-dark shadow">
+            <div class="card-header text-center bg-dark text-white">
+              <strong>Drug resistance types</strong>
+            </div>
+            <div class="card-body text-center">
+                {% for d in dr_data %}
+                    {% set tmp = "%s %s" % (d["drtype"],d["count"]) %}
+
+                    <span style="font-size: 150%" class="badge badge-{{- utils.get_dr_style(d['drtype']).strip().lower() }} mt-1 mb-1">
+                        <span id="odometer_{{-d['drtype'].strip()}}" class="odometer">0</span>
+                        {{ d["drtype"] }}
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-md-center pt-4 pb-4">
+    <div class="col-md-6 text-right">
+            <a class="btn btn-outline-dark" href="{{url_for('sra.browse')}}"><h1>Browse Samples</h1></a>
+    </div>
+    <div class="col-md-6 text-left">
+            <a class="btn btn-outline-dark" href="{{url_for('variants.browse')}}"><h1>Browse Variants</h1></a>
+    </div>
+</div>
+
+<div class="row justify-content-md-center pb-5">
+    <div class="col-md-8">
+        {{ utils.draw_map(geojson) }}
+    </div>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-6">
+        {{ utils.counter_table(data,"lineage")}}
+    </div>
+    <div class="col-md-6">
+        {{ utils.top_mutation_table(top_mutations)}}
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    {% for d in dr_data %}
+
+        setTimeout(function(){
+            document.getElementById("odometer_{{-d['drtype'].strip()}}").innerHTML = {{d['count']}};
+        }, 1000);
+
+    {% endfor %}
+
+
+
+
+    </script>
+
+{% endblock %}

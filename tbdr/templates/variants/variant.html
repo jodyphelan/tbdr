@@ -1,0 +1,273 @@
+{% import 'utils.html' as utils %}
+{% extends 'base.html' %}
+
+{% block header %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+<style media="screen">
+    #mapid { height: 500px; }
+
+    .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
+    .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+    }
+
+    .legend {
+        line-height: 18px;
+        color: #555;
+    }
+
+    .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-md-center pt-4">
+    <div class="col-md-4 text-center">
+        <h1><i>{{ gene }}</i> - {{ variant }}</h1>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        <div class="card border-dark">
+            <div class="card-header text-center">
+              <strong>Drug resistance types</strong>
+            </div>
+            <div class="card-body text-center">
+                {% for drtype in dr_counts %}
+                    {% set tmp = "%s %s" % (dr_counts[drtype],drtype) %}
+                    <span style="font-size: 200%">{{utils.drtype_badge(tmp,drtype)}}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        {{utils.counter_table(sample_data,"lineage")}}
+    </div>
+    <div class="col-md-4">
+        {{utils.counter_table(sample_data,"spoligotype")}}
+    </div>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        <div class="card border-dark">
+            <div class="card-header text-center">
+              <strong>Geographic prevalence</strong>
+            </div>
+            <div class="mt-2 mb-2 text-center">
+                Country level data for this variant is available for {{isolates_with_country}} isolates.
+            </div>
+            <div id="mapid" class="card-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        <div class="card border-dark">
+            <div class="card-header text-center">
+              <strong>Statisctical support</strong>
+            </div>
+            <div class="mt-2 ml-2 mr-2">
+                {% if support|length>0 %}
+                <table class="table table-hover">
+            		<thead>
+            			<tr>
+            				{% for key in support[0] %}
+                                <th scope="col">{{ key.title() }}</th>
+                            {% endfor %}
+            			</tr>
+            		</thead>
+            		<tbody>
+            			{% for d in support %}
+            				<tr>
+            					{% for key in d %}
+                                    <td>{{ d[key]}}</td>
+            					{% endfor %}
+            				</tr>
+            			{% endfor %}
+            		</tbody>
+            	</table>
+                {% else %}
+                    <div class="text-center mb-2">
+                        Not enough data to calculate support.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-8">
+        {% if sample_data|length >= 1000 %}
+
+            <div class="card border-dark">
+                <div class="card-header text-center">
+                    <strong>Samples</strong>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        This table has <b>{{ sample_data|length}}</b> rows and could cause your browser to crash if rendered.
+                    </div>
+                    <form method="post" enctype=multipart/form-data>
+                        <input type="text" name="query_values" value="{{gene}}_{{variant}}" style="display: none;">
+                        <button class="btn btn-primary" name="query" type="submit">
+                            Download CSV
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        {% else %}
+            {{ utils.generic_table(sample_data,{"sample_link":"ID","drtype":"Drug resistance","lineage":"Lineage","country_code":"Country iso2"},"Samples")}}
+
+        {% endif %}
+    <div>
+<div>
+
+<script type="text/javascript">
+    var geojson;
+
+    data = {{ geojson|tojson|safe }}
+
+    var map = L.map('mapid').setView([51.505, -0.09], 2);
+
+    L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: 'abcd',
+    	minZoom: 0,
+    	maxZoom: 20,
+    	ext: 'png'
+    }).addTo(map);
+
+
+    function getColor(d) {
+        return d > 0.8 ? '#800026' :
+               d > 0.6  ? '#BD0026' :
+               d > 0.5  ? '#E31A1C' :
+               d > 0.4  ? '#FC4E2A' :
+               d > 0.3   ? '#FD8D3C' :
+               d > 0.2   ? '#FEB24C' :
+               d > 0.1   ? '#FED976' :
+                          '#FFEDA0';
+    }
+
+    function style(feature) {
+        return {
+            fillColor: getColor(feature.properties.variant),
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7
+        };
+    }
+
+
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+        info.update(layer.feature.properties);
+    }
+
+    function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+        info.update();
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: zoomToFeature
+        });
+    }
+
+    function zoomToFeature(e) {
+        map.fitBounds(e.target.getBounds());
+    }
+
+    geojson = L.geoJson(data, {
+        style: style,
+        onEachFeature: onEachFeature
+    }).addTo(map);
+
+
+    var info = L.control();
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+        this.update();
+        return this._div;
+    };
+
+    // method that we will use to update the control based on feature properties passed
+    info.update = function (props) {
+        this._div.innerHTML = '<h4>Variant Proportion</h4>' +  (props ?
+            '<b>' + props.admin + '</b><br />' + Math.round( props.variant*100 ) + '% of isolates with variant'
+            : 'Hover over a Country');
+    };
+
+    info.addTo(map);
+
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            grades = [0, .10, .20, .30, .40, .50, .60, .80],
+            labels = [];
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 0.05) + '"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+    };
+
+    legend.addTo(map);
+
+</script>
+
+{% endblock %}

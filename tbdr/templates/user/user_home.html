@@ -1,0 +1,48 @@
+{% import 'utils.html' as utils %}
+{% extends 'base.html' %}
+
+{% block header %}
+
+
+{% endblock %}
+
+{% block content %}
+	<div class="row text-center mx-auto">
+		<div class="col-md-1">
+
+		</div>
+		<div class="col-md-10 pt-4">
+			<h3>Welcome back {{g.user["forename"]}}</h3>
+
+
+
+			<div class="row justify-content-md-center">
+				<div class="col-md-6 pb-4">
+					<div class="card border-dark text-center">
+					  <div class="card-header">
+					    Summary
+					  </div>
+					  <div class="card-body">
+					    <h5 class="card-title">Your samples</h5>
+
+									<p class="card-text">
+										You have profiled <b>{{data["num_samples"]}}</b> samples so far.
+									</p>
+									<p class="card-text">
+										The most common lineage in your data is <b>{{data["top_lineage"]}}</b>
+									</p>
+									<p class="card-text">
+										Your data consistst of mostly <b>{{data["top_drtype"]}}</b> isolates
+									</p>
+
+
+					    <a class="btn btn-primary" href="{{ url_for('users.user_results') }}">See results</a>
+					  </div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+{% endblock %}
