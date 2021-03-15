@@ -13,7 +13,7 @@ pip install neo4j redis tqdm
 python setup.py install
 
 # Run flask
-export FLASK_APP=tbprofiler_web
+export FLASK_APP=tbdr
 export FLASK_ENV=development
 flask run
 
@@ -21,5 +21,5 @@ flask run
 rabbitmq-server
 
 # Run celery
-celery -A tbprofiler_web.worker worker --loglevel=info --concurrency=1
+celery -A tbdr.worker worker --loglevel=info --concurrency=1
 ```

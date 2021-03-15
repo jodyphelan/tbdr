@@ -1,2 +1,2 @@
-celery -A tbprofiler_web.worker worker --loglevel=INFO --concurrency=1
+celery -A tbdr.worker worker --loglevel=INFO --concurrency=1
 

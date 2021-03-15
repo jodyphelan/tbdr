@@ -102,12 +102,21 @@ def tbprofiler(fq1,fq2,uniq_id,storage_dir,platform,result_file_dir):
     results["id"] = uniq_id
     results["tbprofiler_version"] = tbp._VERSION
     results["pipeline"] = {"mapper":"bwa","variant_caller":"freebayes"}
-    outfile = "%s.results.json" % (storage_dir+"/"+uniq_id)
 
-    json.dump(results,open(outfile,"w"))
 
 
     with flask_app.app_context():
+        json_output = result_file_dir+"/"+uniq_id+".results.json"
+        text_output = result_file_dir+"/"+uniq_id+".results.txt"
+        csv_output = result_file_dir+"/"+uniq_id+".results.csv"
+        pdf_output = result_file_dir+"/"+uniq_id+".results.pdf"
+        
+        json.dump(results,open(json_output,"w"))
+        tbp.write_text(results,conf,text_output,[])
+        tbp.write_csv(results,conf,csv_output,[])
+        tbp.write_pdf(results,conf,pdf_output)
+
+        
         neo4j_db = get_neo4j_db()
         write_neo4j_results(results,neo4j_db)
         print(flask_app.config)

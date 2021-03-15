@@ -69,11 +69,11 @@
     				<p class="card-text"><b>Drug-resistance:</b> {{ utils.drtype_badge(result["drtype"],result["drtype"]) }}</p>
 
     				<hr>
-    				<form method="post" enctype=multipart/form-data>
-    					<button class="btn btn-outline-success" type="submit">
-    						Download CSV
-    					</button>
-    				</form>
+					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.csv">Download CSV</a>
+					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.txt">Download TXT</a>
+					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.pdf">Download PDF</a>
+					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.json">Download JSON</a>
+					
     			</div>
     		</div>
     	</div>
