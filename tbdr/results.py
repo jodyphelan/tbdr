@@ -49,7 +49,8 @@ def run_result(sample_id):
 	if "Processing" in results["labels"]:
 		log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".log"
 		progress = check_progress(log_file)
-		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","")
+		
+		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
 		return render_template('results/run_result.html',result = None,sample_id=sample_id,progress = progress,log_text=log_text)
 	for var in results["dr_variants"]:
 		var["drugs"] = ", ".join([d["id"] for d in var["drugs"]])
@@ -66,6 +67,9 @@ def run_result(sample_id):
 
 def check_progress(filename):
 	progress = "Uploaded"
+	if not os.path.isfile(filename):
+		progress = "In queue"
+		return progress
 	text = open(filename).read()
 	if "bwa mem" in text:
 		progress = "Mapping"

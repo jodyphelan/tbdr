@@ -94,7 +94,7 @@ def tbprofiler(fq1,fq2,uniq_id,storage_dir,platform,result_file_dir):
     results = pp.bam_profiler(
         conf=conf, bam_file=bam_file, prefix=files_prefix, platform=platform,
         caller="freebayes", threads=4, no_flagstat=False,
-        run_delly = True,samclip=True
+        run_delly = False,samclip=True
     )
 
     results = tbp.reformat(results, conf, reporting_af=0.1)

@@ -1,6 +1,6 @@
 
 {% macro progress_bar(progress) -%}
-	{% set p = {"Mapping":17,"Bam sorting":33,"Variant calling":50,"Variant annotation":67,"Lineage determination":83} %}
+	{% set p = {"In queue":0,"Mapping":17,"Bam sorting":33,"Variant calling":50,"Variant annotation":67,"Lineage determination":83} %}
 	<div class="text-center">
 		<h4>{{progress}}</h4>
 	</div>
@@ -158,7 +158,7 @@ danger
 {%- endmacro %}
 
 
-{% macro generic_table(rows,columns,name) -%}
+{% macro generic_table(rows,columns,name,buttons=False) -%}
 
 
 	{% set rand_id = range(1, 5000) | random %}
@@ -181,8 +181,12 @@ danger
 							<td>
 								{% if key=="drtype" %}
 									<span style="font-size: 100%" class="badge badge-{{- get_dr_style(row['drtype']).strip().lower() }}">{{row["drtype"]}}</span>
-
-
+								{% elif key=="status" %}
+									{% if row[key]=="Processing" %}
+										<span class="badge badge-warning">Processing</span>
+									{% else %}
+										<span class="badge badge-success">Success</span>
+									{% endif %}
 								{% else %}
 									{{ row[key]|safe }}
 								{% endif %}
@@ -199,11 +203,55 @@ danger
 	var table = $("#table-{{rand_id}}").DataTable( {
 		select: true,
 		"scrollX": true,
-	// dom: 'Blfrtip',
+		{% if buttons %}
+		dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ]
+		{% endif %}
 	})
 	</script>
 
 {%- endmacro %}
+
+{% macro gauge(val,max,min=0) -%}
+
+	{% set rand_id = range(1, 5000) | random %}
+	<div class="text-center">
+		<canvas id="canvas{{rand_id}}"></canvas>
+	</div>
+
+	<script>
+		opts = {
+		angle: 0, // The span of the gauge arc
+		lineWidth: 0.44, // The line thickness
+		radiusScale: 0.83, // Relative radius
+		pointer: {
+			length: 0.6, // // Relative to gauge radius
+			strokeWidth: 0.035, // The thickness
+			color: '#000000' // Fill color
+		},
+		limitMax: false, // If false, max value increases automatically if value > maxValue
+		limitMin: false, // If true, the min value of the gauge will be fixed
+		colorStart: '#6FADCF', // Colors
+		colorStop: '#8FC0DA', // just experiment with them
+		strokeColor: '#E0E0E0', // to see which ones work best for you
+		generateGradient: true,
+		highDpiSupport: true // High resolution support
+		}
+	
+		target = document.querySelector('#canvas{{rand_id}}') // your canvas element
+		
+		gaugeChart = new Gauge(target).setOptions(opts) // create sexy gauge!
+		gaugeChart.maxValue = {{max}} // set max gauge value
+		gaugeChart.setMinValue({{min}}) // Prefer setter over gauge.minValue = 0
+		gaugeChart.animationSpeed = 32 // set animation speed (32 is default value)
+		gaugeChart.set({{val}}) // set actual value
+	
+	</script>
+	
+{%- endmacro %}
+
 
 {% macro barchart(csv_file,column,id_column,name,highlight_column=None,highlight_value=None) -%}
 

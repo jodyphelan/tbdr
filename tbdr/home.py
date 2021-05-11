@@ -6,12 +6,14 @@ import json
 #from aseantb.auth import login_required
 from tbdr.db import get_neo4j_db
 from flask import current_app as app
+from flask_login import current_user, login_required
 
 bp = Blueprint('home', __name__)
 
 
 @bp.route('/',methods=('GET', 'POST'))
 def index():
+	print(vars(current_user))
 	# neo4j = get_neo4j_db()
 	if request.method == 'POST':
 		return redirect(url_for('results.run_result', sample_id=request.form["sample_id"]))
@@ -21,3 +23,9 @@ def index():
 def robots():
 	# neo4j = get_neo4j_db()
 	return open(app.config["APP_ROOT"]+url_for('static',filename='robots.txt')).read().replace("\n","<br>")
+
+
+@bp.route('/test')
+@login_required
+def test():
+	return "hello" + current_user.name

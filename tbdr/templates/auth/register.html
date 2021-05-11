@@ -12,61 +12,35 @@
 			</div>
 			<div class="card-body">
 
-				<form method="post" enctype=multipart/form-data>
-					<div class="form-row">
-						<div class="form-group col-md-6">
-							<label for="project_id">First name</label>
-							<input type="text" class="form-control" id="forename" name="forename" placeholder="">
-
-							<label for="lineage">Institution</label>
-							<input type="text" class="form-control" id="institution" name="institution" placeholder="">
-
-						</div>
-						<div class="form-group col-md-6">
-							<label for="project_id">Last name</label>
-							<input type="text" class="form-control" id="surname" name="surname" placeholder="">
-
-							<label for="email">Country</label>
-							<input type="text" class="form-control" id="country" name="country" placeholder="">
-
-
-						</div>
+				<form method="POST" action="/signup">
+					{{ form.csrf_token }}
+					
+					
+					<fieldset class="name p-1 ">
+						<div>{{ form["name"].label }}</div>
+						<div>{{ form.name(placeholder='Forname Surname') }}</div>
+					</fieldset>
+			  
+					<fieldset class="name p-1 ">
+						<div>{{ form.email.label }}</div>
+						<div>{{ form.email(placeholder='youremail@example.com') }}</div>
+					</fieldset>
+			  
+					<fieldset class="name p-1 ">
+						<div>{{ form.password.label }}</div>
+						<div>{{ form.password }}</div>
+					</fieldset>
+			  
+					<fieldset class="name p-1 ">
+						<div>{{ form.confirm.label }}</div>
+						<div>{{ form.confirm }}</div>
+					</fieldset>
+			  
+					<div class="p-1 submit-button">
+					  {{ form.submit(class="btn btn-outline-dark") }}
 					</div>
-					<hr>
-					<div class="form-row">
-						<div class="form-group col-md-6">
-							<label for="email">Email address</label>
-							<input type="text" class="form-control" id="email_address" name="email_address" placeholder="">
-
-
-
-						</div>
-						<div class="form-group col-md-6">
-							<label for="lineage">Password</label>
-							<input type="password" class="form-control" id="password" name="password" placeholder="">
-
-							<label for="lineage">Re-type password</label>
-							<input type="password" class="form-control" id="password_redo" name="password_redo" placeholder="">
-						</div>
-					</div>
-					<hr>
-					<div class="form-row">
-						<div class="form-group">
-							<div class="">
-								Please read the terms and conditions detailed <a href="{{url_for('users.data_agreement')}}">here</a> and check the boxes to agree to the following statements
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="consent1" type="checkbox" value="" id="consent1">
-								<label class="form-check-label" for="consent1">
-									I agree for informations from
-								</label>
-							</div>
-						</div>
-					</div>
-					<hr>
-					<button type="submit" class="btn btn-primary" name="search_strains_button">Submit</button>
-
-				</form>
+			  
+				  </form>
 
 			</div>
 		</div>

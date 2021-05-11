@@ -88,7 +88,7 @@
 					</div>
 					<hr>
 					{{form.upload_id}}
-                    {{form.submit(class="btn btn-outline-dark")}}
+                    {{form.submit}}
 					
 				</form>
 			</div>
@@ -106,9 +106,8 @@
         forceChunking: true,
         url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
         maxFilesize: 1025, // megabytes
-        chunkSize: 100000000, // bytes
-		timeout: 0
-    }	
+        chunkSize: 100000000 // bytes
+    }
 </script>
 
 

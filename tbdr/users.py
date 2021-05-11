@@ -4,32 +4,29 @@ from flask import (
 from collections import Counter
 from werkzeug.exceptions import abort
 import json
-from tbdr.auth import login_required
-from tbdr.db import get_db
-from tbdr.results import result_table
 import os.path
-import tbprofiler as tbp
 from flask import current_app as app
+from flask_login import login_required, current_user
+from .db import get_neo4j_db
 
 bp = Blueprint('users', __name__)
 
+def add_links(runs):
+	for run in runs:
+		run["link"] = "<a href='%s'>%s</a>" % (url_for('results.run_result',sample_id=run["id"]),run["sample_name"])
+		run["status"] = "Processing" if "Processing" in run["labels"] else "Completed"
+		run["timestamp"] = run["timestamp"].split(".")[0]
+	return runs
 
-@login_required
-@bp.route('/user/results',methods=('GET', 'POST'))
-def user_results():
-	return result_table(request,g.user['username'])
-
-@login_required
 @bp.route('/user/home',methods=('GET', 'POST'))
-def user_home():
-	db = get_db()
-	data = {}
-	sql_query = "select id,sample_name,created,status,lineage,drtype from results WHERE user_id = '%s'" % g.user["username"]
-	raw_data = db.execute(sql_query).fetchall()
-	data["num_samples"] = len(raw_data)
-	data["top_lineage"] = Counter([x["lineage"] for x in raw_data]).most_common(1)[0][0]
-	data["top_drtype"] = Counter([x["drtype"] for x in raw_data]).most_common(1)[0][0]
-	return render_template('user/user_home.html',data=data)
+@login_required
+def home():
+	neodb = get_neo4j_db()
+	data = neodb.read("MATCH (n:Private {userID:'%s'}) return n.id as id, n.timestamp as timestamp, n.drtype as drtype,n.subLineage as sublineage, n.sampleName as sample_name, labels(n) as labels" % current_user.id)
+	runs = add_links(data)
+		
+	return render_template('user/user_home.html',runs = data)
+
 
 
 @bp.route('/data_agreement')
