@@ -16,10 +16,10 @@ from datetime import datetime
 bp = Blueprint('upload', __name__)
 
 def run_sample(uniq_id,sample_name,platform,f1,f2=None,neo4j_db=None):
-    filename1 = secure_filename(f1.filename)
-    filename2 = secure_filename(f2.filename) if f2 else None
+    filename1 = f"{uniq_id}_1.fastq.gz" #secure_filename(f1.filename)
+    filename2 = f"{uniq_id}_2.fastq.gz" #secure_filename(f2.filename) if f2 else None
     f1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-    if filename2:
+    if f2:
         f2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
     server_fname1 = "/%s/%s" % (app.config["UPLOAD_FOLDER"],filename1)
     server_fname2 = "/%s/%s" % (app.config["UPLOAD_FOLDER"],filename2) if filename2 else None
