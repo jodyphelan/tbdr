@@ -10,19 +10,20 @@ from flask import Flask,current_app,url_for
 from tbdr.db import get_neo4j_db, write_neo4j_results
 import statsmodels.api as sm
 import numpy as np
+from datetime import datetime
 
-try:
-    sys.base_prefix
-except:
-    sys.base_prefix = getattr(sys, 'base_prefix', getattr(sys, 'real_prefix', sys.prefix))
+# try:
+#     sys.base_prefix
+# except:
+#     sys.base_prefix = getattr(sys, 'base_prefix', getattr(sys, 'real_prefix', sys.prefix))
 
-def get_conf_dict(library_prefix):
-    files = {"gff":".gff","ref":".fasta","ann":".ann.txt","barcode":".barcode.bed","bed":".bed","json_db":".dr.json","version":".version.json"}
-    conf = {}
-    for key in files:
-        sys.stderr.write("Using %s file: %s\n" % (key,library_prefix+files[key]))
-        conf[key] = pp.filecheck(library_prefix+files[key])
-    return conf
+# def get_conf_dict(library_prefix):
+#     files = {"gff":".gff","ref":".fasta","ann":".ann.txt","barcode":".barcode.bed","bed":".bed","json_db":".dr.json","version":".version.json"}
+#     conf = {}
+#     for key in files:
+#         sys.stderr.write("Using %s file: %s\n" % (key,library_prefix+files[key]))
+#         conf[key] = pp.filecheck(library_prefix+files[key])
+#     return conf
 
 
 def make_celery(app):
@@ -74,7 +75,7 @@ def tbprofiler(fq1,fq2,uniq_id,storage_dir,platform,result_file_dir):
     # sys.stdout = Logger()
     sys.stderr = Logger()
 
-    conf = get_conf_dict(sys.base_prefix+"/share/tbprofiler/tbdb")
+    conf = tbp.get_conf_dict("tbdb")
     drug_order = [
         "isoniazid","rifampicin","ethambutol","pyrazinamide","streptomycin",
         "ethionamide","fluoroquinolones","amikacin","capreomycin","kanamycin"
@@ -100,9 +101,12 @@ def tbprofiler(fq1,fq2,uniq_id,storage_dir,platform,result_file_dir):
     results = tbp.reformat(results, conf, reporting_af=0.1)
 
     results["id"] = uniq_id
-    results["tbprofiler_version"] = tbp._VERSION
-    results["pipeline"] = {"mapper":"bwa","variant_caller":"freebayes"}
-
+    results["tbprofiler_version"] = tbp.__version__
+    results["pipeline"] = [
+        {"Analysis":"Mapping","Program":"bwa"},
+        {"Analysis":"Variant calling","Program":"freebayes"}
+    ]
+    results["input_data_source"] = "fastq"
 
 
     with flask_app.app_context():
@@ -111,10 +115,13 @@ def tbprofiler(fq1,fq2,uniq_id,storage_dir,platform,result_file_dir):
         csv_output = result_file_dir+"/"+uniq_id+".results.csv"
         pdf_output = result_file_dir+"/"+uniq_id+".results.pdf"
         
+
+        results["timestamp"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         json.dump(results,open(json_output,"w"))
-        tbp.write_text(results,conf,text_output,[])
-        tbp.write_csv(results,conf,csv_output,[])
+        extra_columns = []
         tbp.write_pdf(results,conf,pdf_output)
+        tbp.write_text(results,conf,text_output,extra_columns,reporting_af=0.05,sep="\t")
+        tbp.write_text(results,conf,csv_output,extra_columns,reporting_af=0.05,sep=",")
 
         
         neo4j_db = get_neo4j_db()

@@ -19,7 +19,7 @@ def create_app(test_config=None):
 		APP_ROOT=os.path.dirname(os.path.abspath(__file__)),
 		NEO4J_URI="neo4j://localhost:7687", NEO4J_USER="neo4j",
 		NEO4J_PASSWORD="test",
-
+		
 		SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/test.db",
     	SQLALCHEMY_ECHO = False,
     	SQLALCHEMY_TRACK_MODIFICATIONS = False,
