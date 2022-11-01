@@ -7,7 +7,6 @@ import json
 import os.path
 from flask import current_app as app
 from flask_login import login_required, current_user
-from .db import get_neo4j_db
 from .tb_crowd_forms import MetaForm
 import csv 
 import codecs 
@@ -76,8 +75,8 @@ def get_performance(drug):
     return data
 
 import datetime
-import pandas as pd
-import plotly.express as px
+# import pandas as pd
+# import plotly.express as px
 import tbprofiler
 conf = tbprofiler.get_conf_dict("tbdb")
 drugs2lt = tbprofiler.get_drugs2lt("/home/jody/github/tbdb/tbdb.bed")

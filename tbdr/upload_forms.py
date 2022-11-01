@@ -70,6 +70,16 @@ class MultiFileUpload(FlaskForm):
             DataRequired(),
         ]
     )
+    pairing  = SelectField(
+        'Pariring',
+        choices=[
+            ("Paired","Paired"),
+            ("Single","Single")
+        ],
+        validators=[
+            DataRequired(),
+        ]
+    )
     upload_id = HiddenField()
     forward_suffix = StringField(
         'Forward File Suffix',

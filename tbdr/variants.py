@@ -4,7 +4,6 @@ from flask import (
 from werkzeug.exceptions import abort
 import json
 # from tbdr.auth import login_required
-from tbdr.db import  get_neo4j_db
 import tbprofiler as tbp
 import sys
 from flask import current_app as app

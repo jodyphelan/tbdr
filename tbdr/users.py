@@ -21,8 +21,8 @@ def add_links(runs):
 @bp.route('/user/home',methods=('GET', 'POST'))
 @login_required
 def home():
-	neodb = get_neo4j_db()
-	data = neodb.read("MATCH (n:Private {userID:'%s'}) return n.id as id, n.timestamp as timestamp, n.drtype as drtype,n.subLineage as sublineage, n.sampleName as sample_name, labels(n) as labels" % current_user.id)
+	db = get_db()
+	data = db.read("SELECT * from MATCH (n:Private {userID:'%s'}) return n.id as id, n.timestamp as timestamp, n.drtype as drtype,n.subLineage as sublineage, n.sampleName as sample_name, labels(n) as labels" % current_user.id)
 	runs = add_links(data)
 		
 	return render_template('user/user_home.html',runs = data)

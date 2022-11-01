@@ -17,10 +17,9 @@ def create_app(test_config=None):
 		SECRET_KEY='dev',
 		UPLOAD_FOLDER="/tmp",
 		APP_ROOT=os.path.dirname(os.path.abspath(__file__)),
-		NEO4J_URI="neo4j://localhost:7687", NEO4J_USER="neo4j",
-		NEO4J_PASSWORD="test",
 		
-		SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/test.db",
+		
+		SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://@localhost/myinner_db",
     	SQLALCHEMY_ECHO = False,
     	SQLALCHEMY_TRACK_MODIFICATIONS = False,
 
@@ -54,10 +53,15 @@ def create_app(test_config=None):
 		from . import sra
 		app.register_blueprint(sra.bp)
 
-		from . import tb_crowd
-		app.register_blueprint(tb_crowd.bp)
+		# from . import tb_crowd
+		# app.register_blueprint(tb_crowd.bp)
 
 		# Create Database Models
 		sqldb.create_all()
+
+		from .db import db_session
+		@app.teardown_appcontext
+		def shutdown_session(exception=None):
+			db_session.remove()
 
 		return app
