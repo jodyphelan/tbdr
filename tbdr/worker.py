@@ -10,7 +10,8 @@ from flask import Flask,current_app,url_for
 # import statsmodels.api as sm
 # import numpy as np
 from datetime import datetime
-from tbdr.db import db
+from .models import Result
+from .db import db_session
 
 def make_celery(app):
     celery = Celery(
@@ -42,9 +43,16 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
 
     with open("%s/%s.log" % (result_file_dir,uniq_id), "a",buffering=1) as LOG:
         if fq1 and fq2:
-            sp.call(f"tb-profiler profile --no_delly --no_flagstat -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True,stderr=LOG,stdout=LOG)
-    data = json.load(open("%s/%s.json" % (result_file_dir,uniq_id)))
-    db.execute("UPDATE results SET data = %, status = ? WHERE sample_id = ?",(json.dumps(data),"Completed",uniq_id))
+            sp.call(f"tb-profiler profile --threads 2 -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True)
+    data = json.load(open("%s/results/%s.results.json" % (result_file_dir,uniq_id)))
+    conf = pp.get_db('tbprofiler','tbdb')
+    data = pp.get_summary(data,conf)
+
+    db_entry = Result.query.filter(Result.sample_id == uniq_id).first()
+    db_entry.data = data
+    db_entry.status = "Completed"
+    db_session.commit()
+
     return True
 
 

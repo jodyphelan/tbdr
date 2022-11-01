@@ -12,16 +12,13 @@ from .db import db_session
 
 from .models import Result
 
-
 def get_result(sample_id):
 	row =  Result.query.filter(Result.sample_id == sample_id).first()
-	print(row)
-	if len(row)==0:
-		return None
-	if row.data:
+	if row and row.data:
 		for var in row.data["dr_variants"]:
-			var["drugs"] = ", ".join([d["id"] for d in var["drugs"]])
-	return row
+			var["drugs"] = ", ".join([d["drug"] for d in var["drugs"]])
+		return row	
+	return None
 
 @bp.route('/results/json/<sample_id>',methods=('GET', 'POST'))
 def run_result_json(sample_id):
@@ -41,13 +38,13 @@ def run_result_json(sample_id):
 
 @bp.route('/results/<sample_id>',methods=('GET', 'POST'))
 def run_result(sample_id):
-	results = get_result(sample_id)
+	result = get_result(sample_id)
 	
-	if results==None:
+	if result==None:
 		flash("Error! Result with ID:%s doesn't exist" % sample_id)
 		return redirect(url_for('home.index'))
 	
-	if results['status']!="Completed":
+	if result.status!="Completed":
 		log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".log"
 		progress = check_progress(log_file)
 		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
@@ -55,13 +52,13 @@ def run_result(sample_id):
 	
 
 	if request.method == 'POST':
-		csv_strings = tbp.get_csv_strings(results,tbp.get_conf_dict("tbdb"))
+		csv_strings = tbp.get_csv_strings(result,tbp.get_conf_dict("tbdb"))
 		csv_text = tbp.load_csv(csv_strings)
 		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=%s.csv" % sample_id})
 
 
 	bam_found = os.path.isfile(app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".targets.bam")
-	return render_template('results/run_result.html',result = results, bam_found = bam_found, sample_id=sample_id)
+	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id)
 
 
 def check_progress(filename):

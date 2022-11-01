@@ -9,8 +9,9 @@ class Result(Base):
     sample_id = Column(String,ForeignKey('samples.id'))
     status = Column(String)
 
-    def __init__(self, sample_id):
+    def __init__(self, sample_id, status="queued"):
         self.sample_id = sample_id
+        self.status = status
 
     def __repr__(self):
         return f'<Result {self.sample_id!r}>'

@@ -12,6 +12,8 @@ import re
 bp = Blueprint('upload', __name__)
 from flask_login import current_user
 import json
+from .models import Result, Sample
+from .db import db_session
 
 def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     # if current_user.is_authenticated:
@@ -20,6 +22,10 @@ def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     #     neo4j_db.write("CREATE (s:Sample:Processing { id:'%s', sampleName:'%s', timestamp:'%s'})" % (uniq_id,sample_name,datetime.now().isoformat()))
     # db.execute("INSERT INTO samples (id) VALUES ('%s')" % (uniq_id))
     # db.execute("INSERT INTO results (sample_id, status) VALUES ('%s', 'queueing')" % uniq_id)
+    db_session.add(Sample(id=uniq_id))
+    db_session.commit()
+    db_session.add(Result(sample_id=uniq_id))
+    db_session.commit()
     tbprofiler.delay(fq1=f1,fq2=f2,uniq_id=uniq_id,upload_dir=app.config["UPLOAD_FOLDER"],platform=platform,result_file_dir=app.config["APP_ROOT"]+url_for('static', filename='results'))
 
 
