@@ -15,6 +15,7 @@ import json
 from .models import Result, Sample, Submission
 from .db import db_session
 
+
 def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     # if current_user.is_authenticated:
     #     neo4j_db.write("CREATE (s:Sample:Private:Processing { id:'%s', sampleName:'%s', timestamp:'%s', userID:'%s'})" % (uniq_id,sample_name,datetime.now().isoformat(),current_user.id))
@@ -28,6 +29,7 @@ def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     db_session.commit()
     print(f1,f2)
     tbprofiler.delay(fq1=f1,fq2=f2,uniq_id=uniq_id,upload_dir=app.config["UPLOAD_FOLDER"],platform=platform,result_file_dir=app.config["APP_ROOT"]+url_for('static', filename='results'))
+
 
 
 
