@@ -79,12 +79,10 @@ def upload():
         upload_id = str(uuid.uuid4())
         session[upload_id] = "Pending"
         form.upload_id.data = upload_id
-    flash(form.errors)
     if form.validate_on_submit():
         session[form.upload_id.data+"_form"] = json.dumps({"pairing":form.pairing.data,"platform":form.platform.data,"R1_suffix":form.forward_suffix.data,"R2_suffix":form.reverse_suffix.data})
         return redirect(url_for('upload.submit_runs',upload_id=form.upload_id.data))
 
-    flash(form.errors)
     return render_template('upload/upload.html',form=form,upload_id=upload_id)
 
 @bp.route('/submit_runs/<uuid:upload_id>',methods=('GET','POST'))

@@ -30,17 +30,19 @@
 
 {% macro get_dr_style(drtype) -%}
 	{% if drtype=="Sensitive" %}
-success
+background-color: #28a745;
+	{% elif drtype=="RR-TB" %}
+background-color: #007bff;
+	{% elif drtype=="HR-TB" %}
+background-color: #E0ACD5;
+	{% elif drtype=="MDR-TB" %}
+background-color: #ffc107;
+	{% elif drtype=="Pre-XDR-TB" %}
+background-color: #dc3545;
+	{% elif drtype=="XDR-TB" %}
+background-color: #343a40; color: #f8f9fa;
 	{% elif drtype=="Other" %}
-light
-	{% elif drtype=="XDR" %}
-dark
-	{% elif drtype=="MDR" %}
-warning
-	{% elif drtype=="Pre-MDR" %}
-primary
-	{% elif drtype=="Pre-XDR" %}
-danger
+background-color: #f8f9fa;
 	{% endif %}
 
 {%- endmacro %}
@@ -48,7 +50,7 @@ danger
 
 
 {% macro drtype_box(rows) -%}
-	{% set counts = {"Sensitive":0,"Pre-MDR":0,"MDR":0,"Pre-XDR":0,"XDR":0,"Other":0} %}
+	{% set counts = {"Sensitive":0,"RR-TB":0,"HR-TB":0,"MDR-TB":0,"Pre-XDR-TB":0,"XDR-TB":0,"Other":0} %}
 	{% for row in rows %}
 		{% set key = row["drtype"] %}
 		{% if key in counts %}
@@ -65,7 +67,7 @@ danger
 	            </div>
 	            <div class="card-body text-center">
 	                {% for key in counts %}
-	                    <span style="font-size: 150%" class="badge badge-{{- get_dr_style(key).strip().lower() }} mt-1 mb-1">
+	                    <span style="{{- get_dr_style(key).strip().lower() }}" class="badge" >
 	                        {{ counts[key] }} {{ key }}
 						</span>
 	                {% endfor %}
@@ -159,6 +161,50 @@ danger
 
 {%- endmacro %}
 
+{% macro generic_tuple_table(rows,columns,name,buttons=False) -%}
+	{% set rand_id = range(1, 5000) | random %}
+	<div class="card border-dark shadow">
+		<div class="card-header text-center bg-dark text-white">
+		  	{{name}}
+		</div>
+		<div class="card-body">
+			<table class="table table-hover" id="table-{{rand_id}}">
+				<thead>
+					<tr>
+						{% for val in columns %}
+							<th scope="col">{{ val }}</th>
+						{% endfor %}
+					</tr>
+				</thead>
+				<tbody id="resultsTable">
+					{% for row in rows %}
+						{% for val in row %}
+							<td>
+								{{ val|safe }}
+							</td>
+						{% endfor %}
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+	var table = $("#table-{{rand_id}}").DataTable( {
+		"aaSorting": [[1,'desc']],
+		select: true,
+		"scrollX": true,
+		{% if buttons %}
+		dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ]
+		{% endif %}
+	})
+	</script>
+
+{%- endmacro %}
 
 {% macro generic_table(rows,columns,name,buttons=False) -%}
 

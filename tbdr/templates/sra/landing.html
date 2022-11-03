@@ -59,7 +59,7 @@
                 {% for d in dr_data %}
                     {% set tmp = "%s %s" % (d["drtype"],d["count"]) %}
 
-                    <span style="font-size: 150%" class="badge badge-{{- utils.get_dr_style(d['drtype']).strip().lower() }} mt-1 mb-1">
+                    <span style="font-size: 150%; {{- utils.get_dr_style(d['drtype']).strip().lower() }}" class="badge mt-1 mb-1">
                         <span id="odometer_{{-d['drtype'].strip()}}" class="odometer">0</span>
                         {{ d["drtype"] }}
                     </span>
@@ -86,11 +86,9 @@
 
 <div class="row justify-content-md-center">
     <div class="col-md-6">
-        {{ utils.counter_table(data,"lineage")}}
+        {{ utils.generic_tuple_table(lineage_counts,["Lineage","Count"],"lineage")}}
     </div>
-    <div class="col-md-6">
-        {{ utils.top_mutation_table(top_mutations)}}
-    </div>
+
 </div>
 
 
