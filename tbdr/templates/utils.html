@@ -1,6 +1,6 @@
 
 {% macro progress_bar(progress) -%}
-	{% set p = {"Mapping":17,"Bam sorting":33,"Variant calling":50,"Variant annotation":67,"Lineage determination":83} %}
+	{% set p = {"In queue":0,"Mapping":17,"Bam sorting":33,"Variant calling":50,"Variant annotation":67,"Lineage determination":83} %}
 	<div class="text-center">
 		<h4>{{progress}}</h4>
 	</div>
@@ -12,33 +12,37 @@
 
 {% macro drtype_badge(text,drtype) -%}
 	{% if drtype=="Sensitive" %}
-		<span class="badge badge-success">{{text}}</span>
+	<span class="badge" style="background-color: #28a745;">{{text}}</span>
+	{% elif drtype=="RR-TB" %}
+	<span class="badge" style="background-color: #007bff;">{{text}}</span>
+	{% elif drtype=="HR-TB" %}
+	<span class="badge" style="background-color: #E0ACD5;">{{text}}</span>
+	{% elif drtype=="MDR-TB" %}
+	<span class="badge" style="background-color: #ffc107;">{{text}}</span>
+	{% elif drtype=="Pre-XDR-TB" %}
+	<span class="badge" style="background-color: #dc3545;">{{text}}</span>
+	{% elif drtype=="XDR-TB" %}
+	<span class="badge" style="background-color: #343a40; color: #f8f9fa;">{{text}}</span>
 	{% elif drtype=="Other" %}
-		<span class="badge badge-light">{{text}}</span>
-	{% elif drtype=="XDR" %}
-		<span class="badge badge-dark">{{text}}</span>
-	{% elif drtype=="MDR" %}
-		<span class="badge badge-warning">{{text}}</span>
-	{% elif drtype=="Pre-MDR" %}
-		<span class="badge badge-primary">{{text}}</span>
-	{% elif drtype=="Pre-XDR" %}
-		<span class="badge badge-danger">{{text}}</span>
+	<span class="badge" style="background-color: #f8f9fa;">{{text}}</span>
 	{% endif %}
 {%- endmacro %}
 
 {% macro get_dr_style(drtype) -%}
 	{% if drtype=="Sensitive" %}
-success
+background-color: #28a745;
+	{% elif drtype=="RR-TB" %}
+background-color: #007bff;
+	{% elif drtype=="HR-TB" %}
+background-color: #E0ACD5;
+	{% elif drtype=="MDR-TB" %}
+background-color: #ffc107;
+	{% elif drtype=="Pre-XDR-TB" %}
+background-color: #dc3545;
+	{% elif drtype=="XDR-TB" %}
+background-color: #343a40; color: #f8f9fa;
 	{% elif drtype=="Other" %}
-light
-	{% elif drtype=="XDR" %}
-dark
-	{% elif drtype=="MDR" %}
-warning
-	{% elif drtype=="Pre-MDR" %}
-primary
-	{% elif drtype=="Pre-XDR" %}
-danger
+background-color: #f8f9fa;
 	{% endif %}
 
 {%- endmacro %}
@@ -46,7 +50,7 @@ danger
 
 
 {% macro drtype_box(rows) -%}
-	{% set counts = {"Sensitive":0,"Pre-MDR":0,"MDR":0,"Pre-XDR":0,"XDR":0,"Other":0} %}
+	{% set counts = {"Sensitive":0,"RR-TB":0,"HR-TB":0,"MDR-TB":0,"Pre-XDR-TB":0,"XDR-TB":0,"Other":0} %}
 	{% for row in rows %}
 		{% set key = row["drtype"] %}
 		{% if key in counts %}
@@ -63,7 +67,7 @@ danger
 	            </div>
 	            <div class="card-body text-center">
 	                {% for key in counts %}
-	                    <span style="font-size: 150%" class="badge badge-{{- get_dr_style(key).strip().lower() }} mt-1 mb-1">
+	                    <span style="font-size: 150%; {{- get_dr_style(key).strip().lower() }}" class="badge mt-2" >
 	                        {{ counts[key] }} {{ key }}
 						</span>
 	                {% endfor %}
@@ -157,8 +161,52 @@ danger
 
 {%- endmacro %}
 
+{% macro generic_tuple_table(rows,columns,name,buttons=False) -%}
+	{% set rand_id = range(1, 5000) | random %}
+	<div class="card border-dark shadow">
+		<div class="card-header text-center bg-dark text-white">
+		  	{{name}}
+		</div>
+		<div class="card-body">
+			<table class="table table-hover" id="table-{{rand_id}}">
+				<thead>
+					<tr>
+						{% for val in columns %}
+							<th scope="col">{{ val }}</th>
+						{% endfor %}
+					</tr>
+				</thead>
+				<tbody id="resultsTable">
+					{% for row in rows %}
+						{% for val in row %}
+							<td>
+								{{ val|safe }}
+							</td>
+						{% endfor %}
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 
-{% macro generic_table(rows,columns,name) -%}
+	<script type="text/javascript">
+	var table = $("#table-{{rand_id}}").DataTable( {
+		"aaSorting": [[1,'desc']],
+		select: true,
+		"scrollX": true,
+		{% if buttons %}
+		dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ]
+		{% endif %}
+	})
+	</script>
+
+{%- endmacro %}
+
+{% macro generic_table(rows,columns,name,buttons=False) -%}
 
 
 	{% set rand_id = range(1, 5000) | random %}
@@ -180,9 +228,13 @@ danger
 						{% for key in columns %}
 							<td>
 								{% if key=="drtype" %}
-									<span style="font-size: 100%" class="badge badge-{{- get_dr_style(row['drtype']).strip().lower() }}">{{row["drtype"]}}</span>
-
-
+									<span style="font-size: 100%; {{- get_dr_style(row['drtype']).strip().lower() }}" class="badge">{{row["drtype"]}}</span>
+								{% elif key=="status" %}
+									{% if row[key]=="Processing" %}
+										<span class="badge badge-warning">Processing</span>
+									{% else %}
+										<span class="badge badge-success">Success</span>
+									{% endif %}
 								{% else %}
 									{{ row[key]|safe }}
 								{% endif %}
@@ -199,11 +251,55 @@ danger
 	var table = $("#table-{{rand_id}}").DataTable( {
 		select: true,
 		"scrollX": true,
-	// dom: 'Blfrtip',
+		{% if buttons %}
+		dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ]
+		{% endif %}
 	})
 	</script>
 
 {%- endmacro %}
+
+{% macro gauge(val,max,min=0) -%}
+
+	{% set rand_id = range(1, 5000) | random %}
+	<div class="text-center">
+		<canvas id="canvas{{rand_id}}"></canvas>
+	</div>
+
+	<script>
+		opts = {
+		angle: 0, // The span of the gauge arc
+		lineWidth: 0.44, // The line thickness
+		radiusScale: 0.83, // Relative radius
+		pointer: {
+			length: 0.6, // // Relative to gauge radius
+			strokeWidth: 0.035, // The thickness
+			color: '#000000' // Fill color
+		},
+		limitMax: false, // If false, max value increases automatically if value > maxValue
+		limitMin: false, // If true, the min value of the gauge will be fixed
+		colorStart: '#6FADCF', // Colors
+		colorStop: '#8FC0DA', // just experiment with them
+		strokeColor: '#E0E0E0', // to see which ones work best for you
+		generateGradient: true,
+		highDpiSupport: true // High resolution support
+		}
+	
+		target = document.querySelector('#canvas{{rand_id}}') // your canvas element
+		
+		gaugeChart = new Gauge(target).setOptions(opts) // create sexy gauge!
+		gaugeChart.maxValue = {{max}} // set max gauge value
+		gaugeChart.setMinValue({{min}}) // Prefer setter over gauge.minValue = 0
+		gaugeChart.animationSpeed = 32 // set animation speed (32 is default value)
+		gaugeChart.set({{val}}) // set actual value
+	
+	</script>
+	
+{%- endmacro %}
+
 
 {% macro barchart(csv_file,column,id_column,name,highlight_column=None,highlight_value=None) -%}
 

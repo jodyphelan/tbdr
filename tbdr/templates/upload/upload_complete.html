@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% import 'utils.html' as utils %}
+
+{% block header %}
+
+
+{% endblock %}
+
+{% block title %}
+	Upload -
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-md-center">
+    <div class="col-md-10">
+        {{utils.generic_table(runs,{"link":"Run ID","sample_name":"Sample name","R1":"Forward read","R2":"Reverse read"},"Submitted runs",True)}}
+    </div>
+</div>
+
+
+{% endblock %}

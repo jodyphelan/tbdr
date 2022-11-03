@@ -14,22 +14,29 @@
 				</div>
 				<div class="card-body">
 
-					<form method="post">
-						<div class="form-group">
-							<label for="exampleInputEmail1">Email address</label>
-							<input name="username" id="username" type="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email" required>
+					<form method="POST" action="/login">
+						{{ form.csrf_token }}
+				  
+						<fieldset class="name p-1 ">
+							<div>{{ form.email.label }}</div>
+							<div>{{ form.email(placeholder='youremail@example.com') }}</div>
+						</fieldset>
+				  
+						<fieldset class="name p-1 ">
+							<div>{{ form.password.label }}</div>
+							<div>{{ form.password }}</div>
+						</fieldset>
+				  
+						<div class="submit-button p-1 pt-2">
+						  {{ form.submit(class="btn btn-outline-dark") }}
 						</div>
-						<div class="form-group">
-					    <label for="exampleInputPassword1">Password</label>
-					    <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
-					  </div>
-						<div class="clearfix">
-								<button type="submit" class="btn btn-primary float-left">Submit</button>
-								<a class="btn btn-outline-success float-right" href="{{ url_for('auth.register') }}">Register new user</a>
+				  
+						<div class="login-signup">
+						  <span>Don't have an account?</span>
+						  <a href="{{ url_for('auth.signup') }}">Sign up.</a>
 						</div>
-
-
-				  </form>
+				  
+					  </form>
 
 				</div>
 			</div>

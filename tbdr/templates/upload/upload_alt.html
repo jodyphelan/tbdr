@@ -27,6 +27,15 @@
 </div>
 
 
+<div class="alert alert-info">
+	Hi {{current_user.name}}! You are currently signed in and your results will 
+	be commited to the TB-CODE database. You are free to remove these results at any time
+    
+    <div>
+    Session key: {{session_variable}}
+    </div>
+</div>
+
 <div class="row justify-content-md-center">
 	
 	<div class="col-md-6 pb-4">
@@ -53,11 +62,6 @@
                         <div>{{form.platform}}</div>
 					</div>
 					
-					<div class="form-group">
-						<div>{{form.pairing.label}}:</div>
-                        <div>{{form.pairing}}</div>
-					</div>
-
 					<a class="btn btn-outline-primary mt-4 mb-4" data-toggle="collapse" href="#advanced_options_collapse" role="button" aria-expanded="false" aria-controls="advanced_options_collapse">
 						Advanced options
 					</a>
@@ -84,7 +88,7 @@
 					</div>
 					<hr>
 					{{form.upload_id}}
-                    {{form.submit(class="btn btn-outline-dark")}}
+                    {{form.submit}}
 					
 				</form>
 			</div>
@@ -102,9 +106,8 @@
         forceChunking: true,
         url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
         maxFilesize: 1025, // megabytes
-        chunkSize: 100000000, // bytes
-		timeout: 0
-    }	
+        chunkSize: 100000000 // bytes
+    }
 </script>
 
 

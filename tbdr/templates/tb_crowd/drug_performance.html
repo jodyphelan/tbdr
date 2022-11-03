@@ -1,0 +1,80 @@
+{% import 'utils.html' as utils %}
+{% extends 'base.html' %}
+
+{% block header %}
+<script src="{{url_for('static', filename='gauge.min.js')}}"></script>
+
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-md-center pt-4">
+  <div class="col-md-5 text-center">
+    <h1>{{data["drug"]|title}}</h1>
+    <hr>
+  </div>
+</div>
+
+<div class="row justify-content-md-center pt-4">
+    <div class="col-md-5 ">
+        <div class="card border-dark shadow">
+            <div class="card-header text-center bg-dark text-white">
+                Performance
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Sensitivity: {{data["sensitivity"]|round(2)}}</h2>
+                        {{utils.gauge(data["sensitivity"],1)}}
+                    </div>
+                    <div class="col-md-6">
+                        <h2>Specificity: {{data["specificity"]|round(2)}}</h2>
+                        {{utils.gauge(data["specificity"],1)}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-dark shadow">
+            <div class="card-header text-center bg-dark text-white">
+                Timeline
+            </div>
+            <div class="card-body">
+                {{data["figure"]|safe}}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5 ">
+        <div class="card border-dark shadow">
+            <div class="card-header text-center bg-dark text-white">
+                Confusion matrix
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{data["drug"]}}</th>
+                            <th scope="col">Resistant</th>
+                            <th scope="col">Sensitive</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Mutant</th>
+                            <td>{{data["table"][0][0]}}</td>
+                            <td>{{data["table"][0][1]}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Wild-type</th>
+                            <td>{{data["table"][1][0]}}</td>
+                            <td>{{data["table"][1][1]}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>  
+        {{utils.generic_table(data["fp_mutations"],{"gene":"Gene","link":"Change","count":"Count"}, "FP mutations")}}
+            
+        {{utils.generic_table(data["fn_mutations"],{"gene":"Gene","link":"Change","count":"Count"}, "FP mutations")}}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,101 +1,86 @@
-import functools
+from flask import Blueprint, redirect, render_template, flash, request, session, url_for
+from flask_login import login_required, logout_user, current_user, login_user
+from .auth_forms import LoginForm, SignupForm
+from .auth_models import db, User
+from . import login_manager
 
-from flask import (
-	Blueprint, flash, g, redirect, render_template, request, session, url_for
-)
-from werkzeug.security import check_password_hash, generate_password_hash
-
-from tbdr.db import get_db
-
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+bp = Blueprint('auth', __name__)
 
 
-@bp.route('/register', methods=('GET', 'POST'))
-def register():
-	if request.method == 'POST':
-		print(request.form)
-		forename = request.form['forename'].title()
-		surname = request.form['surname'].title()
-		institution = request.form['institution'].lower()
-		country = request.form['country'].title()
-		username = request.form['email_address']
-		password = request.form['password']
-		password_redo = request.form['password_redo']
-		db = get_db()
-		error = None
-
-		if None in [forename,surname,institution,country,username,password,password_redo]:
-			error = 'Please fill in all boxes'
-		elif password!=password_redo:
-			error = 'Passwords do not match'
-		elif db.execute(
-			'SELECT id FROM user WHERE username = ?', (username,)
-		).fetchone() is not None:
-			error = 'User {} is already registered.'.format(username)
-
-		if error is None:
-			db.execute(
-				'INSERT INTO users (username, forename, surname, password, institution, country) VALUES (?, ?, ?, ?, ?, ?)',
-				(username, forename, surname, generate_password_hash(password), institution, country)
-			)
-			db.commit()
-			return redirect(url_for('auth.login'))
-
-		flash(error)
-
-	return render_template('auth/register.html')
+@login_manager.user_loader
+def load_user(user_id):
+    """Check if user is logged-in on every page load."""
+    if user_id is not None:
+        return User.query.get(user_id)
+    return None
 
 
-@bp.route('/login', methods=('GET', 'POST'))
+@login_manager.unauthorized_handler
+def unauthorized():
+    """Redirect unauthorized users to Login page."""
+    flash('You must be logged in to view that page.')
+    return redirect(url_for('auth.login'))
+
+
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
-	if request.method == 'POST':
-		username = request.form['username']
-		password = request.form['password']
-		print("Trying to log in: %s" % username)
-		db = get_db()
-		error = None
-		user = db.execute(
-			'SELECT * FROM users WHERE username = ?', (username,)
-		).fetchone()
+    """
+    Log-in page for registered users.
 
-		if user is None:
-			error = 'Incorrect username.'
-		elif not check_password_hash(user['password'], password):
-			error = 'Incorrect password. |%s| |%s|' % (user['password'],password)
+    GET requests serve Log-in page.
+    POST requests validate and redirect user to dashboard.
+    """
+    # Bypass if user is logged in
+    if current_user.is_authenticated:
+        return redirect(url_for('user.home'))
 
-		if error is None:
-			session.clear()
-			session['user_id'] = user['id']
-			print(user['id'])
-			return redirect(url_for('home.index'))
+    form = LoginForm()
+    # Validate login attempt
+    if form.validate_on_submit():
+        print(form.email.data)
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(password=form.password.data):
+            login_user(user)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home.index'))
+        flash('Invalid username/password combination')
+        return redirect(url_for('auth.login'))
+    return render_template(
+        'auth/login.html',
+        form=form
+    )
 
-		flash(error)
 
-	return render_template('auth/login.html')
+@bp.route('/signup', methods=['GET', 'POST'])
+def signup():
+    """
+    User sign-up page.
 
-@bp.before_app_request
-def load_logged_in_user():
-	user_id = session.get('user_id')
+    GET requests serve sign-up page.
+    POST requests validate form & user creation.
+    """
+    form = SignupForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user is None:
+            user = User(
+                name=form.name.data,
+                email=form.email.data,
+            )
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()  # Create new user
+            login_user(user)  # Log in as newly created user
+            print(vars(current_user))
+            flash("Success")
+            return redirect(url_for('home.index'))
+        flash('A user already exists with that email address.')
+    return render_template('auth/register.html',form=form)
 
-	if user_id is None:
-		g.user = None
-	else:
-		g.user = get_db().execute(
-			'SELECT * FROM users WHERE id = ?', (user_id,)
-		).fetchone()
-
-@bp.route('/logout')
+@bp.route("/logout")
+@login_required
 def logout():
-	session.clear()
-	return redirect(url_for('home.index'))
-
-
-def login_required(view):
-	@functools.wraps(view)
-	def wrapped_view(**kwargs):
-		if g.user is None:
-			return redirect(url_for('auth.login'))
-
-		return view(**kwargs)
-
-	return wrapped_view
+    """User log-out logic."""
+    logout_user()
+    flash("Logged out")
+    return redirect(url_for('auth.login'))

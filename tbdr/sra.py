@@ -4,7 +4,6 @@ from flask import (
 from werkzeug.exceptions import abort
 import json
 # from tbdr.auth import login_required
-from tbdr.db import  get_neo4j_db
 import tbprofiler as tbp
 from flask import current_app as app
 from collections import Counter
@@ -12,6 +11,8 @@ bp = Blueprint('sra', __name__)
 import sys
 import csv
 from datetime import datetime
+from .models import Sample, Result, Variant, SampleVariant
+from .db import db_session
 
 def get_geojson(country_counts):
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
@@ -28,31 +29,34 @@ def get_geojson(country_counts):
 
 @bp.route('/sra',methods=('GET', 'POST'))
 def sra():
-	neo4j_db = get_neo4j_db()
-	data = neo4j_db.read("MATCH (n:SRA) WHERE NOT n.drtype IS null return n.drtype as drtype, n.lineage as lineage, n.countryCode as country")
-	dr_order = {"Sensitive":1,"Pre-MDR":2,"MDR":3,"Pre-XDR":4,"XDR":5,"Other":6,"Drug-resistant":7}
-	dr_data = sorted([{"drtype":d[0],"count":d[1]} for d in dict(Counter([d["drtype"] for d in data])).items()] ,key=lambda x:dr_order[x["drtype"]])
-	country_data = neo4j_db.read("MATCH (s:SRA) return s.countryCode as country, count(*) as count")
-	country2total_count = {country.upper():count for country,count in [list(d.values()) for d in country_data] if country!=None}
+
+	country_counts = dict(db_session.execute("SELECT country, COUNT(*) FROM samples WHERE public = true GROUP BY country").fetchall())
+	dr_counts = db_session.execute("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype").fetchall()
+	lineage_counts = db_session.execute("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage").fetchall()
+	print(dr_counts)
+	dr_order = {"Sensitive":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
+	dr_data = sorted(dr_counts ,key=lambda x:dr_order[x["drtype"]])
+	
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	geojson = {"type":"FeatureCollection", "features":[]}
-
+	print(country_counts)
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a2"]
-		if country in country2total_count:
-			f["properties"]["num_isolates"] = country2total_count[country]
+		country = f["properties"]["iso_a2"].lower()
+		print(country)
+		if country in country_counts:
+			f["properties"]["num_isolates"] = country_counts[country]
 			geojson["features"].append(f)
-
-	top_mutations = neo4j_db.read(
-		"MATCH (s:SRA)-[:CONTAINS]->(v:Variant) -[:CONFERS_RESISTANCE]-> ()",
-		"RETURN v.gene as Gene, v.locus_tag as `Locus tag`, v.type as Type, v.change as Variant, count(s) as Count",
-		"ORDER BY Count DESC LIMIT 10"
-	)
-
-
+	print(lineage_counts)
+	# top_mutations = neo4j_db.read(
+	# 	"MATCH (s:SRA)-[:CONTAINS]->(v:Variant) -[:CONFERS_RESISTANCE]-> ()",
+	# 	"RETURN v.gene as Gene, v.locus_tag as `Locus tag`, v.type as Type, v.change as Variant, count(s) as Count",
+	# 	"ORDER BY Count DESC LIMIT 10"
+	# )
 
 
-	return render_template('sra/landing.html', dr_data=dr_data, geojson=geojson, top_mutations = top_mutations, data=data)
+
+
+	return render_template('sra/landing.html', dr_data=dr_data, geojson=geojson, top_mutations = None, lineage_counts=lineage_counts)
 
 @bp.route('/sra/country')
 def country():
@@ -60,14 +64,10 @@ def country():
 
 @bp.route('/sra/country/<country>')
 def country_data(country):
-	neo4j_db = get_neo4j_db()
 	data = query_samples([("country",[country])])
 	country_code = data[0]["country_code"]
-	top_mutations = neo4j_db.read(
-		"MATCH (c:Country {id: '%s'}) <-[:COLLECTED_IN]- (s:SRA)-[:CONTAINS]->(v:Variant) -[:CONFERS_RESISTANCE]-> ()" % country_code.lower(),
-		"RETURN v.gene as Gene, v.locus_tag as `Locus tag`, v.type as Type, v.change as Variant, count(s) as Count",
-		"ORDER BY Count DESC LIMIT 10"
-	)
+	top_mutations = db_session.execute("SELECT gene, change, count, drugs FROM (SELECT variant_id, count(*) as count FROM sample_variants WHERE sample_id IN (SELECT id FROM samples WHERE country = '%s') AND variant_id IN (SELECT id FROM variants WHERE drugs IS NOT NULL) GROUP BY sample_variants.variant_id ORDER BY count DESC LIMIT 10) t LEFT JOIN variants ON t.variant_id = variants.id;" % country_code).fetchall()
+	top_mutations = [dict(x) for x in top_mutations]
 	geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	country_data = {}
 	for row in csv.DictReader(open(app.config["APP_ROOT"]+url_for('static', filename='TB_burden_countries_2020-10-08.csv'))):
@@ -77,19 +77,19 @@ def country_data(country):
 	return render_template('sra/country.html', data=data,top_mutations=top_mutations,geojson = geojson,country=country, country_code = country_code, country_data = country_data, country_file = url_for('static', filename='TB_burden_countries_2020-10-08.csv'))
 
 def query_samples(raw_queries,sample_links = True):
-	neo4j_db = get_neo4j_db()
 	queries = []
 	tmp = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	admin_to_iso_a2 = {y["properties"]["admin"]:y["properties"]["iso_a2"] for y in tmp["features"]}
 
 	for t in raw_queries:
 		if t[0]=="country":
-			queries.append("(%s)" %" OR ".join(["n.countryCode='%s'" % (admin_to_iso_a2[x].lower()) for x in t[1]]))
+			queries.append("(%s)" %" OR ".join(["country='%s'" % (admin_to_iso_a2[x].lower()) for x in t[1]]))
 		else:
 			if len([x for x in t[1] if x!=""])>0:
-				queries.append("(%s)" %" OR ".join(["n.%s='%s'" % (t[0],x) for x in t[1]]))
+				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
 	query = " AND ".join(queries)
-	data = neo4j_db.read("MATCH (n:SRA ) WHERE %s RETURN n.id as id,n.country as country, n.countryCode as country_code, n.drtype as drtype,n.lineage as lineage,n.spoligotype as spoligotype" % query)
+	data = db_session.execute("SELECT id, country as country_code, drtype, lineage FROM SAMPLES WHERE %s" % query).fetchall()
+	data = [dict(x) for x in data]
 	if sample_links:
 		for d in data:
 			d["sample_link"] = '<a href="%s">%s</a>' % (url_for('results.run_result',sample_id=d["id"]),d["id"])
@@ -97,7 +97,6 @@ def query_samples(raw_queries,sample_links = True):
 
 @bp.route('/sra/browse',methods=('GET', 'POST'))
 def browse():
-	neo4j_db = get_neo4j_db()
 	tmp = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	country_list = sorted([y["properties"]["admin"] for y in tmp["features"]])
 	lineages = sorted(list(set([l.strip().split()[3] for l in open(sys.base_prefix+"/share/tbprofiler/tbdb.barcode.bed")])))
@@ -109,10 +108,10 @@ def browse():
 			csv_text = "\n".join(csv_strings)
 			return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
 		else:
-			data = query_samples(request.form.lists())
-			geojson = get_geojson(Counter([x["country_code"].upper() for x in data]))
-			# flash(geojson)
 			print(list(request.form.lists()))
+			data = query_samples(request.form.lists())
+			geojson = get_geojson(Counter([x["country_code"].upper() for x in data if x["country_code"]]))
+			print(data)
 			return render_template('sra/browse.html', data = data , geojson=geojson, countries = country_list,lineages=lineages, query=json.dumps(list(request.form.lists())))
 
 	return render_template('sra/browse.html', data = None, countries=country_list,lineages=lineages)
