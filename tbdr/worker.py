@@ -36,10 +36,13 @@ celery = make_celery(flask_app)
 
 @celery.task
 def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
-
+    platform = platform.lower()
+    pp.debug("Starting run for %s" % uniq_id)
     with open("%s/%s.log" % (result_file_dir,uniq_id), "a",buffering=1) as LOG:
         if fq1 and fq2:
-            sp.call(f"tb-profiler profile --threads 2 -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True)
+            sp.call(f"tb-profiler profile --platform {platform} --threads 2 --txt --csv --pdf --spoligotype -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+        else:
+            sp.call(f"tb-profiler profile --platform {platform} --threads 2 --txt --csv --pdf --spoligotype -1 {fq1} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
     data = json.load(open("%s/results/%s.results.json" % (result_file_dir,uniq_id)))
     conf = pp.get_db('tbprofiler','tbdb')
     data = pp.get_summary(data,conf)

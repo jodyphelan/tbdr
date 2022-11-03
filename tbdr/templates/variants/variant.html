@@ -50,17 +50,7 @@
 
 <div class="row justify-content-md-center">
     <div class="col-md-8">
-        <div class="card border-dark">
-            <div class="card-header text-center">
-              <strong>Drug resistance types</strong>
-            </div>
-            <div class="card-body text-center">
-                {% for drtype in dr_counts %}
-                    {% set tmp = "%s %s" % (dr_counts[drtype],drtype) %}
-                    <span style="font-size: 200%">{{utils.drtype_badge(tmp,drtype)}}</span>
-                {% endfor %}
-            </div>
-        </div>
+        {{ utils.drtype_box(sample_data) }}
     </div>
 </div>
 
@@ -147,7 +137,7 @@
             </div>
 
         {% else %}
-            {{ utils.generic_table(sample_data,{"sample_link":"ID","drtype":"Drug resistance","lineage":"Lineage","country_code":"Country iso2"},"Samples")}}
+            {{ utils.generic_table(sample_data,{"sample_link":"ID","drtype":"Drug resistance","lineage":"Lineage","country":"Country iso2"},"Samples")}}
 
         {% endif %}
     <div>

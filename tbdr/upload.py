@@ -12,7 +12,7 @@ import re
 bp = Blueprint('upload', __name__)
 from flask_login import current_user
 import json
-from .models import Result, Sample
+from .models import Result, Sample, Submission
 from .db import db_session
 
 def run_sample(uniq_id,sample_name,platform,f1,f2=None):
@@ -26,6 +26,7 @@ def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     db_session.commit()
     db_session.add(Result(sample_id=uniq_id))
     db_session.commit()
+    print(f1,f2)
     tbprofiler.delay(fq1=f1,fq2=f2,uniq_id=uniq_id,upload_dir=app.config["UPLOAD_FOLDER"],platform=platform,result_file_dir=app.config["APP_ROOT"]+url_for('static', filename='results'))
 
 
@@ -57,17 +58,12 @@ def sort_out_paried_files(upload_id,r1_suffix,r2_suffix):
 
 def sort_out_single_files(upload_id,r1_suffix):
     files = os.listdir(os.path.join(app.config["UPLOAD_FOLDER"],upload_id))
-    prefixes = set()
-    for f in files:
-        tmp1 = re.search("(.+)%s" % r1_suffix,f)
-        if tmp1==None:
-            return "%s does not contain '_1.fastq.gz' as the file ending. Please revise your the file suffix in advanced options" % f
-        prefixes.add(tmp1.group(1))
     runs = []
-    for p in prefixes:
+    for f in files:
+        print(f)
         uniq_id = str(uuid.uuid4())
-        r1 = p + r1_suffix
-        sample_name = p if current_user.is_authenticated else uniq_id
+        r1 = f 
+        sample_name = uniq_id
         runs.append({"ID":uniq_id,"sample_name":sample_name,"R1":r1,"R2":None})
     return runs
 
@@ -90,23 +86,27 @@ def submit_runs(upload_id):
     upload_id = str(upload_id)
     upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],upload_id)
     fd = json.loads(session[upload_id+"_form"])
-    if fd['pairing']=="Paired":
-        runs = sort_out_paried_files(upload_id, fd["R1_suffix"] ,fd["R2_suffix"])
-    else:
-        runs = sort_out_single_files(upload_id, fd["R1_suffix"])
-    if isinstance(runs, str):
-        flash(runs)
-        return redirect(url_for('upload.upload'))
-    print(runs)
+    
     if session[upload_id]!="Submitted":
+        if fd['pairing']=="Paired":
+            runs = sort_out_paried_files(upload_id, fd["R1_suffix"] ,fd["R2_suffix"])
+        else:
+            runs = sort_out_single_files(upload_id, fd["R1_suffix"])
+        if isinstance(runs, str):
+            return redirect(url_for('upload.upload'))
+
         for run in runs:
             r1 = "%s/%s" % (upload_dir,run["R1"])
             r2 = "%s/%s" % (upload_dir,run["R2"]) if run["R2"] else None
+            print(r1,r2)
             run_sample(run["ID"],run["sample_name"],fd["platform"],r1,r2)
-            
+        entry = Submission(id=upload_id,runs=runs)
+        db_session.add(entry)
+        db_session.commit()
         session[upload_id] = "Submitted"
     else:
         print("Run already submitted")
+    runs = db_session.query(Submission).filter(Submission.id==upload_id).first().runs
     for run in runs:
         run["link"] = '<a href="'+url_for('results.run_result',sample_id=run["ID"])+'">'+run["ID"]+'</a>'
     return render_template('upload/upload_complete.html',runs=runs)

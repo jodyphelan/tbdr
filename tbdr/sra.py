@@ -32,7 +32,7 @@ def sra():
 
 	country_counts = dict(db_session.execute("SELECT country, COUNT(*) FROM samples WHERE public = true GROUP BY country").fetchall())
 	dr_counts = db_session.execute("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype").fetchall()
-	lineage_counts = db_session.execute("SELECT sublin, COUNT(*) FROM samples WHERE public = true GROUP BY sublin").fetchall()
+	lineage_counts = db_session.execute("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage").fetchall()
 	print(dr_counts)
 	dr_order = {"Sensitive":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
 	dr_data = sorted(dr_counts ,key=lambda x:dr_order[x["drtype"]])
@@ -66,11 +66,8 @@ def country():
 def country_data(country):
 	data = query_samples([("country",[country])])
 	country_code = data[0]["country_code"]
-	top_mutations = neo4j_db.read(
-		"MATCH (c:Country {id: '%s'}) <-[:COLLECTED_IN]- (s:SRA)-[:CONTAINS]->(v:Variant) -[:CONFERS_RESISTANCE]-> ()" % country_code.lower(),
-		"RETURN v.gene as Gene, v.locus_tag as `Locus tag`, v.type as Type, v.change as Variant, count(s) as Count",
-		"ORDER BY Count DESC LIMIT 10"
-	)
+	top_mutations = db_session.execute("SELECT gene, change, count, drugs FROM (SELECT variant_id, count(*) as count FROM sample_variants WHERE sample_id IN (SELECT id FROM samples WHERE country = '%s') AND variant_id IN (SELECT id FROM variants WHERE drugs IS NOT NULL) GROUP BY sample_variants.variant_id ORDER BY count DESC LIMIT 10) t LEFT JOIN variants ON t.variant_id = variants.id;" % country_code).fetchall()
+	top_mutations = [dict(x) for x in top_mutations]
 	geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	country_data = {}
 	for row in csv.DictReader(open(app.config["APP_ROOT"]+url_for('static', filename='TB_burden_countries_2020-10-08.csv'))):
@@ -92,9 +89,9 @@ def query_samples(raw_queries,sample_links = True):
 				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
 	query = " AND ".join(queries)
 	data = db_session.execute("SELECT id, country as country_code, drtype, lineage FROM SAMPLES WHERE %s" % query).fetchall()
+	data = [dict(x) for x in data]
 	if sample_links:
 		for d in data:
-			d = dict(d)
 			d["sample_link"] = '<a href="%s">%s</a>' % (url_for('results.run_result',sample_id=d["id"]),d["id"])
 	return data
 

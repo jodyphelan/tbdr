@@ -67,7 +67,7 @@ background-color: #f8f9fa;
 	            </div>
 	            <div class="card-body text-center">
 	                {% for key in counts %}
-	                    <span style="{{- get_dr_style(key).strip().lower() }}" class="badge" >
+	                    <span style="font-size: 150%; {{- get_dr_style(key).strip().lower() }}" class="badge mt-2" >
 	                        {{ counts[key] }} {{ key }}
 						</span>
 	                {% endfor %}
@@ -228,7 +228,7 @@ background-color: #f8f9fa;
 						{% for key in columns %}
 							<td>
 								{% if key=="drtype" %}
-									<span style="font-size: 100%" class="badge badge-{{- get_dr_style(row['drtype']).strip().lower() }}">{{row["drtype"]}}</span>
+									<span style="font-size: 100%; {{- get_dr_style(row['drtype']).strip().lower() }}" class="badge">{{row["drtype"]}}</span>
 								{% elif key=="status" %}
 									{% if row[key]=="Processing" %}
 										<span class="badge badge-warning">Processing</span>

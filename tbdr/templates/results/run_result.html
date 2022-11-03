@@ -66,6 +66,9 @@
                     <p><b>Number of reads:</b> {{ result["qc"]["num_reads_mapped"]}}</p>
                     <p><b>Percentage reads mapped:</b> {{ result["qc"]["pct_reads_mapped"]}}</p>
     				<p class="card-text"><b>Strain:</b> {{ result["sublin"] }}</p>
+					{% if "spoligotype" in result %}
+						<p class="card-text"><b>Spoligotype:</b> {{ result["spoligotype"]["octal"] }}</p>
+					{% endif %}
     				<p class="card-text"><b>Drug-resistance:</b> {{ utils.drtype_badge(result["drtype"],result["drtype"]) }}</p>
 
     				<hr>
@@ -129,13 +132,13 @@
     						</tr>
     					</thead>
     					<tbody>
-    					{% for drug_row in result["lineage"] %}
+    					{% for row in result["lineage"] %}
     						<tr>
-    							<td>{{ drug_row["lin"] }}</td>
-    							<td>{{ drug_row["family"] }}</td>
-    							<td>{{ drug_row["spoligotype"] }}</td>
-    							<td>{{ drug_row["rd"] }}</td>
-                                <td>{{ drug_row["frac"]|round(2)|float }}</td>
+    							<td>{{ row["lin"] }}</td>
+    							<td>{{ row["family"] }}</td>
+    							<td>{{ row["spoligotype"] }}</td>
+    							<td>{{ row["rd"] }}</td>
+                                <td>{{ row["frac"]|round(2)|float }}</td>
     						</tr>
     					{% endfor %}
     					</tbody>
@@ -313,7 +316,14 @@
             <div class="col-md-5">
                 {{utils.generic_table(result["qc"]["gene_coverage"],{"gene":"Gene","locus_tag":"Locus Tag","fraction":"Fraction","cutoff":"Cutoff"},"Gene coverage")}}
             </div>
-            <div class="col-md-5">
+			{% if "spoligotype" in result %}
+				<div class="col-md-5">
+					{{utils.generic_table(result["spoligotype"]["spacers"],{"name":"Name","seq":"Sequence","count":"Count"},"Spacer count")}}
+				</div>
+			{% endif %}
+        </div>
+		<div class="row justify-content-center">
+			<div class="col-md-5">
                 <div class="card border-dark mb-3 shadow">
         			<div class="card-header bg-dark text-white text-center">Software</div>
         			<div class="card-body text-dark">
@@ -327,7 +337,7 @@
         			</div>
         		</div>
             </div>
-        </div>
+		</div>
     {% endif %}
 {% endif %}
 {% endblock %}

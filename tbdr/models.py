@@ -2,6 +2,18 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.dialects.postgresql import JSONB
 from tbdr.db import Base
 
+class Submission(Base):
+    __tablename__ = 'submissions'
+    id = Column(String, primary_key=True)
+    runs = Column(JSONB)
+
+    def __init__(self, id, runs):
+        self.id = id
+        self.runs = runs
+
+    def __repr__(self):
+        return f'<Result {self.id!r}>'    
+
 class Result(Base):
     __tablename__ = 'results'
     id = Column(Integer, primary_key=True)
