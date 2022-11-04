@@ -101,7 +101,7 @@
         chunking: true,
         forceChunking: true,
         url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
-        maxFilesize: 1025, // megabytes
+        maxFilesize: 4025, // megabytes
         chunkSize: 100000000, // bytes
 		timeout: 0
     }	
