@@ -103,7 +103,15 @@
         url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
         maxFilesize: 4025, // megabytes
         chunkSize: 100000000, // bytes
-		timeout: 0
+		timeout: 0,
+		init: function() {
+			this.on("processing", file => {
+				document.getElementById('submit').classList.add("disabled");
+			});
+			this.on("success", file => {
+				document.getElementById('submit').classList.remove("disabled");
+			});
+		},
     }	
 </script>
 
