@@ -95,6 +95,7 @@ def submit_runs(upload_id):
         else:
             runs = sort_out_single_files(upload_id, fd["R1_suffix"])
         if isinstance(runs, str):
+            flash(runs)
             return redirect(url_for('upload.upload'))
 
         for run in runs:
