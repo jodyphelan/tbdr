@@ -50,7 +50,12 @@
 
 		<div class="container-fluid">
 			{% for message in get_flashed_messages() %}
-    		    <div class="alert alert-danger mt-2" role="alert">{{ message }}</div>
+    		    <div class="alert alert-danger mt-2" role="alert">
+					<h3>Error:</h3>
+					<div>
+						{{ message }}
+					</div>
+				</div>
     		{% endfor %}
     		{% block content %}{% endblock %}
 		</div>
