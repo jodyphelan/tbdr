@@ -47,20 +47,26 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     conf = pp.get_db('tbprofiler','tbdb')
     data = pp.get_summary(data,conf)
 
+    pp.debug("Finished run for %s" % uniq_id)
+    pp.debug("Starting DB entry for %s" % uniq_id)
     db_entry = Result.query.filter(Result.sample_id == uniq_id).first()
     db_entry.data = data
     db_entry.status = "Completed"
     db_session.commit()
-
+    pp.debug("Extracting bam file for %s" % uniq_id)
     bam_file = "%s/bam/%s.bam" % (result_file_dir,uniq_id)
     pp.run_cmd("samtools view -b -L %s %s > %s/%s.targets.bam" % (conf["bed"], bam_file, result_file_dir, uniq_id))
+    pp.debug("Indexing bam file for %s" % uniq_id)
     pp.run_cmd("samtools index  %s/%s.targets.bam" % (result_file_dir, uniq_id))
+    pp.debug("Extracting vcf file for %s" % uniq_id)
     pp.run_cmd("bcftools view %s/vcf/%s.targets.csq.vcf.gz > %s/%s.targets.vcf" % (result_file_dir,uniq_id,result_file_dir,uniq_id))
     
     for f in glob("%s/results/%s*" % (result_file_dir,uniq_id)):
+        pp.debug("Copying %s file for %s" % (f,uniq_id))
         shutil.copyfile(f,"%s/%s" % (result_file_dir,f.split("/")[-1]))
 
     for d in ['bam','vcf','results']:
         for f in glob("%s/%s/%s*" % (result_file_dir,d,uniq_id)):
+            pp.debug("Removing %s file for %s" % (f,uniq_id))
             os.remove(f)
     return True
