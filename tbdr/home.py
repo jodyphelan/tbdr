@@ -1,3 +1,4 @@
+import os
 from flask import (
 	Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -26,3 +27,11 @@ def robots():
 @login_required
 def test():
 	return "hello" + current_user.name
+
+
+from flask import send_from_directory
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
