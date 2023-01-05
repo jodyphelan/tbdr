@@ -69,4 +69,8 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
         for f in glob("%s/%s/%s*" % (result_file_dir,d,uniq_id)):
             pp.debug("Removing %s file for %s" % (f,uniq_id))
             os.remove(f)
+    
+    os.remove(fq1)
+    if fq2:
+        os.remove(fq2)
     return True
