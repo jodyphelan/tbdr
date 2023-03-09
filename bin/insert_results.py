@@ -32,7 +32,7 @@ def main(args):
             json_data = copy(data)
             data['lineage'] = data['sublin']
             sample_id = data['id']
-            result = conn.execute(insert(samples_table),data)
+            result = conn.execute(insert(samples_table),data))
             # result = conn.execute(stmt)
             stmt = insert(results_table).values(data=json_data,sample_id=sample_id)
             result = conn.execute(stmt)
@@ -49,6 +49,7 @@ def main(args):
             result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
             rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
             result = conn.execute(insert(sample_variants_table),rows)
+            conn.commit()
 
     meta = {}
     for row in csv.DictReader(open(args.metadata_csv)):
