@@ -15,7 +15,7 @@ from copy import copy
 
 def main(args):
     from sqlalchemy import create_engine
-    engine = create_engine(f"postgresql+psycopg2://{args.db_user}:{args.db_pass}@localhost/tbdr", echo=False)
+    engine = create_engine(f"postgresql+psycopg2://{args.db_user}:{args.db_pass}@localhost", echo=False)
     from sqlalchemy.dialects.postgresql import insert
     from sqlalchemy import select
     from sqlalchemy import MetaData
