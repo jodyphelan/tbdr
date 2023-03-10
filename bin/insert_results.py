@@ -28,11 +28,18 @@ def main(args):
 
     def add_sample(data):
         with engine.connect() as conn:
-            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None: return
+            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None: 
+                # remove existing results
+                print("Removing existing results")
+                conn.execute(results_table.delete().where(results_table.c.sample_id == data["id"]))
+                conn.execute(sample_variants_table.delete().where(sample_variants_table.c.sample_id == data["id"]))
+                conn.execute(samples_table.delete().where(samples_table.c.id == data["id"]))
+                # conn.execute(variant_table.delete().where(variant_table.c.sample_id == data["id"]))
+
             json_data = copy(data)
             data['lineage'] = data['sublin']
             sample_id = data['id']
-            result = conn.execute(insert(samples_table),data))
+            result = conn.execute(insert(samples_table),data)
             # result = conn.execute(stmt)
             stmt = insert(results_table).values(data=json_data,sample_id=sample_id)
             result = conn.execute(stmt)
