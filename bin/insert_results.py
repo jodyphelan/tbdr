@@ -28,21 +28,24 @@ def main(args):
 
     def add_sample(data):
         with engine.connect() as conn:
-            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None: 
+            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None:
                 # remove existing results
                 print("Removing existing results")
                 conn.execute(results_table.delete().where(results_table.c.sample_id == data["id"]))
                 conn.execute(sample_variants_table.delete().where(sample_variants_table.c.sample_id == data["id"]))
                 conn.execute(samples_table.delete().where(samples_table.c.id == data["id"]))
                 # conn.execute(variant_table.delete().where(variant_table.c.sample_id == data["id"]))
+                conn.commit()
+
 
             json_data = copy(data)
             data['lineage'] = data['sublin']
             sample_id = data['id']
             result = conn.execute(insert(samples_table),data)
-            # result = conn.execute(stmt)
+            conn.commit()
             stmt = insert(results_table).values(data=json_data,sample_id=sample_id)
             result = conn.execute(stmt)
+            conn.commit()
             rows = [
                 {
                     'id': "%(locus_tag)s_%(change)s" % var,
@@ -54,6 +57,7 @@ def main(args):
                 } for var in data['dr_variants']+data['other_variants']]
             if rows==[]: return
             result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
+            conn.commit()
             rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
             result = conn.execute(insert(sample_variants_table),rows)
             conn.commit()
@@ -63,7 +67,7 @@ def main(args):
         row['id'] = row['wgs_id']
         row['country'] = row['country_code']
         row['date'] = row['date_of_collection']
-        if row['country']=="N/A": del row['country'] 
+        if row['country']=="N/A": del row['country']
         meta[row['wgs_id']] = row
 
 
@@ -72,7 +76,7 @@ def main(args):
     if m:
         data.update(m)
     data['public'] = True
-    
+
     add_sample(data)
 
 # Set up the parser
