@@ -15,7 +15,7 @@ from copy import copy
 
 def main(args):
     from sqlalchemy import create_engine
-    engine = create_engine(f"postgresql+psycopg2://{args.db_user}:{args.db_pass}@localhost", echo=False)
+    engine = create_engine(f"postgresql+psycopg2://{args.db_user}:{args.db_pass}@localhost/tbdr", echo=False)
     from sqlalchemy.dialects.postgresql import insert
     from sqlalchemy import select
     from sqlalchemy import MetaData
@@ -35,17 +35,17 @@ def main(args):
                 conn.execute(sample_variants_table.delete().where(sample_variants_table.c.sample_id == data["id"]))
                 conn.execute(samples_table.delete().where(samples_table.c.id == data["id"]))
                 # conn.execute(variant_table.delete().where(variant_table.c.sample_id == data["id"]))
-                conn.commit()
+                # conn.commit()
 
 
             json_data = copy(data)
             data['lineage'] = data['sublin']
             sample_id = data['id']
             result = conn.execute(insert(samples_table),data)
-            conn.commit()
+            # conn.commit()
             stmt = insert(results_table).values(data=json_data,sample_id=sample_id)
             result = conn.execute(stmt)
-            conn.commit()
+            # conn.commit()
             rows = [
                 {
                     'id': "%(locus_tag)s_%(change)s" % var,
@@ -57,10 +57,10 @@ def main(args):
                 } for var in data['dr_variants']+data['other_variants']]
             if rows==[]: return
             result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
-            conn.commit()
+            # conn.commit()
             rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
             result = conn.execute(insert(sample_variants_table),rows)
-            conn.commit()
+            # conn.commit()
 
     meta = {}
     for row in csv.DictReader(open(args.metadata_csv)):
