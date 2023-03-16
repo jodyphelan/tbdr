@@ -3,7 +3,9 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<script src="https://cdn.jsdelivr.net/npm/igv@2.7.4/dist/igv.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/igv@2.7.4/dist/igv.min.js"></script> -->
+<script src="{{ url_for('static', filename='igv.min.js') }}"></script>
+
 <style media="screen">
     .log_div {
         display:block;
@@ -65,6 +67,7 @@
                     <p class="card-text"><b>Date:</b> {{ result["timestamp"] }}</p>
                     <p><b>Number of reads:</b> {{ result["qc"]["num_reads_mapped"]}}</p>
                     <p><b>Percentage reads mapped:</b> {{ result["qc"]["pct_reads_mapped"]}}</p>
+                    <p><b>Median coverage:</b> {{ result["qc"]["median_coverage"]}}</p>
     				<p class="card-text"><b>Strain:</b> {{ result["sublin"] }}</p>
 					{% if "spoligotype" in result %}
 						<p class="card-text"><b>Spoligotype:</b> {{ result["spoligotype"]["octal"] }}</p>
