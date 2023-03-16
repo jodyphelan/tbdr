@@ -8,6 +8,7 @@ import os
 from flask import Flask
 from .models import Result
 from .db import db_session
+from time import sleep
 
 def make_celery(app):
     celery = Celery(
