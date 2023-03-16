@@ -87,8 +87,9 @@ def query_samples(raw_queries,sample_links = True):
 		else:
 			if len([x for x in t[1] if x!=""])>0:
 				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
-	query = " AND ".join(queries)
-	data = db_session.execute("SELECT id, country as country_code, drtype, lineage FROM SAMPLES WHERE %s" % query).fetchall()
+	query = "WHERE "+" AND ".join(queries) if len(queries)>0 else ""
+
+	data = db_session.execute("SELECT id, country as country_code, drtype, lineage FROM SAMPLES %s" % query).fetchall()
 	data = [dict(x) for x in data]
 	if sample_links:
 		for d in data:
