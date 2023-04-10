@@ -18,7 +18,7 @@ def create_app(test_config=None):
 		UPLOAD_FOLDER="/tmp",
 		APP_ROOT=os.path.dirname(os.path.abspath(__file__)),
 		
-		
+		SNP_DIFF_DB="/Users/jody/temp/tb/results/snp_diffs.db",
 		SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://@localhost/tbdr",
     	SQLALCHEMY_ECHO = False,
     	SQLALCHEMY_TRACK_MODIFICATIONS = False,

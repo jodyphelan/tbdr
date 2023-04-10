@@ -9,6 +9,40 @@
 	</div>
 {% endmacro %}
 
+{% macro transmission_graph(data) %}
+<script src="https://unpkg.com/cytoscape@3.23.0/dist/cytoscape.min.js"></script>
+
+<div class="card border-dark shadow">
+	<div class="card-header bg-dark text-white text-center">
+		This is a transmission graph of the sample
+	</div>
+		<div class="card-body">
+			<div id="cy" style="width: 100%; height: 300px; display: block;"></div>
+		</div>
+	</div>
+</div>
+
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://cdn.jsdelivr.net/gh/cytoscape/cytoscape.js-popper/cytoscape-popper.js"></script>
+<script src="{{ url_for('static', filename='tgv.js') }}"></script>
+
+
+<script>
+
+graph = {{ data|safe }};
+console.log(graph)
+tgv.tgv({
+	div: 'cy',
+	graph: graph,
+	add_controls: true
+})
+
+</script>
+
+
+
+{% endmacro %}
+
 
 {% macro drtype_badge(text,drtype) -%}
 	{% if drtype=="Sensitive" %}

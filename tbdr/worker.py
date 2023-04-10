@@ -9,6 +9,8 @@ from flask import Flask
 from .models import Result
 from .db import db_session
 from time import sleep
+from uuid import uuid4
+import sys
 
 def make_celery(app):
     celery = Celery(
@@ -32,6 +34,7 @@ flask_app = Flask(__name__)
 flask_app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
     CELERY_RESULT_BACKEND='redis://localhost:6379',
+    SNP_DIFF_DB="/Users/jody/temp/tb/results/snp_diffs.db",
 )
 celery = make_celery(flask_app)
 
@@ -71,13 +74,34 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     return True
 
 def run_tb_profiler_command(fq1,fq2,uniq_id,platform,result_file_dir):
+    pp.debug(flask_app.config)
+    snp_diff_db = flask_app.config.get('SNP_DIFF_DB',None)
+    snp_db_arg = f" --call_whole_genome --snp_diff_no_store --snp_dist 20 --snp_diff_db {snp_diff_db} " if snp_diff_db else ""
     platform = platform.lower()
     pp.debug("Starting run for %s" % uniq_id)
+    pp.debug(f"tb-profiler profile {snp_db_arg} --no_delly --spoligotype --ram 8 --threads 4 --txt --csv -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}")
     with open("%s/%s.log" % (result_file_dir,uniq_id), "a",buffering=1) as LOG:
+        
         if fq1 and fq2:
-            sp.call(f"tb-profiler profile --spoligotype --ram 8 --threads 2 --txt --csv --pdf -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+            sp.call(f"tb-profiler profile {snp_db_arg} --no_delly --spoligotype --ram 8 --threads 4 --txt --csv -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
         else:
-            sp.call(f"tb-profiler profile --spoligotype --ram 8 --threads 2 --txt --csv --pdf -1 {fq1} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+            sp.call(f"tb-profiler profile {snp_db_arg} --no_delly --spoligotype --ram 8 --threads 4 --txt --csv -1 {fq1} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+        if snp_diff_db:
+            result_file = f'{result_file_dir}/results/{uniq_id}.results.json'
+            pp.debug(json.load(open(result_file))['close_samples'])
+            close_samples = [d['sample'] for d in json.load(open(result_file))['close_samples']]
+            if len(close_samples)==0:
+                return
+            tmpfile = str(uuid4())
+            with open(tmpfile,"w") as O:
+                O.write("\n".join(close_samples)+"\n")
+                O.write("%s\n" % uniq_id)
+            extra_result_dir = "/".join(snp_diff_db.split("/")[:-1])
+            sp.call(f"tb-profiler collate --prefix {tmpfile} --samples {tmpfile} --dir {result_file_dir}/results {extra_result_dir}",shell=True)
+            graph = json.load(open(f'{tmpfile}.transmission_graph.json'))
+            json_results = json.load(open(result_file))
+            json_results['transmission_graph'] = graph
+            json.dump(json_results,open(result_file,"w"))
 
 
 def profile_remote(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
