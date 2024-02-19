@@ -9,6 +9,24 @@
 	</div>
 {% endmacro %}
 
+{% macro row_val(val,i=0,total_rows=1,url=None) -%}
+	{% if total_rows==1 %}
+		{% if url is not none %}
+			<td><a href="{{url}}">{{val}}</a></td>
+		{% else %}
+			<td>{{val}}</td>
+		{% endif %}
+	{% else %}
+		{% if i==1 %}
+			{% if url is not none %}
+				<td rowspan="{{total_rows}}"><a href="{{url}}">{{val}}</a></td>
+			{% else %}
+				<td rowspan="{{total_rows}}">{{val}}</td>
+			{% endif %}
+		{% else %}
+		{% endif %}
+	{% endif %}
+{%- endmacro %}
 
 {% macro drtype_badge(text,drtype) -%}
 	{% if drtype=="Sensitive" %}

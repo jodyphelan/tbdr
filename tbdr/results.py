@@ -16,8 +16,11 @@ def get_result(sample_id):
 	row =  Result.query.filter(Result.sample_id == sample_id).first()
 	if row:
 		if row.data:
-			for var in row.data["dr_variants"]:
-				var["drugs"] = ", ".join([d["drug"] for d in var["drugs"]])
+			print(row.data['dr_variants'])
+			# for var in row.data["dr_variants"]:
+			# 	var["drugs"] = ", ".join([d["drug"] for d in var["drugs"]])
+
+			
 		return row	
 
 	return None
