@@ -1,12 +1,15 @@
 
 {% macro progress_bar(progress) -%}
-	{% set p = {"In queue":0,"Mapping":17,"Bam sorting":33,"Variant calling":50,"Variant annotation":67,"Lineage determination":83} %}
+	{% set p = {"In queue":0,"Mapping":17,"Variant calling":50,"Spoligotyping":67,"Coverage analysis":83} %}
 	<div class="text-center">
 		<h4>{{progress}}</h4>
 	</div>
-	<div class="progress">
-	  <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="{{p[progress]}}" aria-valuemin="0" aria-valuemax="100" style="width: {{p[progress]}}%"></div>
-	</div>
+	
+
+	<div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="{{p[progress]}}" aria-valuemin="0" aria-valuemax="100">
+		<div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{p[progress]}}%"></div>
+	  </div>
+	  
 {% endmacro %}
 
 {% macro row_val(val,i=0,total_rows=1,url=None) -%}
