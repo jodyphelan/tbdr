@@ -3,6 +3,12 @@
 
 {% block header %}
 
+<style>
+	.card:hover {
+		box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+		transform: scale(1.005);
+	}
+</style>
 
 {% endblock %}
 
@@ -33,7 +39,7 @@
 
 			<div class="row justify-content-md-center">
 				<div class="col-md-6 pb-4">
-					<div class="card border-dark text-center shadow">
+					<div class="card border-dark text-center">
 					  <div class="card-header bg-dark text-white">
 					    Step 1
 					  </div>
@@ -58,7 +64,7 @@
 
 			<div class="row justify-content-md-center">
 				<div class="col-md-6 pb-4">
-					<div class="card border-dark text-center shadow">
+					<div class="card border-dark text-center">
 					  <div class="card-header bg-dark text-white">
 					    Step 2
 					  </div>
@@ -74,7 +80,11 @@
 									<div class="col-md-6">
 										<input type="text" name="sample_id" class="form-control" placeholder="Sample ID">
 									</div>
-									<button type="submit" class="btn btn-dark">Submit</button>
+								</div>
+								<div class="row justify-content-md-center pt-3">
+									<div class="col-md-6">
+										<button type="submit" class="btn btn-dark">Submit</button>
+									</div>
 								</div>
 							</form>
 					  </div>

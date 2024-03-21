@@ -15,9 +15,6 @@ from .models import Result
 def get_result(sample_id):
 	row =  Result.query.filter(Result.sample_id == sample_id).first()
 	if row:
-		if row.data:
-			for var in row.data["dr_variants"]:
-				var["drugs"] = ", ".join([d["drug"] for d in var["drugs"]])
 		return row	
 
 	return None
@@ -69,16 +66,14 @@ def check_progress(filename):
 		progress = "In queue"
 		return progress
 	text = open(filename).read()
-	if "bwa mem" in text:
+	if "Mapping to reference genome" in text:
 		progress = "Mapping"
-	if "samtools fixmate"  in text:
-		progress = "Bam sorting"
-	if "samclip" in text:
+	if "Running variant calling" in text:
 		progress = "Variant calling"
-	if "bcftools csq" in text:
-		progress = "Variant annotation"
-	if "%CHROM\\t%POS\\t%REF\\t%ALT[\\t%GT\\t%AD]" in text:
-		progress = "Lineage determination"
+	if "Counting kmers" in text:
+		progress = "Spoligotyping"
+	if "Calculating bamstats" in text:
+		progress = "Coverage analysis"
 	if "Profiling complete!" in text:
 		progress = "Completed"
 	return progress

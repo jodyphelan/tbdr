@@ -19,7 +19,7 @@ def create_app(test_config=None):
 		APP_ROOT=os.path.dirname(os.path.abspath(__file__)),
 		
 		
-		SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://@localhost/myinner_db",
+		SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://@localhost/tbdr",
     	SQLALCHEMY_ECHO = False,
     	SQLALCHEMY_TRACK_MODIFICATIONS = False,
 
@@ -52,6 +52,7 @@ def create_app(test_config=None):
 
 		from . import sra
 		app.register_blueprint(sra.bp)
+
 
 		# from . import tb_crowd
 		# app.register_blueprint(tb_crowd.bp)

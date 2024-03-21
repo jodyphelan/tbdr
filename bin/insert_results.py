@@ -15,7 +15,7 @@ from copy import copy
 
 def main(args):
     from sqlalchemy import create_engine
-    engine = create_engine("postgresql+psycopg2://@localhost/myinner_db", echo=False)
+    engine = create_engine(f"postgresql+psycopg2://{args.db_user}:{args.db_pass}@localhost/tbdr", echo=False)
     from sqlalchemy.dialects.postgresql import insert
     from sqlalchemy import select
     from sqlalchemy import MetaData
@@ -28,14 +28,24 @@ def main(args):
 
     def add_sample(data):
         with engine.connect() as conn:
-            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None: return
+            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None:
+                # remove existing results
+                print("Removing existing results")
+                conn.execute(results_table.delete().where(results_table.c.sample_id == data["id"]))
+                conn.execute(sample_variants_table.delete().where(sample_variants_table.c.sample_id == data["id"]))
+                conn.execute(samples_table.delete().where(samples_table.c.id == data["id"]))
+                # conn.execute(variant_table.delete().where(variant_table.c.sample_id == data["id"]))
+                # conn.commit()
+
+
             json_data = copy(data)
             data['lineage'] = data['sublin']
             sample_id = data['id']
             result = conn.execute(insert(samples_table),data)
-            # result = conn.execute(stmt)
+            # conn.commit()
             stmt = insert(results_table).values(data=json_data,sample_id=sample_id)
             result = conn.execute(stmt)
+            # conn.commit()
             rows = [
                 {
                     'id': "%(locus_tag)s_%(change)s" % var,
@@ -47,41 +57,35 @@ def main(args):
                 } for var in data['dr_variants']+data['other_variants']]
             if rows==[]: return
             result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
+            # conn.commit()
             rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
             result = conn.execute(insert(sample_variants_table),rows)
-
-    # If a list of samples is supplied through the args object, store it in a list else get the list from looking in the results direcotry
-    if args.samples:
-        samples = [x.rstrip() for x in open(args.samples).readlines()]
-    else:
-        samples = [x.replace(args.suffix,"") for x in os.listdir(args.dir) if x[-len(args.suffix):]==args.suffix]
+            # conn.commit()
 
     meta = {}
     for row in csv.DictReader(open(args.metadata_csv)):
         row['id'] = row['wgs_id']
         row['country'] = row['country_code']
         row['date'] = row['date_of_collection']
-        if row['country']=="N/A": del row['country'] 
+        if row['country']=="N/A": del row['country']
         meta[row['wgs_id']] = row
 
-    # Loop through the sample result files
-    for s in tqdm(samples):
-        # Data has the same structure as the .result.json files
-        data = json.load(open(pp.filecheck("%s/%s%s" % (args.dir,s,args.suffix))))
-        m = meta.get(s)
-        if m:
-            data.update(m)
-        data['public'] = True
-        
-        add_sample(data)
+
+    data = json.load(open(args.json))
+    m = meta.get(data['id'])
+    if m:
+        data.update(m)
+    data['public'] = True
+
+    add_sample(data)
 
 # Set up the parser
 parser = argparse.ArgumentParser(description='tbprofiler script',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--samples',type=str,help='File with samples')
-parser.add_argument('--dir',default="results/",type=str,help='Directory containing results')
+parser.add_argument('--json',type=str,help='File with samples',required = True)
 parser.add_argument('--db',default="tbdb",type=str,help='Database name')
 parser.add_argument('--metadata-csv',type=str,help='Database name',required = True)
-parser.add_argument('--suffix',default=".results.json",type=str,help='File suffix')
+parser.add_argument('--db-pass',type=str,help='Database name',required = True)
+parser.add_argument('--db-user',type=str,help='Database name',required = True)
 parser.set_defaults(func=main)
 
 args = parser.parse_args()

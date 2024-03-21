@@ -103,6 +103,10 @@
         maxFilesize: 4025, // megabytes
         chunkSize: 100000000, // bytes
 		timeout: 0,
+		renameFile: function(file) {
+			var safefilename = file.name.replace(/[^\w.]/gi, '')
+			return safefilename;
+		},
 		init: function() {
 			this.on("processing", file => {
 				document.getElementById('submit').classList.add("disabled");
