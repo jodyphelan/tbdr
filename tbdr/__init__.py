@@ -1,3 +1,8 @@
+"""A webserver interface for the TB-Profiler"""
+
+__version__ = "2.0.0"
+
+
 import os
 from flask import Flask
 from . import db
@@ -5,6 +10,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import redis
 from flask_session import Session
+
+
 
 sqldb = SQLAlchemy()
 login_manager = LoginManager()

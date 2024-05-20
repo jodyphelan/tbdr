@@ -38,12 +38,12 @@ def run_result_json(sample_id):
 @bp.route('/results/<sample_id>',methods=('GET', 'POST'))
 def run_result(sample_id):
 	result = get_result(sample_id)
-	print(result)
 	if result==None:
 		flash("Error! Result with ID:%s doesn't exist" % sample_id)
 		return redirect(url_for('home.index'))
 	
-	if sample_id[:3] not in ("DRR","SRR","ERR") and result.status!="Completed":
+	# print(result.data['migrated'])
+	if sample_id[:3] not in ("DRR","SRR","ERR","SAM") and result.status!="Completed":
 		log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".log"
 		progress = check_progress(log_file)
 		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""

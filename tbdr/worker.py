@@ -78,7 +78,9 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     data = json.load(open("%s/results/%s.results.json" % (result_file_dir,uniq_id)))
     conf = pp.get_db('tbprofiler','tbdb')
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
-
+    for var in data['other_variants']:
+        var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
+    data['migrated'] = False
     logger.info("Finished run for %s" % uniq_id)
     logger.info("Starting DB entry for %s" % uniq_id)
     db_entry = Result.query.filter(Result.sample_id == uniq_id).first()
@@ -135,6 +137,9 @@ def profile_remote(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     data = json.load(open(f"{tmp_dir}/{uniq_id}.results.json"))
     conf = pp.get_db('tbprofiler','tbdb')
     data = pp.get_summary(data,conf)
+    for var in data['other_variants']:
+        var['grading'] = {a['drug']:a['confidence'] for a in var['drugs']}
+
 
     logger.info("Finished run for %s" % uniq_id)
     logger.info("Starting DB entry for %s" % uniq_id)
