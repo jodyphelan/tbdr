@@ -41,6 +41,16 @@
             Your files are being proessed, please come back later.
         </div>
     </div>
+
+	<div class="row justify-content-center">
+		<div class="col-md-8 text-center">
+			<div>
+				While you wait would you be willing to give some feedback on TB-Profiler? 
+				<button data-tf-slider="lS4u9U0O" data-tf-position="right" data-tf-opacity="100" data-tf-iframe-props="title=TBDR feedback" data-tf-transitive-search-params data-tf-medium="snippet" class="btn btn-info p-1 m-2">Click here</button><script src="//embed.typeform.com/next/embed.js"></script>
+				to provide feedback.
+			</div>
+		</div>
+	</div>
     <div class="row justify-content-center text-center pt-4">
         <div class="col-mt-8">
             <div class="">
@@ -63,12 +73,34 @@
 	<script>
 		window.setTimeout( function() {
 			window.location.reload();
-		}, 5000);
+		}, 10000);
 	</script>
 
 {% else %}
 
+	{% if result["migrated"]==True %}
+	<div class="row justify-content-md-center">
+        <div class="col-md-10">
 
+					<div class="alert alert-danger" role="alert">
+						This result has been migrated from an older version of TB-Profiler. 
+						Some information may be missing, and it has not been profiled using 
+						the latest mutation database. It is advised to re-run the analysis.
+					</div>
+		</div>
+	</div>
+	{% endif %}
+	{% if result["qc"]["target_median_depth"] < 30 %}
+	<div class="row justify-content-md-center">
+        <div class="col-md-10">
+
+					<div class="alert alert-danger" role="alert">
+						This average coverage of the target regions is below the recommended 30x.
+						Some mutations may not be detected due to low coverage.
+					</div>
+		</div>
+	</div>
+	{% endif %}
     <div class="row justify-content-md-center">
         <div class="col-md-10">
     		<div class="card border-dark mb-3">
@@ -254,15 +286,16 @@
     					</thead>
     					<tbody>
     					{% for var in result["other_variants"] %}
-							{% for ann in var["annotation"] %}
+							{% set dlen = var["gene_associated_drugs"]|length %}
+							{% for drug in var["gene_associated_drugs"] %}
 								<tr>
-									{{utils.row_val(var["gene_name"],loop.index,var["annotation"]|length)}}
-									{{utils.row_val(var["pos"],loop.index,var["annotation"]|length)}}
-									{{utils.row_val(var["change"],loop.index,var["annotation"]|length,url_for('variants.variant',gene=var['locus_tag'],variant=var['change'])) }}
-									{{utils.row_val(var["type"],loop.index,var["annotation"]|length)}}
-									{{utils.row_val(var["freq"]|round(2)|float,loop.index,var["annotation"]|length)}}
-									{{utils.row_val(ann["drug"])}}
-									{{utils.row_val(ann["confidence"])}}
+									{{utils.row_val(var["gene_name"],loop.index,dlen)}}
+									{{utils.row_val(var["pos"],loop.index,dlen)}}
+									{{utils.row_val(var["change"],loop.index,dlen,url_for('variants.variant',gene=var['locus_tag'],variant=var['change'])) }}
+									{{utils.row_val(var["type"],loop.index,dlen)}}
+									{{utils.row_val(var["freq"]|round(2)|float,loop.index,dlen)}}
+									{{utils.row_val(drug)}}
+									{{utils.row_val(var["grading"][drug])}}
 								</tr>
 								{% endfor %}
     					{% endfor %}

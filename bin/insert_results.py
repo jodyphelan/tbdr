@@ -2,15 +2,11 @@
 
 # Load useful libraries
 import json
-from collections import defaultdict
 import argparse
-import os
-from tqdm import tqdm
-import sys
 import csv
-import pathogenprofiler as pp
-import tbprofiler
 from copy import copy
+import sys
+
 
 
 def main(args):
@@ -35,21 +31,21 @@ def main(args):
                 conn.execute(sample_variants_table.delete().where(sample_variants_table.c.sample_id == data["id"]))
                 conn.execute(samples_table.delete().where(samples_table.c.id == data["id"]))
                 # conn.execute(variant_table.delete().where(variant_table.c.sample_id == data["id"]))
-                # conn.commit()
+                conn.commit()
 
 
             json_data = copy(data)
-            data['lineage'] = data['sublin']
+            data['lineage'] = data['sub_lineage']
             sample_id = data['id']
             result = conn.execute(insert(samples_table),data)
-            # conn.commit()
-            stmt = insert(results_table).values(data=json_data,sample_id=sample_id)
+            conn.commit()
+            stmt = insert(results_table).values(data=json_data,sample_id=sample_id,status="Completed")
             result = conn.execute(stmt)
-            # conn.commit()
+            conn.commit()
             rows = [
                 {
                     'id': "%(locus_tag)s_%(change)s" % var,
-                    'gene':var['gene'],
+                    'gene':var['gene_name'],
                     'change':var['change'],
                     'type':var['type'],
                     'locus_tag':var['locus_tag'],
@@ -57,10 +53,10 @@ def main(args):
                 } for var in data['dr_variants']+data['other_variants']]
             if rows==[]: return
             result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
-            # conn.commit()
+            conn.commit()
             rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
             result = conn.execute(insert(sample_variants_table),rows)
-            # conn.commit()
+            conn.commit()
 
     meta = {}
     for row in csv.DictReader(open(args.metadata_csv)):
@@ -76,6 +72,7 @@ def main(args):
     if m:
         data.update(m)
     data['public'] = True
+    sys.stderr.write(f"Adding {data['id']}\n")  
 
     add_sample(data)
 
