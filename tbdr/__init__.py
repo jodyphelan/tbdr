@@ -39,8 +39,8 @@ def create_app(test_config=None):
 	sess.init_app(app)
 	
 	with app.app_context():
-		from . import auth
-		app.register_blueprint(auth.bp)
+		# from . import auth
+		# app.register_blueprint(auth.bp)
 
 		from . import home
 		app.register_blueprint(home.bp)
