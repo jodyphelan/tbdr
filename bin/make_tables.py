@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import create_engine
 
 
-engine = create_engine("postgresql+psycopg2://@localhost/tbdr", echo=True)
+engine = create_engine(f'postgresql+psycopg2://@localhost/tbdr')
 metadata_obj = MetaData()
 
 submission_table = Table(

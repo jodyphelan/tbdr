@@ -2,7 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from flask import current_app as app
-engine = create_engine('postgresql+psycopg2://@localhost/tbdr')
+
+engine = create_engine(f'postgresql+psycopg2://{app.config["PG_USER"]}:{app.config["PG_PASS"]}@localhost/tbdr')
+
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

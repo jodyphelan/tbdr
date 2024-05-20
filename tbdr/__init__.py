@@ -5,16 +5,15 @@ __version__ = "2.0.0"
 
 import os
 from flask import Flask
-from . import db
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+# from flask_login import LoginManager
 import redis
 from flask_session import Session
 
 
 
 sqldb = SQLAlchemy()
-login_manager = LoginManager()
+# login_manager = LoginManager()
 sess = Session()
 
 def create_app(test_config=None):
@@ -26,16 +25,19 @@ def create_app(test_config=None):
 		APP_ROOT=os.path.dirname(os.path.abspath(__file__)),
 		
 		
-		SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://@localhost/tbdr",
     	SQLALCHEMY_ECHO = False,
     	SQLALCHEMY_TRACK_MODIFICATIONS = False,
 
 		SESSION_TYPE = "redis",
     	SESSION_REDIS = redis.from_url("redis://localhost:6379")
 	)
+	app.config.from_envvar('YOURAPPLICATION_SETTINGS')
+	print(app.config)
+	app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{app.config["PG_USER"]}:{app.config["PG_PASS"]}@localhost/tbdr'
+
 
 	sqldb.init_app(app)
-	login_manager.init_app(app)
+	# login_manager.init_app(app)
 	sess.init_app(app)
 	
 	with app.app_context():
