@@ -114,8 +114,16 @@ def main(args):
     conf = pp.get_db('tbprofiler',args.db)
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
     for var in data['other_variants']:
-        for var in data['other_variants']:
-            var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
+        var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
+
+    for l in data['lineage']:
+        del l['support']
+    for var in data['dr_variants'] + data['other_variants'] + data['qc_fail_variants']:
+        if 'annotation' in var:
+            del var['annotation']
+        if 'consequences' in var:
+            del var['consequences']
+    
     data['public'] = args.public
 
     add_sample(data)
