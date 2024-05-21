@@ -108,6 +108,7 @@ def main(args):
 
     for json_file in tqdm(glob(f"{args.dir}/*.json")):
         data = json.load(open(json_file))
+        sys.stderr.write(f"Adding {data['id']}\n")  
         m = meta.get(data['id'])
         if m:
             data.update(m)
@@ -119,7 +120,6 @@ def main(args):
             for var in data['other_variants']:
                 var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
         data['public'] = args.type
-        sys.stderr.write(f"Adding {data['id']}\n")  
 
         add_sample(data)
 
