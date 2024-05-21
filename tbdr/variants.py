@@ -21,7 +21,6 @@ for l in open(sys.base_prefix + "/share/tbprofiler/tbdb.bed"):
 
 
 def get_variant_samples(gene,variant,add_links=True):
-	locus_tag = gene2locus_tag[gene]
 	sample_data =  db_session.execute(text("SELECT * FROM sample_variants LEFT JOIN samples ON sample_variants.sample_id = samples.id WHERE variant_id = '%s_%s';" % (gene2locus_tag[gene],variant))).fetchall()
 	if add_links:
 		for i,d in enumerate(sample_data):

@@ -54,7 +54,7 @@ def sort_out_paried_files(upload_id,r1_suffix,r2_suffix):
             return "%s is present in data file but not %s. Please check." % (r2,r1)
         if r2 not in files:
             return "%s is present in data file but not %s. Please check." % (r1,r2)
-        sample_name = p if current_user.is_authenticated else uniq_id
+        sample_name =  uniq_id
         runs.append({"ID":uniq_id,"sample_name":sample_name,"R1":r1,"R2":r2})
     return runs
 
