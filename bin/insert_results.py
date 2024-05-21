@@ -33,7 +33,7 @@ def get_drug_table(dr_variants,conf):
                 'confidence': '',
                 'comment': '',
             })
-    
+    new_table = [r for r in new_table if r['drug'] in all_drugs]
     new_table = sorted(new_table, key=lambda x: all_drugs.index(x['drug']))
     for drug in all_drugs:
         drugrows = [d for d in new_table if d['drug'] == drug]
