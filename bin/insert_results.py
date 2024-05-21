@@ -6,7 +6,45 @@ import argparse
 import csv
 from copy import copy
 import sys
+import pathogenprofiler as pp
+import tbdr
 
+
+def get_drug_table(dr_variants,conf):
+    all_drugs = conf['drugs']
+    new_table = []
+    for v in dr_variants:
+        for d in v['drugs']:
+            new_row = {
+                'drug': d['drug'],
+                'gene': v['gene_name'],
+                'change': v['change'],
+                'confidence': d['confidence'],
+                'comment': d['comment'],
+            }
+            new_table.append(new_row)
+    variant_drugs = list(set([r['drug'] for r in new_table]))
+    for d in all_drugs:
+        if d not in variant_drugs:
+            new_table.append({
+                'drug': d,
+                'gene': '',
+                'change': '',
+                'confidence': '',
+                'comment': '',
+            })
+    
+    new_table = sorted(new_table, key=lambda x: all_drugs.index(x['drug']))
+    for drug in all_drugs:
+        drugrows = [d for d in new_table if d['drug'] == drug]
+        for i,r in enumerate(drugrows):
+            if i == 0:
+                r['drug-rowspan'] = len(drugrows)
+            generows = [g for g in drugrows if g['gene'] == r['gene']]
+            for j,g in enumerate(generows):
+                if j == 0:
+                    g['gene-rowspan'] = len(generows)
+    return new_table
 
 
 def main(args):
@@ -71,7 +109,14 @@ def main(args):
     m = meta.get(data['id'])
     if m:
         data.update(m)
-    data['public'] = True
+
+
+    conf = pp.get_db('tbprofiler',args.db)
+    data['drug_table'] = get_drug_table(data['dr_variants'],conf)
+    for var in data['other_variants']:
+        for var in data['other_variants']:
+            var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
+    data['public'] = args.type
     sys.stderr.write(f"Adding {data['id']}\n")  
 
     add_sample(data)
@@ -83,6 +128,7 @@ parser.add_argument('--db',default="tbdb",type=str,help='Database name')
 parser.add_argument('--metadata-csv',type=str,help='Database name',required = True)
 parser.add_argument('--db-pass',type=str,help='Database name',required = True)
 parser.add_argument('--db-user',type=str,help='Database name',required = True)
+parser.add_argument('--type',choices=[True,False],type=bool,help='Database name',required = True)
 parser.set_defaults(func=main)
 
 args = parser.parse_args()

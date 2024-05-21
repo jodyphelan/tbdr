@@ -1,33 +1,23 @@
 from glob import glob
 import shutil
-from celery import Celery
+from celery import Celery, Task
 import subprocess as sp
 import json
 import pathogenprofiler as pp
 import os
 from flask import Flask
-from .models import Result
-from .db import db_session
 from time import sleep
 from celery.utils.log import get_task_logger
+from .models import Result
+from .db import db_session
+from celery import shared_task
+
+from tbdr import create_app
+
+
 
 logger = get_task_logger(__name__)
 
-def make_celery(app):
-    celery = Celery(
-        app.import_name,
-        backend=app.config['CELERY_RESULT_BACKEND'],
-        broker=app.config['CELERY_BROKER_URL']
-    )
-    celery.conf.update(app.config)
-
-    class ContextTask(celery.Task):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
 
 def get_drug_table(dr_variants,conf):
     all_drugs = conf['drugs']
@@ -65,14 +55,14 @@ def get_drug_table(dr_variants,conf):
                     g['gene-rowspan'] = len(generows)
     return new_table
 
-flask_app = Flask(__name__)
-flask_app.config.update(
-    CELERY_BROKER_URL='redis://localhost:6379',
-    CELERY_RESULT_BACKEND='redis://localhost:6379',
-)
-celery = make_celery(flask_app)
+# flask_app = Flask(__name__)
+# flask_app.config.update(
+#     CELERY_BROKER_URL='redis://localhost:6379',
+#     CELERY_RESULT_BACKEND='redis://localhost:6379',
+# )
+# celery = make_celery(flask_app)
 
-@celery.task
+@shared_task
 def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     run_tb_profiler_command(fq1,fq2,uniq_id,platform,result_file_dir)
     data = json.load(open("%s/results/%s.results.json" % (result_file_dir,uniq_id)))
