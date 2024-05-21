@@ -131,7 +131,7 @@ parser.add_argument('--db',default="tbdb",type=str,help='Database name')
 parser.add_argument('--metadata-csv',type=str,help='Database name',required = True)
 parser.add_argument('--db-pass',type=str,help='Database name',required = True)
 parser.add_argument('--db-user',type=str,help='Database name',required = True)
-parser.add_argument('--public',action='store_true',help='Database name',required = True)
+parser.add_argument('--public',action='store_true',help='Database name')
 parser.set_defaults(func=main)
 
 args = parser.parse_args()
