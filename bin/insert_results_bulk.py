@@ -120,7 +120,7 @@ def main(args):
         for var in data['other_variants']:
             for var in data['other_variants']:
                 var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
-        data['public'] = args.type
+        data['public'] = args.public
 
         add_sample(data)
 
@@ -131,7 +131,7 @@ parser.add_argument('--db',default="tbdb",type=str,help='Database name')
 parser.add_argument('--metadata-csv',type=str,help='Database name',required = True)
 parser.add_argument('--db-pass',type=str,help='Database name',required = True)
 parser.add_argument('--db-user',type=str,help='Database name',required = True)
-parser.add_argument('--type',choices=[True,False],type=bool,help='Database name',required = True)
+parser.add_argument('--public',action='store_true',help='Database name',required = True)
 parser.set_defaults(func=main)
 
 args = parser.parse_args()
