@@ -30,20 +30,20 @@ def sra():
 	country_counts = dict(db_session.execute(text("SELECT country, COUNT(*) FROM samples WHERE public = true GROUP BY country")).fetchall())
 	dr_counts = db_session.execute(text("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype")).fetchall()
 	lineage_counts = db_session.execute(text("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage")).fetchall()
-	print(dr_counts[0]._asdict())
+
 	dr_order = {"Sensitive":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
 	dr_data = sorted(dr_counts ,key=lambda x:dr_order[x._asdict()["drtype"]])
 	
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	geojson = {"type":"FeatureCollection", "features":[]}
-	print(country_counts)
+
 	for f in raw_geojson["features"]:
 		country = f["properties"]["iso_a2"].lower()
-		print(country)
+
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
 			geojson["features"].append(f)
-	print(lineage_counts)
+
 
 
 
@@ -81,14 +81,11 @@ def query_samples(raw_queries,sample_links = True):
 			if len([x for x in t[1] if x!=""])>0:
 				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
 	query = "WHERE "+" AND ".join(queries) if len(queries)>0 else ""
-	print("SELECT id, country as country_code, drtype, lineage FROM SAMPLES %s AND public = true" % query)
+
 	data = db_session.execute(text("SELECT id, country as country_code, drtype, lineage FROM SAMPLES %s AND public = true" % query)).fetchall()
-	print("asdasd")
-	print([x._asdict() for x in data])
 	data = [x._asdict() for x in data]
 	if sample_links:
 		for d in data:
-			print(d)
 			d["sample_link"] = '<a href="%s">%s</a>' % (url_for('results.run_result',sample_id=d["id"]),d["id"])
 	return data
 
@@ -105,7 +102,7 @@ def browse():
 			csv_text = "\n".join(csv_strings)
 			return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
 		else:
-			print(list(request.form.lists()))
+
 			data = query_samples(request.form.lists())
 			geojson = get_geojson(Counter([x["country_code"].upper() for x in data if x["country_code"]]))
 			print(data)

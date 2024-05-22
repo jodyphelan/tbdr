@@ -27,7 +27,6 @@ def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     db_session.commit()
     db_session.add(Result(sample_id=uniq_id))
     db_session.commit()
-    print(f1,f2)
     tbprofiler.delay(fq1=f1,fq2=f2,uniq_id=uniq_id,upload_dir=app.config["UPLOAD_FOLDER"],platform=platform,result_file_dir=app.config["APP_ROOT"]+url_for('static', filename='results'))
 
 

@@ -27,7 +27,7 @@ def get_variant_samples(gene,variant,add_links=True):
 			d = d._asdict()
 			d["sample_link"] = '<a href="%s">%s</a>' % (url_for('results.run_result',sample_id=d["id"]),d["id"])
 			sample_data[i] = d
-	print(sample_data)
+
 	return sample_data
 
 def query_variants(raw_queries):
@@ -38,7 +38,7 @@ def query_variants(raw_queries):
 			queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
 	query = " AND ".join(queries)
 	data = db_session.execute(text("SELECT * from variants WHERE %s" % query)).fetchall()
-	print(type(data))
+
 	new_data = []
 	for row in data:
 		x = row._asdict()

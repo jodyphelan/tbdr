@@ -53,7 +53,7 @@ def create_app(test_config=None):
               result_backend='redis://localhost:6379'
           ),
     )
-    print(app.config)
+
     app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{app.config["PG_USER"]}:{app.config["PG_PASS"]}@localhost/tbdr'
 
     celery_init_app(app)
