@@ -4,7 +4,7 @@ from flask import url_for
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-1", "--R1", help="Path to first fastq file",required = True)
-argparser.add_argument("-2", "--R2", help="Path to second fastq file",required = True)
+argparser.add_argument("-2", "--R2", help="Path to second fastq file")
 argparser.add_argument("--uniq_id", help="Unique ID for the sample",required = True)
 argparser.add_argument("--platform",choices = ['illumina','nanopore'], help="Unique ID for the sample",required = True)
 argparser.add_argument("--dir", help="Unique ID for the sample",required = True)
