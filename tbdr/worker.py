@@ -98,12 +98,12 @@ def run_tb_profiler_command(fq1,fq2,uniq_id,platform,result_file_dir):
     logger.info("Starting run for %s" % uniq_id)
     with open("%s/%s.log" % (result_file_dir,uniq_id), "a",buffering=1) as LOG:
         if fq1 and fq2:
-            sp.call(f"tb-profiler profile --spoligotype --ram 8 --threads 2 --txt --csv -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+            sp.call(f"tb-profiler profile --spoligotype --ram 8 --kmer_counter dsk --threads 2 --txt --csv -1 {fq1} -2 {fq2} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
         else:
             if platform == "nanopore":
                 
-                sp.call(f"tb-profiler profile --spoligotype --ram 8 --threads 2 --txt --csv -1 {fq1} --caller bcftools -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+                sp.call(f"tb-profiler profile --spoligotype --ram 8 --kmer_counter dsk --threads 2 --txt --csv -1 {fq1} --caller bcftools -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
             else:
-                sp.call(f"tb-profiler profile --spoligotype --ram 8 --threads 2 --txt --csv -1 {fq1} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
+                sp.call(f"tb-profiler profile --spoligotype --ram 8 --kmer_counter dsk --threads 2 --txt --csv -1 {fq1} -m {platform.lower()} -p {uniq_id} --dir {result_file_dir}",shell=True, stderr=LOG,stdout=LOG)
 
 
