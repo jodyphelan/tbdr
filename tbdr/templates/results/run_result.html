@@ -244,7 +244,7 @@
     					{% for var in result["dr_variants"] %}
 							{% for d in var["drugs"] %}
 								<tr>
-									{{utils.row_val(var["gene_name"],loop.index,var["drugs"]|length) }}
+									{{ utils.row_val(var["gene_name"],loop.index,var["drugs"]|length) }}
 									{{ utils.row_val(var["pos"],loop.index,var["drugs"]|length) }}
 									{{ utils.row_val(var["change"],loop.index,var["drugs"]|length,url_for('variants.variant',gene=var['locus_tag'],variant=var['change']))}}
 									{{ utils.row_val(var["type"],loop.index,var["drugs"]|length) }}
