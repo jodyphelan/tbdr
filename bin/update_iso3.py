@@ -44,8 +44,9 @@ for i in tqdm(iso_a3, desc="Updating iso_a3"):
     # update entries in the table 'samples' with the correct iso_a3 values
         cmd = f"UPDATE samples SET iso_a3 = '{iso_a3}' WHERE iso_a3 = '{iso_a2}'"
         print(cmd)
-        c.execute(cmd)
-        db.commit()
+        if not args.dry_run:
+            c.execute(cmd)
+            db.commit()
 
 c.execute("SELECT id FROM samples")
 rows = c.fetchall()
@@ -62,8 +63,9 @@ for row in tqdm(rows, desc="Updating iso_a3 for samples"):
                 iso_a3 = data['iso3'].lower()
                 cmd = f"UPDATE samples SET iso_a3 = '{iso_a3}' WHERE id = '{id}'"
                 print(cmd)
-                c.execute(cmd)
-                db.commit()
+                if not args.dry_run:
+                    c.execute(cmd)
+                    db.commit()
         except:
             pass
 
