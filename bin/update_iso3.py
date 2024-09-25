@@ -4,6 +4,14 @@ import sys
 import json
 from  ena_query.query import get_ena_country
 from tqdm import tqdm
+import argparse
+
+parser = argparse.ArgumentParser(description='Update iso_a3 values in the samples table')
+parser.add_argument('--dry-run', action='store_true', help='Do not update the database')
+parser.add_argument('--user', type=str, help='Database user', required=True)
+parser.add_argument('--password', type=str, help='Database password', required=True)
+args = parser.parse_args()
+
 
 
 geojson = json.load(open("tbdr/static/custom.geo.json"))
@@ -16,8 +24,8 @@ for f in geojson["features"]:
 
 db = psycopg2.connect(
     dbname='tbdr',
-    user="",
-    password=""
+    user=args.user,
+    password=args.password,
 )
 c = db.cursor()
 
