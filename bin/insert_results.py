@@ -8,6 +8,7 @@ from copy import copy
 import sys
 import pathogenprofiler as pp
 import tbdr
+import ena_query.query as eq
 
 
 def get_drug_table(dr_variants,conf):
@@ -110,6 +111,9 @@ def main(args):
     if m:
         data.update(m)
 
+    ena_data = eq.get_ena_country(data)
+    if ena_data['iso3']:
+        data['iso_a3'] = ena_data['iso3']
 
     conf = pp.get_db('tbprofiler',args.db)
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
