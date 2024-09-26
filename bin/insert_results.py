@@ -112,8 +112,8 @@ def main(args):
         data.update(m)
 
     ena_data = eq.get_ena_country(data)
+    print(f"ENA data: {ena_data}")
     if ena_data['iso3']:
-        print(f"ENA data: {ena_data}")
         data['iso_a3'] = ena_data['iso3']
 
     conf = pp.get_db('tbprofiler',args.db)
