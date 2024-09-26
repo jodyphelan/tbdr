@@ -111,7 +111,7 @@ def main(args):
     if m:
         data.update(m)
 
-    ena_data = eq.get_ena_country(data)
+    ena_data = eq.get_ena_country(data['id'])
     print(f"ENA data: {ena_data}")
     if ena_data['iso3']:
         data['iso_a3'] = ena_data['iso3']
