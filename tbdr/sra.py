@@ -16,7 +16,7 @@ def get_geojson(country_counts):
 	geojson = {"type":"FeatureCollection", "features":[]}
 
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a2"]
+		country = f["properties"]["iso_a3"]
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
 			geojson["features"].append(f)
@@ -27,7 +27,8 @@ def get_geojson(country_counts):
 @bp.route('/sra',methods=('GET', 'POST'))
 def sra():
 
-	country_counts = dict(db_session.execute(text("SELECT country, COUNT(*) FROM samples WHERE public = true GROUP BY country")).fetchall())
+	country_counts = dict(db_session.execute(text("SELECT iso_a3, COUNT(*) FROM samples WHERE public = true GROUP BY iso_a3")).fetchall())
+	country_counts = {k.lower():v for k,v in country_counts.items() if k is not None}
 	dr_counts = db_session.execute(text("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype")).fetchall()
 	lineage_counts = db_session.execute(text("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage")).fetchall()
 
@@ -38,7 +39,7 @@ def sra():
 	geojson = {"type":"FeatureCollection", "features":[]}
 
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a2"].lower()
+		country = f["properties"]["iso_a3"].lower()
 
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
@@ -58,7 +59,8 @@ def country():
 @bp.route('/sra/country/<country>')
 def country_data(country):
 	data = query_samples([("country",[country])])
-	country_code = data[0]["country_code"]
+	country_code = data[0]["country_code"].upper()
+	print(country_code)
 	top_mutations = db_session.execute(text("SELECT gene, change, count, drugs FROM (SELECT variant_id, count(*) as count FROM sample_variants WHERE sample_id IN (SELECT id FROM samples WHERE country = '%s') AND variant_id IN (SELECT id FROM variants WHERE drugs IS NOT NULL) GROUP BY sample_variants.variant_id ORDER BY count DESC LIMIT 10) t LEFT JOIN variants ON t.variant_id = variants.id;" % country_code)).fetchall()
 	top_mutations = [x._asdict() for x in top_mutations]
 	geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
@@ -72,17 +74,17 @@ def country_data(country):
 def query_samples(raw_queries,sample_links = True):
 	queries = []
 	tmp = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
-	admin_to_iso_a2 = {y["properties"]["admin"]:y["properties"]["iso_a2"] for y in tmp["features"]}
+	admin_to_iso_a3 = {y["properties"]["admin"]:y["properties"]["iso_a3"] for y in tmp["features"]}
 
 	for t in raw_queries:
 		if t[0]=="country":
-			queries.append("(%s)" %" OR ".join(["country='%s'" % (admin_to_iso_a2[x].lower()) for x in t[1]]))
+			queries.append("(%s)" %" OR ".join(["iso_a3='%s'" % (admin_to_iso_a3[x].lower()) for x in t[1]]))
 		else:
 			if len([x for x in t[1] if x!=""])>0:
 				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
 	query = "WHERE "+" AND ".join(queries) if len(queries)>0 else ""
 
-	data = db_session.execute(text("SELECT id, country as country_code, drtype, lineage FROM SAMPLES %s AND public = true" % query)).fetchall()
+	data = db_session.execute(text("SELECT id, iso_a3 as country_code, drtype, lineage FROM SAMPLES %s AND public = true" % query)).fetchall()
 	data = [x._asdict() for x in data]
 	if sample_links:
 		for d in data:

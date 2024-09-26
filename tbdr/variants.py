@@ -90,7 +90,7 @@ def variant(gene,variant):
 	geojson = {"type":"FeatureCollection", "features":[]}
 	isolates_with_country = 0
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a2"].lower()
+		country = f["properties"]["iso_a3"].lower()
 		if country in country2variant_count:
 			f["properties"]["variant"] = country2variant_count[country] / country2total_count[country]
 			geojson["features"].append(f)
