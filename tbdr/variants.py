@@ -71,7 +71,9 @@ def variant(gene,variant):
 	if "query" in request.form:
 		query =request.form["query_values"]
 		print(query)
-		gene,variant = query.split("_")
+		tmp = query.split("_")
+		gene = tmp[0]
+		variant = "_".join(tmp[1:])
 		data = get_variant_samples(gene,variant,add_links=False)
 		csv_strings = [",".join([str(y) for y in x.values()]) for x in data]
 		csv_strings.insert(0,",".join(list(data[0])))
