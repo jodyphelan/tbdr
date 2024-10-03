@@ -70,6 +70,7 @@ def browse():
 def variant(gene,variant):
 	if "query" in request.form:
 		query =request.form["query_values"]
+		print(query)
 		gene,variant = query.split("_")
 		data = get_variant_samples(gene,variant,add_links=False)
 		csv_strings = [",".join([str(y) for y in x.values()]) for x in data]
