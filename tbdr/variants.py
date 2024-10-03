@@ -76,8 +76,8 @@ def variant(gene,variant):
 		variant = "_".join(tmp[1:])
 		data = get_variant_samples(gene,variant,add_links=False)
 		print(data)
-		csv_strings = [",".join([str(y) for y in x]) for x in data]
-		# csv_strings.insert(0,",".join(list(data[0])))
+		csv_strings = [",".join([str(x[i]) for i in [1,0,2,7,8,10]]) for x in data]
+		csv_strings.insert(0,",".join(['Accession','Genome position','Variant','DR type','Lineage','Country code']))
 		csv_text = "\n".join(csv_strings)
 		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
 	data = get_variant_samples(gene,variant)
