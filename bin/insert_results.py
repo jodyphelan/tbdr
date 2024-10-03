@@ -114,7 +114,7 @@ def main(args):
     ena_data = eq.get_ena_country(data['id'])
     print(f"ENA data: {ena_data}")
     if ena_data['iso3']:
-        data['iso_a3'] = ena_data['iso3']
+        data['iso_a3'] = ena_data['iso3'].lower()
 
     conf = pp.get_db('tbprofiler',args.db)
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
