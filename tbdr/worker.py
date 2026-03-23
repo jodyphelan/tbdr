@@ -11,6 +11,7 @@ from celery.utils.log import get_task_logger
 from .models import Result
 from .db import db_session
 from celery import shared_task
+import sys
 
 from tbdr import create_app
 
@@ -58,9 +59,11 @@ def get_drug_table(dr_variants,conf):
 
 @shared_task
 def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
+    __softwarename__ = 'tbprofiler'
+    db_dir = f'{sys.base_prefix}/share/{__softwarename__}'
     run_tb_profiler_command(fq1,fq2,uniq_id,platform,result_file_dir)
     data = json.load(open("%s/results/%s.results.json" % (result_file_dir,uniq_id)))
-    conf = pp.get_db('tbprofiler','tbdb')
+    conf = pp.get_db(db_dir,'who_v2+')
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
     for var in data['other_variants']:
         var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
