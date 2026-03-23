@@ -51,7 +51,7 @@ def run_result(sample_id):
 	
 
 	if request.method == 'POST':
-		csv_strings = tbp.get_csv_strings(result,tbp.get_conf_dict("tbdb"))
+		csv_strings = tbp.get_csv_strings(result,tbp.get_conf_dict("who_v2+"))
 		csv_text = tbp.load_csv(csv_strings)
 		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=%s.csv" % sample_id})
 

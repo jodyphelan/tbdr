@@ -14,7 +14,7 @@ from sqlalchemy import text
 bp = Blueprint('variants', __name__)
 
 gene2locus_tag = {}
-for l in open(sys.base_prefix + "/share/tbprofiler/tbdb.bed"):
+for l in open(sys.base_prefix + "/share/tbprofiler/who_v2+/genes.bed"):
 	row = l.strip().split()
 	gene2locus_tag[row[4]] = row[3]
 	gene2locus_tag[row[3]] = row[3]
