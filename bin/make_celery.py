@@ -1,5 +1,1 @@
-from tbdr import create_app
-
-flask_app = create_app()
-celery = flask_app.extensions["celery"]
-
+from tbdr.celery_app import celery, flask_app

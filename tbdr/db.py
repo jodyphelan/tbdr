@@ -14,10 +14,7 @@ def get_engine():
     """Get or create the database engine."""
     global _engine
     if _engine is None:
-        _engine = create_engine(
-            f'postgresql+psycopg2://{current_app.config["PG_USER"]}:'
-            f'{current_app.config["PG_PASS"]}@localhost/tbdr'
-        )
+        _engine = create_engine(current_app.config['SQLALCHEMY_DATABASE_URI'])
     return _engine
 
 def get_db_session():

@@ -8,6 +8,7 @@ from collections import Counter
 bp = Blueprint('sra', __name__)
 import sys
 import csv
+import os
 from .db import db_session
 from sqlalchemy import text
 
@@ -108,7 +109,8 @@ def query_samples(raw_queries,sample_links = True):
 def browse():
 	tmp = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	country_list = sorted([y["properties"]["admin"] for y in tmp["features"]])
-	lineages = sorted(list(set([l.strip().split()[3] for l in open(sys.base_prefix+"/share/tbprofiler/who_v3/barcode.bed")])))
+	barcode_bed = os.path.join(app.config['TB_PROFILER_DB_DIR'], app.config['TB_PROFILER_DB'], 'barcode.bed')
+	lineages = sorted(list(set([l.strip().split()[3] for l in open(barcode_bed)])))
 	if request.method == 'POST':
 		if "result_id" in request.form: # navbar search
 					return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))

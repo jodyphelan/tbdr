@@ -1,0 +1,107 @@
+name: tbdr
+
+x-tbdr-environment: &tbdr-environment
+  POSTGRES_DB: ${POSTGRES_DB:-tbdr}
+  POSTGRES_USER: ${POSTGRES_USER:-tbdr}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+  TBDR_DB_HOST: postgres
+  TBDR_DB_PORT: 5432
+  TBDR_REDIS_URL: redis://redis:6379/0
+  TBDR_CELERY_BROKER_URL: redis://redis:6379/1
+  TBDR_CELERY_RESULT_BACKEND: redis://redis:6379/2
+  TBDR_UPLOAD_DIR: /data/uploads
+  TBDR_RESULTS_DIR: /opt/tbdr/tbdr/static/results
+  TBDR_TBPROFILER_DB: who_v3
+  TBDR_TBPROFILER_DB_DIR: /opt/conda/envs/tbdr/share/tbprofiler
+  TBDR_SECRET_KEY: ${TBDR_SECRET_KEY:?Set TBDR_SECRET_KEY in .env}
+  TBDR_PROFILE_THREADS: ${TBDR_PROFILE_THREADS:-2}
+  TBDR_PROFILE_RAM_GB: ${TBDR_PROFILE_RAM_GB:-8}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tbdr}
+      POSTGRES_USER: ${POSTGRES_USER:-tbdr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  init-db:
+    platform: linux/amd64
+    build:
+      context: .
+    environment: *tbdr-environment
+    command: ["python", "-m", "tbdr.bootstrap"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    platform: linux/amd64
+    build:
+      context: .
+    environment: *tbdr-environment
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "tbdr:create_app()"]
+    ports:
+      - "${TBDR_WEB_PORT:-8000}:8000"
+    volumes:
+      - uploads:/data/uploads
+      - results:/opt/tbdr/tbdr/static/results
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  worker:
+    platform: linux/amd64
+    build:
+      context: .
+    environment:
+      <<: *tbdr-environment
+      TBDR_CELERY_CONCURRENCY: ${TBDR_CELERY_CONCURRENCY:-1}
+    command: ["celery", "-A", "tbdr.celery_app:celery", "worker", "--loglevel=INFO", "--concurrency=${TBDR_CELERY_CONCURRENCY:-1}", "--time-limit=3600"]
+    volumes:
+      - uploads:/data/uploads
+      - results:/opt/tbdr/tbdr/static/results
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
+  uploads:
+  results:

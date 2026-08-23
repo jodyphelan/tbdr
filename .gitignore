@@ -2,11 +2,13 @@ build/
 dist/
 *.egg-info/
 __pycache__/
+.pycache/
 .save.cson
 tbdr/static/results/*
 dump.rdb
 example_data/
 test.ipynb
 settings.cfg
+.env
 .DS_Store
 .vscode/

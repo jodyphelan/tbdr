@@ -5,7 +5,7 @@ from werkzeug.exceptions import abort
 import json
 # from tbdr.auth import login_required
 import tbprofiler as tbp
-import sys
+import os
 from flask import current_app as app
 from collections import defaultdict, Counter
 from .db import db_session
@@ -14,7 +14,8 @@ from sqlalchemy import text
 bp = Blueprint('variants', __name__)
 
 gene2locus_tag = {}
-for l in open(sys.base_prefix + "/share/tbprofiler/who_v3/genes.bed"):
+genes_bed = os.path.join(app.config['TB_PROFILER_DB_DIR'], app.config['TB_PROFILER_DB'], 'genes.bed')
+for l in open(genes_bed):
 	row = l.strip().split()
 	gene2locus_tag[row[4]] = row[3]
 	gene2locus_tag[row[3]] = row[3]
@@ -107,6 +108,5 @@ def variant(gene,variant):
 			isolates_with_country += country2variant_count[country]
 
 	return render_template('variants/variant.html',gene=gene,variant = variant,dr_counts = dr_counts,geojson=geojson,lineage_counts = lineage_counts,isolates_with_country=isolates_with_country, sample_data = data)
-
 
 

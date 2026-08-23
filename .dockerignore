@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+__pycache__
+*.py[cod]
+*.egg-info
+build
+dist
+.venv
+example_data
+test.ipynb
+tbdr/static/results/*
+!tbdr/static/results/.gitkeep
