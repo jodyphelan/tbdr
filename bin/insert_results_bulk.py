@@ -102,7 +102,7 @@ def main(args):
     for row in csv.DictReader(open(args.metadata_csv)):
         row['id'] = row['wgs_id']
         row['country'] = row['country_code']
-        row['date'] = row['date_of_collection']
+        row['date'] = row['year_of_collection']
         if row['country']=="N/A": del row['country']
         meta[row['wgs_id']] = row
 

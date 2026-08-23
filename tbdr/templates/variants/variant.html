@@ -60,216 +60,89 @@
     </div>
 </div>
 
-<div class="row justify-content-md-center">
-    <div class="col-md-8">
-        {{ utils.drtype_box(sample_data) }}
-    </div>
-</div>
 
-<div class="row justify-content-md-center">
-    <div class="col-md-4">
-        {{utils.counter_table(sample_data,"lineage")}}
-    </div>
-    <div class="col-md-4">
-        {{utils.counter_table(sample_data,"spoligotype")}}
-    </div>
-</div>
+<section class="pb-5" aria-labelledby="resistance-title">
+    <div class="dashboard-card">
+        <div class="row align-items-center g-4 mb-4">
+        
+        <div class="col-lg-12 text-center">
+            <h2 id="resistance-title" class="h3 mb-2">Drug-resistance profile</h2>
+            <p class="mb-0 text-muted">
+            Sample counts grouped by reported drug-resistance type.
+            </p>
+        </div>
+        </div>
 
-<div class="row justify-content-md-center">
-    <div class="col-md-8">
-        <div class="card border-dark">
-            <div class="card-header text-center">
-              <strong>Geographic prevalence</strong>
-            </div>
-            <div class="mt-2 mb-2 text-center">
-                Country level data for this variant is available for {{isolates_with_country}} isolates.
-            </div>
-            <div id="mapid" class="card-body">
+        <dl class="resistance-grid">
+        <div>
+            <dt>Susceptible</dt>
+            <dd>{{dr_counts["Susceptible"]}}</dd>
+        </div>
+        <div>
+            <dt>RR-TB</dt>
+            <dd>{{dr_counts["RR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>HR-TB</dt>
+            <dd>{{dr_counts["HR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>MDR-TB</dt>
+            <dd>{{dr_counts["MDR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>Pre-XDR-TB</dt>
+            <dd>{{dr_counts["Pre-XDR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>XDR-TB</dt>
+            <dd>{{dr_counts["XDR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>Other</dt>
+            <dd>{{dr_counts["Other"]}}</dd>
+        </div>
+        </dl>
+    </div>
+    </section>
 
-            </div>
+
+<section class="pb-5" aria-labelledby="resistance-title">
+
+    <div class="row justify-content-md-center">
+        <div class="col-md-6">
+            {{utils.counter_table(sample_data,"lineage",name="Lineage")}}
+        </div>
+        <div class="col-md-6">
+            {{utils.counter_table(sample_data,"spoligotype",name="Spoligotype")}}
         </div>
     </div>
-</div>
-
-<div class="row justify-content-md-center">
-    <div class="col-md-8">
-        <div class="card border-dark">
-            <div class="card-header text-center">
-              <strong>Statisctical support</strong>
-            </div>
-            <div class="mt-2 ml-2 mr-2">
-                {% if support|length>0 %}
-                <table class="table table-hover">
-            		<thead>
-            			<tr>
-            				{% for key in support[0] %}
-                                <th scope="col">{{ key.title() }}</th>
-                            {% endfor %}
-            			</tr>
-            		</thead>
-            		<tbody>
-            			{% for d in support %}
-            				<tr>
-            					{% for key in d %}
-                                    <td>{{ d[key]}}</td>
-            					{% endfor %}
-            				</tr>
-            			{% endfor %}
-            		</tbody>
-            	</table>
-                {% else %}
-                    <div class="text-center mb-2">
-                        Not enough data to calculate support.
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row justify-content-md-center">
-    <div class="col-md-8">
-        {% if sample_data|length >= 1000 %}
-
-            <div class="card border-dark">
-                <div class="card-header text-center">
-                    <strong>Samples</strong>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        This table has <b>{{ sample_data|length}}</b> rows and could cause your browser to crash if rendered.
-                    </div>
-                    <form method="post" enctype=multipart/form-data>
-                        <input type="text" name="query_values" value="{{gene}}_{{variant}}" style="display: none;">
-                        <button class="btn btn-primary" name="query" type="submit">
-                            Download CSV
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-        {% else %}
-            {{ utils.generic_table(sample_data,{"sample_link":"ID","drtype":"Drug resistance","lineage":"Lineage","country":"Country iso2"},"Samples")}}
-
-        {% endif %}
-    <div>
-<div>
-
-<script type="text/javascript">
-    var geojson;
-
-    data = {{ geojson|tojson|safe }}
-
-    var map = L.map('mapid').setView([51.505, -0.09], 2);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        subdomains: 'abcd',
-    	minZoom: 0,
-    	maxZoom: 20,
-    	ext: 'png'
-    }).addTo(map);
+</section>
+    
+    <section class="pb-5" aria-labelledby="strain-title">
+        
+        <article class="dashboard-card">
+            <h2 class="h3 mb-2">Sample locations</h2>
+            <p class="text-muted mb-4">
+                Geographic distribution of samples in the database.
+            </p>
+            <figure >
+                {{ utils.draw_map(geojson, '500px') }}
+                <figcaption class="small text-muted mt-3">
+                    Samples can be mapped by country, region, or precise collection location.
+                </figcaption>
+            </figure>
+        </article>
+    </section>
 
 
-    function getColor(d) {
-        return d > 0.8 ? '#800026' :
-               d > 0.6  ? '#BD0026' :
-               d > 0.5  ? '#E31A1C' :
-               d > 0.4  ? '#FC4E2A' :
-               d > 0.3   ? '#FD8D3C' :
-               d > 0.2   ? '#FEB24C' :
-               d > 0.1   ? '#FED976' :
-                          '#FFEDA0';
-    }
-
-    function style(feature) {
-        return {
-            fillColor: getColor(feature.properties.variant),
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    }
 
 
-    function highlightFeature(e) {
-        var layer = e.target;
+<section class="pb-5" aria-labelledby="strain-title">
 
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-        info.update(layer.feature.properties);
-    }
-
-    function resetHighlight(e) {
-        geojson.resetStyle(e.target);
-        info.update();
-    }
-
-    function onEachFeature(feature, layer) {
-        layer.on({
-            mouseover: highlightFeature,
-            mouseout: resetHighlight,
-            click: zoomToFeature
-        });
-    }
-
-    function zoomToFeature(e) {
-        map.fitBounds(e.target.getBounds());
-    }
-
-    geojson = L.geoJson(data, {
-        style: style,
-        onEachFeature: onEachFeature
-    }).addTo(map);
+            {{ utils.bigtable(sample_data,[{ 'data': 'sample_link', 'title': 'ID' },	{ 'data': 'drtype', 'title': 'Drug resistance' },{ 'data': 'lineage', 'title': 'Lineage' },	{ 'data': 'iso_a3', 'title': 'Country iso3' }],"Samples")}}
+</section>
 
 
-    var info = L.control();
-
-    info.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-        this.update();
-        return this._div;
-    };
-
-    // method that we will use to update the control based on feature properties passed
-    info.update = function (props) {
-        this._div.innerHTML = '<h4>Variant Proportion</h4>' +  (props ?
-            '<b>' + props.admin + '</b><br />' + Math.round( props.variant*100 ) + '% of isolates with variant'
-            : 'Hover over a Country');
-    };
-
-    info.addTo(map);
-
-    var legend = L.control({position: 'bottomright'});
-
-    legend.onAdd = function (map) {
-
-        var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, .10, .20, .30, .40, .50, .60, .80],
-            labels = [];
-
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 0.05) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-
-        return div;
-    };
-
-    legend.addTo(map);
-
-</script>
 
 {% endblock %}

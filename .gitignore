@@ -5,3 +5,8 @@ __pycache__/
 .save.cson
 tbdr/static/results/*
 dump.rdb
+example_data/
+test.ipynb
+settings.cfg
+.DS_Store
+.vscode/

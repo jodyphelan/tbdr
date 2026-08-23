@@ -11,44 +11,43 @@
 {% endblock %}
 
 {% block content %}
+<section class="hero text-center py-2" aria-labelledby="page-title">
 
-<div class="row justify-content-md-center pt-4 pb-4">
-    <div class="col-md-10">
-        <div>
-            Your runs have been submitted and will be processed shortly. 
-            You can view the status of your runs by clicking on the links below.
+    <h1 id="page-title" class="display-5 fw-bold mb-3">
+        Your data is being processed.
+    </h1>
+    <p class="lead text-muted mb-4">
+           Your runs have been submitted and will be processed shortly. You can view the status of your runs by clicking on the links below. 
+    </p>
+</section>
 
-        </div>
-        <div class="alert alert-primary p-2" role="alert">
+<section class="py-2" aria-labelledby="result-id-title">
+            {{utils.generic_table(runs,{"link":"Run ID","sample_name":"Sample name","R1":"Forward read","R2":"Reverse read"},"Submitted runs",True)}}
+</section>
+
+<section class="text-center py-2">
+    <article class="info-card">
+        <h2 class="h2">While you wait</h2>
+        <h2 class="h5">NTM data</h2>
+        <p class="">
             Do you have NTM data? We are currently working on a NTM version of TB-Profiler.
-            You can test it out <a href="https://bioinformatics.lshtm.ac.uk/ntm-profiler">here</a>! 
             This is still in development so please let us know if you have any feedback.
-        </div>
-        <div>
+        </p>
+        <p>
+            <a class="btn btn-outline-primary rounded-pill px-4" href="https://bioinformatics.lshtm.ac.uk/ntm-profiler">Profile NTMs</a>
+        </p>
+        <h2 class="h5">We value your feedback</h2>
+        <p class="">
             While you wait would you be willing to give some feedback on TB-Profiler? 
-            <button data-tf-slider="lS4u9U0O" data-tf-position="right" data-tf-opacity="100" data-tf-iframe-props="title=TBDR feedback" data-tf-transitive-search-params data-tf-medium="snippet" class="btn btn-info p-1 m-2">Click here</button><script src="//embed.typeform.com/next/embed.js"></script>
-            to provide feedback.
-        </div>
-    </div>
-</div>
-
-<div class="row justify-content-md-center">
-    <div class="col-md-10">
-        {{utils.generic_table(runs,{"link":"Run ID","sample_name":"Sample name","R1":"Forward read","R2":"Reverse read"},"Submitted runs",True)}}
-    </div>
-</div>
-
-<div class="row justify-content-center text-center pt-4">
-    <div class="col-mt-8">
-        <div class="">
-
+        </p>
+        <p>
             
-        </div>
-        <div class="pt-4">
+            <button class="btn btn-outline-primary rounded-pill px-4" data-tf-slider="lS4u9U0O" data-tf-position="right" data-tf-opacity="100" data-tf-iframe-props="title=TBDR feedback" data-tf-transitive-search-params data-tf-medium="snippet" class="btn btn-info p-1 m-2">Give feedback</button><script src="//embed.typeform.com/next/embed.js"></script>
+        </p>
+    </article>
+</section>
 
-        </div>
-    </div>
-</div>
+
 
 
 {% endblock %}

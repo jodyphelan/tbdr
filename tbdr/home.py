@@ -14,7 +14,8 @@ bp = Blueprint('home', __name__)
 @bp.route('/',methods=('GET', 'POST'))
 def index():
 	if request.method == 'POST':
-		return redirect(url_for('results.run_result', sample_id=request.form["sample_id"]))
+		print(request.form)
+		return redirect(url_for('results.run_result', sample_id=request.form["result_id"]))
 	return render_template('home/index.html')
 
 @bp.route('/robots.txt')

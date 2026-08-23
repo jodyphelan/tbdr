@@ -63,7 +63,7 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     db_dir = f'{sys.base_prefix}/share/{__softwarename__}'
     run_tb_profiler_command(fq1,fq2,uniq_id,platform,result_file_dir)
     data = json.load(open("%s/results/%s.results.json" % (result_file_dir,uniq_id)))
-    conf = pp.get_db(db_dir,'who_v2+')
+    conf = pp.get_db(db_dir,'who_v3')
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
     for var in data['other_variants']:
         var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
@@ -80,7 +80,7 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
     logger.info("Indexing bam file for %s" % uniq_id)
     pp.run_cmd("samtools index  %s/%s.targets.bam" % (result_file_dir, uniq_id))
     logger.info("Extracting vcf file for %s" % uniq_id)
-    pp.run_cmd("bcftools view %s/vcf/%s.targets.vcf.gz > %s/%s.targets.vcf" % (result_file_dir,uniq_id,result_file_dir,uniq_id))
+    pp.run_cmd("bcftools view %s/vcf/%s.vcf.gz > %s/%s.vcf" % (result_file_dir,uniq_id,result_file_dir,uniq_id))
     
     for f in glob("%s/results/%s*" % (result_file_dir,uniq_id)):
         logger.info("Copying %s file for %s" % (f,uniq_id))

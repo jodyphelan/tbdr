@@ -5,6 +5,7 @@ import json
 import argparse
 import csv
 from copy import copy
+import os
 import sys
 import pathogenprofiler as pp
 import tbdr
@@ -83,7 +84,7 @@ def main(args):
             conn.commit()
             rows = [
                 {
-                    'id': "%(locus_tag)s_%(change)s" % var,
+                    'id': "%(locus_tag)s:%(change)s" % var,
                     'gene':var['gene_name'],
                     'change':var['change'],
                     'type':var['type'],
@@ -93,30 +94,42 @@ def main(args):
             if rows==[]: return
             result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
             conn.commit()
-            rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
+            rows = [{'variant_id': "%(locus_tag)s:%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
             result = conn.execute(insert(sample_variants_table),rows)
             conn.commit()
 
     meta = {}
-    for row in csv.DictReader(open(args.metadata_csv)):
+    for row in csv.DictReader(open(args.metadata_csv, encoding="utf-8-sig")):
         row['id'] = row['wgs_id']
         row['country'] = row['country_code']
-        row['date'] = row['date_of_collection']
+        row['year_of_collection'] = row['year_of_collection']
         if row['country']=="N/A": del row['country']
         meta[row['wgs_id']] = row
 
 
     data = json.load(open(args.json))
+    for var in data['dr_variants'] + data['other_variants'] + data['qc_fail_variants']:
+        var['freq'] = round(float(var['freq']),2)
     m = meta.get(data['id'])
     if m:
         data.update(m)
 
-    ena_data = eq.get_ena_country(data['id'])
+    ena_data = eq.get_ena_metadata(data['id'])
     print(f"ENA data: {ena_data}")
     if ena_data['iso3']:
-        data['iso_a3'] = ena_data['iso3'].lower()
+        data['iso_a3'] = ena_data['iso3'].upper()
+    if ena_data['country']:
+        data['country'] = ena_data['country']
+    if ena_data['collection_year']:
+        data['year_of_collection'] = ena_data['collection_year']
+    data['ena_metadata'] = ena_data
 
-    conf = pp.get_db('tbprofiler',args.db)
+    
+    db_dir = os.path.join(sys.base_prefix, 'share', 'tbprofiler')
+    print(f"Using database directory: {db_dir}")
+    conf = pp.get_db(db_dir,args.db)
+
+    
     data['drug_table'] = get_drug_table(data['dr_variants'],conf)
     for var in data['other_variants']:
         var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}

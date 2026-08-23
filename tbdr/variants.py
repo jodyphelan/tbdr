@@ -14,14 +14,14 @@ from sqlalchemy import text
 bp = Blueprint('variants', __name__)
 
 gene2locus_tag = {}
-for l in open(sys.base_prefix + "/share/tbprofiler/who_v2+/genes.bed"):
+for l in open(sys.base_prefix + "/share/tbprofiler/who_v3/genes.bed"):
 	row = l.strip().split()
 	gene2locus_tag[row[4]] = row[3]
 	gene2locus_tag[row[3]] = row[3]
 
 
 def get_variant_samples(gene,variant,add_links=True):
-	sample_data =  db_session.execute(text("SELECT * FROM sample_variants LEFT JOIN samples ON sample_variants.sample_id = samples.id WHERE variant_id = '%s_%s';" % (gene2locus_tag[gene],variant))).fetchall()
+	sample_data =  db_session.execute(text("SELECT * FROM sample_variants LEFT JOIN samples ON sample_variants.sample_id = samples.id WHERE variant_id = '%s:%s';" % (gene2locus_tag[gene],variant))).fetchall()
 	if add_links:
 		for i,d in enumerate(sample_data):
 			d = d._asdict()
@@ -62,6 +62,8 @@ def browse():
 	variant_types = db_session.execute(text("SELECT DISTINCT type FROM variants;")).fetchall()
 	data = None
 	if request.method == 'POST':
+		if "result_id" in request.form: # navbar search
+			return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))
 		data = query_variants(request.form.lists())
 	return render_template('variants/variant_home.html', genes = genes, locus_tags = locus_tags, variant_types=variant_types, data = data)
 
@@ -81,22 +83,26 @@ def variant(gene,variant):
 		csv_text = "\n".join(csv_strings)
 		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
 	data = get_variant_samples(gene,variant)
+	print(data)
 	dr_counts = dict(Counter([d["drtype"] for d in data]))
-	dr_counts = {k:dr_counts.get(k,0) for k in ["Sensitive","Pre-MDR","MDR","Pre-XDR","XDR","Other"]}
-	lineage_counts = Counter({d["lineage"] for d in data})
+	dr_counts = {k:dr_counts.get(k,0) for k in ["Susceptible","RR-TB","HR-TB","MDR-TB","Pre-XDR-TB","XDR-TB","Other"]}
+	lineage_counts = dict(Counter([d["lineage"] for d in data]))
 
 	# support_data = get_variant_stats(gene,variant)
 
 
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
-	country2total_count = dict(db_session.execute(text('SELECT country, COUNT(*) as count FROM samples GROUP BY country;')).fetchall())
-	country2variant_count = Counter([d["country"] for d in data])
+	country2total_count = dict(db_session.execute(text('SELECT iso_a3, COUNT(*) as count FROM samples GROUP BY iso_a3;')).fetchall())
+	country2variant_count = Counter([d["iso_a3"].upper() for d in data if d["iso_a3"] is not None])
+
 	geojson = {"type":"FeatureCollection", "features":[]}
 	isolates_with_country = 0
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a3"].lower()
+		country = f["properties"]["iso_a3"].upper()
+		print(country)
 		if country in country2variant_count:
 			f["properties"]["variant"] = country2variant_count[country] / country2total_count[country]
+			f['properties']['num_isolates'] = country2variant_count[country]
 			geojson["features"].append(f)
 			isolates_with_country += country2variant_count[country]
 

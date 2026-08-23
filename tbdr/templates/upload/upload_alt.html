@@ -1,114 +1,474 @@
 {% extends 'base.html' %}
 
-{% block header %}
+{% block head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.css">
 
 {% endblock %}
 
 {% block title %}
-	Upload -
+	Upload
 {% endblock %}
 
 {% block content %}
-<div class="pt-4 pb-4">
-	Upload your next generation sequencing data in <b>fastQ</b> format. Files will
-	be processed using the tb-profiler pipeline with default parameters. You may
-	select the technology used to generate the data (Illumina or Oxford Nanopore).
-	Samples will be process with a first in first out policy so please be patient
-	as there may be runs waiting to be processed before yours.
+<section class="page-intro text-center pt-4 pb-5" aria-labelledby="page-title">
+        <h1 id="page-title" class="display-5 fw-bold mb-3">Submit a sequencing sample</h1>
+        <p class="lead text-muted mb-0">
+          Upload one or two <em>M. tuberculosis</em> FASTQ files to begin analysis.
+        </p>
+      </section>
 
-</div>
-<div class="pb-4">
-    <b>Please note:</b> at the moment we can only accomodate uploads of under 1GB.
-    If you have files which are larger or you require many	isolates to be processed
-    and have access to a linux or osX operating system then	it might be worthwhile
-    to run the commandline version of tb-profiler. For more information on this please visit the
-	<a href="https://github.com/jodyphelan/TBProfiler/">github repository</a>.
-</div>
+      <ol class="upload-stepper" aria-label="Submission progress">
+        <li class="is-active" data-step-indicator="1" aria-current="step">
+          <span class="step-marker" aria-hidden="true">1</span>
+          <span class="step-label">Upload FASTQ files</span>
+        </li>
+        <li data-step-indicator="2">
+          <span class="step-marker" aria-hidden="true">2</span>
+          <span class="step-label">Configure analysis</span>
+        </li>
+        <li data-step-indicator="3">
+          <span class="step-marker" aria-hidden="true">3</span>
+          <span class="step-label">Review and submit</span>
+        </li>
+      </ol>
 
+	  <section class="upload-card upload-form-panel mx-auto" aria-labelledby="form-title">
+        <div id="upload-stage-1" class="upload-stage" data-stage="1" tabindex="-1" aria-labelledby="form-title">
+          <h2 id="form-title" class="h3 mb-2">Upload FASTQ files</h2>
+          <p class="text-muted mb-4">
+            Add FASTQ files for one or more samples. Paired reads are matched in the next step.
+          </p>
 
-<div class="alert alert-info">
-	Hi {{current_user.name}}! You are currently signed in and your results will 
-	be commited to the TB-CODE database. You are free to remove these results at any time
-    
-    <div>
-    Session key: {{session_variable}}
-    </div>
-</div>
+          <form id="dropper" class="dropzone upload-dropzone mb-4" action='{{ url_for("upload.file_upload",upload_id=upload_id) }}' method="post" enctype="multipart/form-data">
+          <div class="dz-message">
+            <span class="d-block fw-semibold text-dark mb-1">Drop FASTQ files here to upload</span>
+            <span class="small">or click to browse. You can add files for more than one sample.</span>
+          </div>
+        </form>
+          <p id="upload-status" class="small text-muted mb-0" aria-live="polite">Upload at least one FASTQ file to continue.</p>
+          <div id="upload-validation" class="stage-validation" role="alert" hidden></div>
 
-<div class="row justify-content-md-center">
-	
-	<div class="col-md-6 pb-4">
-		<div class="card shadow border-dark">
-			<div class="card-header bg-dark text-white">
-				Batch upload
-			</div>
-			<div class="card-body">
-				<p class="card-text">
-					You can upload multiple samples together to batch process them. At the
-					 moment batch uploading only supports paried end reads. By default, files must use
-					 <b>_1.fastq.gz</b> and <b>_2.fastq.gz</b> as the file suffix in order for them
-					 to be paired correctly. The suffix can be changed in the advanced options.
-				</p>
-                <form method="POST" action='{{ url_for("upload.file_upload",upload_id=upload_id) }}' class="dropzone dz-clickable" 
-                    id="dropper" enctype="multipart/form-data">
-                </form>
-				<form method="post" enctype=multipart/form-data>
-                    {{ form.csrf_token }}
-                    
-					
-                    <div class="form-group">
-						<div>{{form.platform.label}}:</div>
-                        <div>{{form.platform}}</div>
-					</div>
-					
-					<a class="btn btn-outline-primary mt-4 mb-4" data-toggle="collapse" href="#advanced_options_collapse" role="button" aria-expanded="false" aria-controls="advanced_options_collapse">
-						Advanced options
-					</a>
+          <div class="d-flex flex-wrap justify-content-end mt-4">
+            <button id="upload-next" class="btn btn-primary btn-lg rounded-pill px-4 upload-action" type="button" disabled>Next: configure analysis</button>
+          </div>
+        </div>
 
-					<div class="collapse" id="advanced_options_collapse">
-						<h5>File suffix</h5>
-						<div class="mb-2">
-							Read suffix. Use this option to change the default suffix of files.
-							For example if your fastq file is named <b>sample1_R1.fastq.gz</b>	 then your
-							suffix should be <b>_R1.fastq.gz</b>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-                                <div>{{form.forward_suffix.label}}:</div>
-                                <div>{{form.forward_suffix(value="_1.fastq.gz")}}</div>
-							</div>
-							<div class="col-md-6">
-                                <div>{{form.reverse_suffix.label}}:</div>
-                                <div>{{form.reverse_suffix(value="_2.fastq.gz")}}</div>
-							</div>
-						</div>
+        <form id="batch-form" method="post">
+			{{ form.csrf_token }}
 
 
-					</div>
-					<hr>
-					{{form.upload_id}}
-                    {{form.submit}}
-					
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
+          <div id="upload-stage-2" class="upload-stage" data-stage="2" tabindex="-1" aria-labelledby="configuration-title" hidden>
+            <h2 id="configuration-title" class="h3 mb-2">Configure analysis</h2>
+            <p class="text-muted mb-4">Select the sequencing platform and read layout for the files you uploaded.</p>
 
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label" for="platform">Sequencing platform</label>
+                <select id="platform" class="form-select rounded-pill px-3" name="platform" aria-describedby="configuration-validation" required>
+                  <option value="" selected disabled>Select a platform</option>
+                  <option value="Illumina">Illumina</option>
+                  <option value="Nanopore">Oxford Nanopore</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pairing">Read type</label>
+                <select id="pairing" class="form-select rounded-pill px-3" name="pairing" aria-describedby="configuration-validation" required>
+                  <option value="" selected disabled>Select a read type</option>
+                  <option value="Paired">Paired-end</option>
+                  <option value="Single">Single-end</option>
+                </select>
+                <p id="nanopore-read-type-help" class="form-text mb-0" hidden>Oxford Nanopore reads are processed as single-end.</p>
+              </div>
+            </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
+            <div id="paired-options" class="paired-options" hidden>
+              <button class="btn btn-outline-primary rounded-pill px-4 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-options" aria-expanded="false" aria-controls="advanced-options">
+                Advanced paired-read options
+              </button>
 
-<script type="application/javascript">
-    Dropzone.options.dropper = {
-        paramName: 'file',
-        chunking: true,
-        forceChunking: true,
-        url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
-        maxFilesize: 1025, // megabytes
-        chunkSize: 100000000 // bytes
-    }
-</script>
+              <div id="advanced-options" class="collapse mb-4">
+                <div class="border rounded-4 p-3 bg-light">
+                  <h3 class="h6">Paired-read file suffixes</h3>
+                  <p class="small text-muted">Change these only if your paired files use a different naming convention, such as <code>sample1_R1.fastq.gz</code>.</p>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label" for="forward-suffix">Forward suffix</label>
+                      <input id="forward-suffix" class="form-control rounded-pill px-3" type="text" name="forward_suffix" aria-describedby="configuration-validation" value="_1.fastq.gz">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="reverse-suffix">Reverse suffix</label>
+                      <input id="reverse-suffix" class="form-control rounded-pill px-3" type="text" name="reverse_suffix" aria-describedby="configuration-validation" value="_2.fastq.gz">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            <div id="configuration-validation" class="stage-validation" role="alert" hidden></div>
+            <div class="d-flex flex-wrap justify-content-between gap-3 mt-4">
+              <button class="btn btn-outline-primary btn-lg rounded-pill px-4 upload-action" type="button" data-previous-step="1">Back</button>
+              <button id="configuration-next" class="btn btn-primary btn-lg rounded-pill px-4 upload-action" type="button">Next: review submission</button>
+            </div>
+          </div>
+
+          <div id="upload-stage-3" class="upload-stage" data-stage="3" tabindex="-1" aria-labelledby="review-title" hidden>
+            <h2 id="review-title" class="h3 mb-2">Review submission</h2>
+            <p class="text-muted mb-4">Confirm the uploaded files and analysis settings before starting processing.</p>
+
+            <div class="mb-4">
+              <h3 class="h5">Uploaded files</h3>
+              <ul id="review-files" class="upload-review-list" aria-live="polite"></ul>
+            </div>
+
+            <div class="mb-4">
+              <h3 class="h5">Analysis settings</h3>
+              <dl class="review-details">
+                <div>
+                  <dt>Platform</dt>
+                  <dd id="review-platform">—</dd>
+                </div>
+                <div>
+                  <dt>Read type</dt>
+                  <dd id="review-pairing">—</dd>
+                </div>
+                <div id="review-suffixes" hidden>
+                  <dt>Read suffixes</dt>
+                  <dd id="review-suffix-values">—</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div id="review-validation" class="stage-validation" role="alert" hidden></div>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+              <button class="btn btn-outline-primary btn-lg rounded-pill px-4 upload-action" type="button" data-previous-step="2">Back</button>
+              <div class="text-end">
+                {{form.upload_id}}
+			  	{{form.submit(class="btn btn-primary rounded-pill px-4 upload-action")}}
+                <p class="small text-muted mt-2 mb-0">Maximum file size: 4 GB. Each submission receives a unique result ID.</p>
+              </div>
+            </div>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
+    <script>
+      Dropzone.autoDiscover = false;
+
+      const stages = [...document.querySelectorAll(".upload-stage")];
+      const stepIndicators = [...document.querySelectorAll("[data-step-indicator]")];
+      const uploadNextButton = document.getElementById("upload-next");
+      const configurationNextButton = document.getElementById("configuration-next");
+      const submitButton = document.getElementById("submit");
+      const batchForm = document.getElementById("batch-form");
+      const uploadIdInput = document.getElementById("upload-id");
+      const uploadStatus = document.getElementById("upload-status");
+      const platform = document.getElementById("platform");
+      const pairing = document.getElementById("pairing");
+      const pairedReadOption = pairing.querySelector('option[value="Paired"]');
+      const pairedOptions = document.getElementById("paired-options");
+      const advancedOptions = document.getElementById("advanced-options");
+      const nanoporeReadTypeHelp = document.getElementById("nanopore-read-type-help");
+      const suffixInputs = [
+        document.getElementById("forward-suffix"),
+        document.getElementById("reverse-suffix")
+      ];
+      const successfulFiles = new Set();
+      const filesInProgress = new Set();
+      let currentStage = 1;
+
+      const dropper = new Dropzone("#dropper", {
+			paramName: 'file',
+			chunking: true,
+			forceChunking: true,
+			url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
+			maxFilesize: 4025, // megabytes
+			chunkSize: 100000000, // bytes
+			timeout: 0,
+			renameFile: function(file) {
+				var safefilename = file.name.replace(/[^\w.]/gi, '')
+				return safefilename;
+			},
+			init: function() {
+				this.on("processing", file => {
+					document.getElementById('submit').classList.add("disabled");
+				});
+				this.on("success", file => {
+					document.getElementById('submit').classList.remove("disabled");
+				});
+			},
+		}	);
+
+      function getValidationElement(stage) {
+        return document.getElementById(`${stage}-validation`);
+      }
+
+      function showValidation(stage, message) {
+        const validation = getValidationElement(stage);
+        validation.textContent = message;
+        validation.hidden = false;
+      }
+
+      function clearValidation(stage) {
+        const validation = getValidationElement(stage);
+        validation.textContent = "";
+        validation.hidden = true;
+      }
+
+      function hasPendingUploads() {
+        return filesInProgress.size > 0 || dropper.getQueuedFiles().length > 0 || dropper.getUploadingFiles().length > 0;
+      }
+
+      function updateUploadState() {
+        const hasSuccessfulUpload = successfulFiles.size > 0;
+        const uploadsPending = hasPendingUploads();
+
+        uploadNextButton.disabled = !hasSuccessfulUpload || uploadsPending;
+
+        if (uploadsPending) {
+          uploadStatus.textContent = "Files are uploading. You can continue once every upload finishes.";
+        } else if (hasSuccessfulUpload) {
+          uploadStatus.textContent = `${successfulFiles.size} file${successfulFiles.size === 1 ? "" : "s"} uploaded successfully. You can continue.`;
+        } else {
+          uploadStatus.textContent = "Upload at least one FASTQ file to continue.";
+        }
+      }
+
+      function setStage(stageNumber) {
+        currentStage = stageNumber;
+
+        stages.forEach((stage) => {
+          const isCurrentStage = Number(stage.dataset.stage) === stageNumber;
+          stage.hidden = !isCurrentStage;
+        });
+
+        stepIndicators.forEach((indicator) => {
+          const indicatorStep = Number(indicator.dataset.stepIndicator);
+          indicator.classList.toggle("is-active", indicatorStep === stageNumber);
+          indicator.classList.toggle("is-complete", indicatorStep < stageNumber);
+
+          if (indicatorStep === stageNumber) {
+            indicator.setAttribute("aria-current", "step");
+          } else {
+            indicator.removeAttribute("aria-current");
+          }
+        });
+
+        const currentPanel = document.querySelector(`[data-stage="${stageNumber}"]`);
+        window.requestAnimationFrame(() => currentPanel.focus());
+      }
+
+      function setUploadId(response) {
+        let responseData = response;
+
+        if (typeof response === "string") {
+          try {
+            responseData = JSON.parse(response);
+          } catch {
+            return;
+          }
+        }
+
+        if (responseData === null || typeof responseData !== "object") {
+          return;
+        }
+
+        const returnedUploadId = responseData.upload_id || responseData.uploadId || responseData.id;
+
+        if (typeof returnedUploadId === "string" && returnedUploadId.length > 0) {
+          uploadIdInput.value = returnedUploadId;
+        }
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes < 1024 * 1024) {
+          return `${Math.round(bytes / 1024)} KB`;
+        }
+
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+
+      function updatePairedOptions() {
+        const isPaired = pairing.value === "Paired";
+        pairedOptions.hidden = !isPaired;
+
+        suffixInputs.forEach((input) => {
+          input.required = isPaired;
+        });
+
+        if (!isPaired) {
+          bootstrap.Collapse.getInstance(advancedOptions)?.hide();
+        }
+      }
+
+      function updatePlatformOptions() {
+        const isNanopore = platform.value === "Nanopore";
+
+        pairedReadOption.disabled = isNanopore;
+        pairedReadOption.hidden = isNanopore;
+        nanoporeReadTypeHelp.hidden = !isNanopore;
+
+        if (isNanopore) {
+          pairing.value = "Single";
+        }
+
+        updatePairedOptions();
+      }
+
+      function validateConfiguration() {
+        const missingPlatform = !platform.value;
+        const missingPairing = !pairing.value;
+        const isPaired = pairing.value === "Paired";
+        const missingSuffix = isPaired && suffixInputs.some((input) => !input.value.trim());
+
+        platform.classList.toggle("is-invalid", missingPlatform);
+        pairing.classList.toggle("is-invalid", missingPairing);
+        suffixInputs.forEach((input) => input.classList.toggle("is-invalid", isPaired && !input.value.trim()));
+
+        if (missingPlatform || missingPairing || missingSuffix) {
+          showValidation("configuration", "Choose a sequencing platform and read type. Paired-end submissions also need both read suffixes.");
+          return false;
+        }
+
+        clearValidation("configuration");
+        return true;
+      }
+
+      function updateReview() {
+        const reviewFiles = document.getElementById("review-files");
+        reviewFiles.replaceChildren();
+
+        successfulFiles.forEach((file) => {
+          const item = document.createElement("li");
+          const name = document.createElement("span");
+          const size = document.createElement("span");
+
+          name.textContent = file.name;
+          size.className = "text-muted small";
+          size.textContent = formatFileSize(file.size);
+          item.append(name, size);
+          reviewFiles.append(item);
+        });
+
+        document.getElementById("review-platform").textContent = platform.options[platform.selectedIndex].text;
+        document.getElementById("review-pairing").textContent = pairing.options[pairing.selectedIndex].text;
+
+        const reviewSuffixes = document.getElementById("review-suffixes");
+        const reviewSuffixValues = document.getElementById("review-suffix-values");
+        const isPaired = pairing.value === "Paired";
+
+        reviewSuffixes.hidden = !isPaired;
+        reviewSuffixValues.textContent = isPaired
+          ? `${suffixInputs[0].value} / ${suffixInputs[1].value}`
+          : "—";
+      }
+
+      function validateUploadStage() {
+        if (hasPendingUploads()) {
+          showValidation("upload", "Wait for the current uploads to finish before continuing.");
+          return false;
+        }
+
+        if (successfulFiles.size === 0) {
+          showValidation("upload", "Upload at least one FASTQ file before continuing.");
+          return false;
+        }
+
+        clearValidation("upload");
+        return true;
+      }
+
+      dropper.on("processing", (file) => {
+        filesInProgress.add(file);
+        successfulFiles.delete(file);
+        updateUploadState();
+      });
+
+      dropper.on("success", (file, response) => {
+        filesInProgress.delete(file);
+        successfulFiles.add(file);
+        setUploadId(response);
+        clearValidation("upload");
+        updateUploadState();
+      });
+
+      dropper.on("error", (file, message) => {
+        filesInProgress.delete(file);
+        successfulFiles.delete(file);
+        showValidation("upload", typeof message === "string" ? message : "This file could not be uploaded. Remove it or try again.");
+        updateUploadState();
+      });
+
+      dropper.on("removedfile", (file) => {
+        filesInProgress.delete(file);
+        successfulFiles.delete(file);
+        updateUploadState();
+      });
+
+      dropper.on("queuecomplete", updateUploadState);
+
+      uploadNextButton.addEventListener("click", () => {
+        if (validateUploadStage()) {
+          setStage(2);
+        }
+      });
+
+      platform.addEventListener("change", () => {
+        platform.classList.remove("is-invalid");
+        updatePlatformOptions();
+      });
+
+      pairing.addEventListener("change", () => {
+        pairing.classList.remove("is-invalid");
+        updatePairedOptions();
+      });
+
+      suffixInputs.forEach((input) => {
+        input.addEventListener("input", () => {
+          input.classList.remove("is-invalid");
+        });
+      });
+
+      configurationNextButton.addEventListener("click", () => {
+        if (validateConfiguration()) {
+          updateReview();
+          setStage(3);
+        }
+      });
+
+      document.querySelectorAll("[data-previous-step]").forEach((button) => {
+        button.addEventListener("click", () => {
+          setStage(Number(button.dataset.previousStep));
+        });
+      });
+
+      batchForm.addEventListener("submit", (event) => {
+        if (!validateUploadStage()) {
+          event.preventDefault();
+          setStage(1);
+          return;
+        }
+
+        if (!validateConfiguration()) {
+          event.preventDefault();
+          setStage(2);
+          return;
+        }
+
+        if (currentStage !== 3) {
+          event.preventDefault();
+          updateReview();
+          setStage(3);
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting samples…";
+      });
+
+      updatePlatformOptions();
+      updateUploadState();
+    </script>
 
 {% endblock %}

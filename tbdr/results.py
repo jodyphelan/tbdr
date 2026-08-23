@@ -57,6 +57,28 @@ def run_result(sample_id):
 
 
 	bam_found = os.path.isfile(app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".targets.bam")
+
+	result.data['non_associated_variants_table'] = []
+	for var in result.data['other_variants']:
+		for drug,confidence in var['grading'].items():
+		
+			row = var.copy()
+			row['change'] = '<a href="%s">%s</a>' % (url_for('variants.variant',gene=row['locus_tag'],variant=row['change']),row['change'])
+			row['drug'] = drug
+			row['confidence'] = confidence
+			result.data['non_associated_variants_table'].append(row)
+
+	result.data['associated_variants_table'] = []
+	for var in result.data['dr_variants']:
+		print(var)
+		for ann in var['drugs']:
+
+			row = var.copy()
+			row['change'] = '<a href="%s">%s</a>' % (url_for('variants.variant',gene=row['locus_tag'],variant=row['change']),row['change'])
+			row['drug'] = ann['drug']
+			row['confidence'] = ann['confidence']
+			row['comment'] = ann['comment']
+			result.data['associated_variants_table'].append(row)
 	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id)
 
 

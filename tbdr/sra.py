@@ -1,5 +1,5 @@
 from flask import (
-	Blueprint,  render_template, request, url_for, Response
+	Blueprint, redirect,  render_template, request, url_for, Response
 )
 import json
 # from tbdr.auth import login_required
@@ -12,34 +12,46 @@ from .db import db_session
 from sqlalchemy import text
 
 def get_geojson(country_counts):
+	print(country_counts)
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	geojson = {"type":"FeatureCollection", "features":[]}
 
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a3"]
+		country = f["properties"]["iso_a3"].upper()
+
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
 			geojson["features"].append(f)
 
+	print(geojson)
 	return geojson
 
 
 @bp.route('/sra',methods=('GET', 'POST'))
 def sra():
+	if request.method == 'POST':
+		if "result_id" in request.form: # navbar search
+			return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))
 
 	country_counts = dict(db_session.execute(text("SELECT iso_a3, COUNT(*) FROM samples WHERE public = true GROUP BY iso_a3")).fetchall())
-	country_counts = {k.lower():v for k,v in country_counts.items() if k is not None}
+	country_counts = {k.upper():v for k,v in country_counts.items() if k is not None}
 	dr_counts = db_session.execute(text("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype")).fetchall()
 	lineage_counts = db_session.execute(text("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage")).fetchall()
-
-	dr_order = {"Sensitive":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
+	lineage_counts = [{"lineage": k, "count": v} for k, v in lineage_counts]
+	dr_order = {"Susceptible":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
+	year_of_collection = db_session.execute(text("SELECT year_of_collection, COUNT(*) FROM samples WHERE public = true GROUP BY year_of_collection")).fetchall()
+	year_of_collection = [{'year':int(k),'count':v} for k,v in year_of_collection if k]
+	print(year_of_collection)
+	
 	dr_data = sorted(dr_counts ,key=lambda x:dr_order[x._asdict()["drtype"]])
+	dr_data = {d:dict(dr_counts).get(d,0) for d in dr_order}
+	total_samples = sum(dr_data.values())
 	
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	geojson = {"type":"FeatureCollection", "features":[]}
 
 	for f in raw_geojson["features"]:
-		country = f["properties"]["iso_a3"].lower()
+		country = f["properties"]["iso_a3"].upper()
 
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
@@ -50,7 +62,7 @@ def sra():
 
 
 
-	return render_template('sra/landing.html', dr_data=dr_data, geojson=geojson, top_mutations = None, lineage_counts=lineage_counts)
+	return render_template('sra/landing.html', total_samples=total_samples,dr_data=dr_data, geojson=geojson, top_mutations = None, lineage_counts=lineage_counts,year_of_collection=year_of_collection)
 
 @bp.route('/sra/country')
 def country():
@@ -74,17 +86,18 @@ def country_data(country):
 def query_samples(raw_queries,sample_links = True):
 	queries = []
 	tmp = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
-	admin_to_iso_a3 = {y["properties"]["admin"]:y["properties"]["iso_a3"] for y in tmp["features"]}
+	admin_to_iso_a3 = {y["properties"]["admin"]:y["properties"]["iso_a3"].upper() for y in tmp["features"]}
 
 	for t in raw_queries:
 		if t[0]=="country":
-			queries.append("(%s)" %" OR ".join(["iso_a3='%s'" % (admin_to_iso_a3[x].lower()) for x in t[1]]))
+			queries.append("(%s)" %" OR ".join(["iso_a3='%s'" % (admin_to_iso_a3[x].upper()) for x in t[1]]))
 		else:
 			if len([x for x in t[1] if x!=""])>0:
 				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
 	query = "WHERE "+" AND ".join(queries) if len(queries)>0 else ""
 
-	data = db_session.execute(text("SELECT id, iso_a3 as country_code, drtype, lineage FROM SAMPLES %s AND public = true" % query)).fetchall()
+	data = db_session.execute(text("SELECT id, iso_a3 as country_code, drtype, lineage, year_of_collection FROM SAMPLES %s AND public = true" % query)).fetchall()
+
 	data = [x._asdict() for x in data]
 	if sample_links:
 		for d in data:
@@ -95,8 +108,10 @@ def query_samples(raw_queries,sample_links = True):
 def browse():
 	tmp = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	country_list = sorted([y["properties"]["admin"] for y in tmp["features"]])
-	lineages = sorted(list(set([l.strip().split()[3] for l in open(sys.base_prefix+"/share/tbprofiler/tbdb.barcode.bed")])))
+	lineages = sorted(list(set([l.strip().split()[3] for l in open(sys.base_prefix+"/share/tbprofiler/who_v3/barcode.bed")])))
 	if request.method == 'POST':
+		if "result_id" in request.form: # navbar search
+					return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))
 		if "query" in request.form:
 			data = query_samples(json.loads(request.form["query_values"]),sample_links=False)
 			csv_strings = [",".join([str(y) for y in x.values()]) for x in data]
@@ -104,10 +119,15 @@ def browse():
 			csv_text = "\n".join(csv_strings)
 			return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
 		else:
-
+			print(list(request.form.lists()))
 			data = query_samples(request.form.lists())
 			geojson = get_geojson(Counter([x["country_code"].upper() for x in data if x["country_code"]]))
+			dr_data = dict(Counter([x["drtype"] for x in data if x["drtype"]]))
+			lineage_counts = [{"lineage": k, "count": v} for k,v in Counter([x["lineage"] for x in data if x["lineage"]]).items()]
+			print(lineage_counts)
 			print(data)
-			return render_template('sra/browse.html', data = data , geojson=geojson, countries = country_list,lineages=lineages, query=json.dumps(list(request.form.lists())))
+			year_of_collection = [{"year": k, "count": v} for k,v in Counter([x["year_of_collection"] for x in data if x.get("year_of_collection")]).items()]
+			print(year_of_collection)
+			return render_template('sra/browse.html', data = data , dr_data = dr_data,geojson=geojson, year_of_collection=year_of_collection,lineage_counts=lineage_counts,countries = country_list,lineages=lineages, query=json.dumps(list(request.form.lists())))
 
 	return render_template('sra/browse.html', data = None, countries=country_list,lineages=lineages)

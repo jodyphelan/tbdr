@@ -1,122 +1,133 @@
-{% extends 'base.html' %}
+	{% extends 'base.html' %}
 
-{% block header %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.css">
+	{% block head %}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.css">
 
-{% endblock %}
-
-{% block title %}
-	Upload -
-{% endblock %}
-
-{% block content %}
-<div class="pt-4 pb-4">
-	Upload your next generation sequencing data in <b>fastQ</b> format. Files will
-	be processed using the tb-profiler pipeline with default parameters. You may
-	select the technology used to generate the data (Illumina or Oxford Nanopore).
-	Samples will be process with a first in first out policy so please be patient
-	as there may be runs waiting to be processed before yours.
-
-</div>
-<div class="pb-4">
-    <b>Please note:</b> at the moment we can only accomodate uploads of files under 4GB.
-    If you have files which are larger or you require many	isolates to be processed
-    and have access to a linux or macOS operating system then	it might be worthwhile
-    to run the commandline version of tb-profiler. For more information on this please visit the
-	<a href="https://github.com/jodyphelan/TBProfiler/">github repository</a>.
-</div>
-
-
-<div class="row justify-content-md-center">
 	
-	<div class="col-md-6 pb-4">
-		<div class="card shadow border-dark">
-			<div class="card-header bg-dark text-white">
-				Batch upload
-			</div>
-			<div class="card-body">
-				<p class="card-text">
-					You can upload multiple samples together to batch process them. By default, paired files must use
-					 <b>_1.fastq.gz</b> and <b>_2.fastq.gz</b> as the file suffix in order for them
-					 to be paired correctly. The suffix can be changed in the advanced options.
-				</p>
-                <form method="POST" action='{{ url_for("upload.file_upload",upload_id=upload_id) }}' class="dropzone dz-clickable" 
-                    id="dropper" enctype="multipart/form-data">
-                </form>
-				<form method="post" enctype=multipart/form-data>
-                    {{ form.csrf_token }}
-                    
-					
-                    <div class="form-group">
-						<div>{{form.platform.label}}:</div>
-                        <div>{{form.platform}}</div>
-					</div>
-					
-					<div class="form-group">
-						<div>{{form.pairing.label}}:</div>
-                        <div>{{form.pairing}}</div>
-					</div>
+	
+	{% endblock %}
 
-					<a class="btn btn-outline-primary mt-4 mb-4" data-bs-toggle="collapse" href="#advanced_options_collapse" role="button" aria-expanded="false" aria-controls="advanced_options_collapse">
-						Advanced options
-					</a>
+	{% block title %}
+		Upload -
+	{% endblock %}
 
-					<div class="collapse" id="advanced_options_collapse">
-						<h5>File suffix</h5>
-						<div class="mb-2">
-							Read suffix. Use this option to change the default suffix of files.
-							For example if your fastq file is named <b>sample1_R1.fastq.gz</b>	 then your
-							suffix should be <b>_R1.fastq.gz</b>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-                                <div>{{form.forward_suffix.label}}:</div>
-                                <div>{{form.forward_suffix(value="_1.fastq.gz")}}</div>
-							</div>
-							<div class="col-md-6">
-                                <div>{{form.reverse_suffix.label}}:</div>
-                                <div>{{form.reverse_suffix(value="_2.fastq.gz")}}</div>
-							</div>
-						</div>
+	{% block content %}
+	{{upload_id}}
+	<section class="page-intro text-center pt-4 pb-5" aria-labelledby="page-title">
+        <h1 id="page-title" class="display-5 fw-bold mb-3">Submit a sequencing sample</h1>
+        <p class="lead text-muted mb-0">
+          Upload one or two <em>M. tuberculosis</em> FASTQ files to begin analysis.
+        </p>
+      </section>
+
+      <section class="row g-4 mb-5" aria-label="Submission steps">
+        <div class="col-md-4">
+          <article class="info-card">
+            <span class="step-number" aria-hidden="true">1</span>
+            <h2 class="h5">Choose your reads</h2>
+            <p class="text-muted mb-0">Submit a single FASTQ file or a forward and reverse pair.</p>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="info-card">
+            <span class="step-number" aria-hidden="true">2</span>
+            <h2 class="h5">We analyse the sample</h2>
+            <p class="text-muted mb-0">Your sequencing data is processed automatically after submission.</p>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="info-card">
+            <span class="step-number" aria-hidden="true">3</span>
+            <h2 class="h5">Keep your result ID</h2>
+            <p class="text-muted mb-0">Use the unique result ID to return to the completed report later.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="upload-card mx-auto" style="max-width: 46rem;" aria-labelledby="form-title">
+        <h2 id="form-title" class="h3 mb-2">Batch upload</h2>
+        <p class="text-muted mb-4">
+          Upload multiple samples together. Paired reads are matched using the
+          <code>_1.fastq.gz</code> and <code>_2.fastq.gz</code> suffixes by default.
+        </p>
+
+        <form id="dropper" class="dropzone upload-dropzone mb-4" action='{{ url_for("upload.file_upload",upload_id=upload_id) }}' method="post" enctype="multipart/form-data">
+          <div class="dz-message">
+            <span class="d-block fw-semibold text-dark mb-1">Drop FASTQ files here to upload</span>
+            <span class="small">or click to browse. You can add files for more than one sample.</span>
+          </div>
+        </form>
+
+        <form id="batch-form" method="post">
+			{{ form.csrf_token }}
+          <!-- <input id="upload-id" name="upload_id" type="hidden" value=""> -->
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label" for="platform">Sequencing platform</label>
+              {{form.platform(class_="form-select rounded-pill px-3", id="platform")}}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="pairing">Read type</label>
+              {{form.pairing(class_="form-select rounded-pill px-3", id="pairing")}}
+            </div>
+          </div>
+
+          <button class="btn btn-outline-primary rounded-pill px-4 mb-3 upload-action" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-options" aria-expanded="false" aria-controls="advanced-options">
+            Advanced options
+          </button>
+
+          <div id="advanced-options" class="collapse mb-4">
+            <div class="border rounded-4 p-3 bg-light">
+              <h3 class="h6">Paired-read file suffixes</h3>
+              <p class="small text-muted">Change these only if your paired files use a different naming convention, such as <code>sample1_R1.fastq.gz</code>.</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="forward-suffix">Forward suffix</label>
+                  <input id="forward-suffix" class="form-control rounded-pill px-3" type="text" name="forward_suffix" value="_1.fastq.gz">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="reverse-suffix">Reverse suffix</label>
+                  <input id="reverse-suffix" class="form-control rounded-pill px-3" type="text" name="reverse_suffix" value="_2.fastq.gz">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-3">
+			  {{form.upload_id}}
+			  {{form.submit(class="btn btn-primary rounded-pill px-4 upload-action")}}
+
+            <p class="small text-muted mb-0">Maximum file size: 4 GB. Each submission receives a unique result ID.</p>
+          </div>
+        </form>
+      </section>
+			
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
+
+	<script type="application/javascript">
+		Dropzone.options.dropper = {
+			paramName: 'file',
+			chunking: true,
+			forceChunking: true,
+			url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
+			maxFilesize: 4025, // megabytes
+			chunkSize: 100000000, // bytes
+			timeout: 0,
+			renameFile: function(file) {
+				var safefilename = file.name.replace(/[^\w.]/gi, '')
+				return safefilename;
+			},
+			init: function() {
+				this.on("processing", file => {
+					document.getElementById('submit').classList.add("disabled");
+				});
+				this.on("success", file => {
+					document.getElementById('submit').classList.remove("disabled");
+				});
+			},
+		}	
+	</script>
 
 
-					</div>
-					<hr>
-					{{form.upload_id}}
-                    {{form.submit(class="btn btn-outline-dark")}}
-					
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
-
-<script type="application/javascript">
-    Dropzone.options.dropper = {
-        paramName: 'file',
-        chunking: true,
-        forceChunking: true,
-        url: '{{ url_for("upload.file_upload", upload_id=upload_id) }}',
-        maxFilesize: 4025, // megabytes
-        chunkSize: 100000000, // bytes
-		timeout: 0,
-		renameFile: function(file) {
-			var safefilename = file.name.replace(/[^\w.]/gi, '')
-			return safefilename;
-		},
-		init: function() {
-			this.on("processing", file => {
-				document.getElementById('submit').classList.add("disabled");
-			});
-			this.on("success", file => {
-				document.getElementById('submit').classList.remove("disabled");
-			});
-		},
-    }	
-</script>
-
-
-{% endblock %}
+	{% endblock %}
