@@ -2,46 +2,9 @@
 
 {% extends 'base.html' %}
 
-{% block header %}
+{% block head %}
 
 
-<style media="screen">
-#mapid { height: 500px; }
-
-.info {
-	padding: 6px 8px;
-	font: 14px/16px Arial, Helvetica, sans-serif;
-	background: white;
-	background: rgba(255,255,255,0.8);
-	box-shadow: 0 0 15px rgba(0,0,0,0.2);
-	border-radius: 5px;
-}
-.info h4 {
-	margin: 0 0 5px;
-	color: #777;
-}
-
-.legend {
-	line-height: 18px;
-	color: #555;
-}
-
-.legend i {
-	width: 18px;
-	height: 18px;
-	float: left;
-	margin-right: 8px;
-	opacity: 0.7;
-}
-</style>
-
-<script type="text/javascript">
-$( function() {
-
-} );
-
-
-</script>
 
 
 {% endblock %}
@@ -52,31 +15,31 @@ $( function() {
 
 {% block content %}
 
-<div class="row justify-content-md-center">
-    <div class="col-md-8">
-        <div class="card border-dark shadow">
-            <div class="card-header text-center bg-dark text-white">
-              <strong>Sample selector</strong>
-            </div>
-            <div class="card-body text-center">
-                <form method="post" enctype=multipart/form-data>
-					<div class="form-row">
-						<div class="col-md-4">
+<section class="info-card mb-4" aria-labelledby="filters-title">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+          <div>
+            <h2 id="filters-title" class="h3 mb-2">Filter variants</h2>
+            <p class="text-muted mb-0">Choose one or more values in any field to narrow the catalogue.</p>
+          </div>
+          <button class="btn btn-outline-primary rounded-pill px-4" type="reset" form="variant-filters">Clear filters</button>
+        </div>
 
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Lineage</label>
-							    <select name="lineage" multiple class="form-control" id="exampleFormControlSelect2">
-									{% for d in lineages %}
-										<option>{{d}}</option>
-									{% endfor %}
-							    </select>
-						  	</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Drug resistance</label>
-							    <select name="drtype" multiple class="form-control" id="exampleFormControlSelect2">
-							      	<option>Sensitive</option>
+        <form id="variant-filters" method="post">
+          <div class="row g-4">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" for="gene">Lineage</label>
+              <select id="lineage" class="form-select variant-select" name="lineage" multiple>
+                {% for d in lineages %}
+					<option>{{d}}</option>
+				{% endfor %}
+              </select>
+              <div class="form-text">Hold Command or Control to choose more than one.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" for="drug-resistance">Drug resistance</label>
+              <select name="drtype" multiple class="form-control" id="exampleFormControlSelect2">
+							      	<option>Susceptible</option>
 							      	<option>RR-TB</option>
 							      	<option>HR-TB</option>
 							      	<option>MDR-TB</option>
@@ -84,82 +47,169 @@ $( function() {
 							      	<option>XDR-TB</option>
 									<option>Other</option>
 							    </select>
-						  	</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Country</label>
-							    <select name="country" multiple class="form-control" id="exampleFormControlSelect2">
-							      	{% for c in countries %}
+              <div class="form-text">Select the drug resistance type.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" for="country">Country</label>
+              <select id="country" class="form-select variant-select" name="country" multiple>
+                {% for c in countries %}
 										<option>{{c}}</option>
 									{% endfor %}
-							    </select>
-						  	</div>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Spoligptype</label>
-							    <input name="spoligotype" multiple class="form-control" id="exampleFormControlSelect2" placeholder="Binary spoligotype (0/1)">
-						  	</div>
-						</div>
-					</div>
-
-                    <button type="submit" class="btn btn-primary"  id="single_sample_submit">Submit</button>
-                </form>
+              </select>
+              <div class="form-text">Select the country of the sample.</div>
             </div>
-        </div>
-    </div>
-</div>
+		</div>
+		<div class="row g-4 py-3">
+
+            <div class="col-md-5">
+              <label class="form-label fw-semibold" for="spoligotype">Spoligotype</label>
+			<input id="spoligotype" class="form-control rounded-pill px-3" type="text" name="spoligotype" placeholder="Binary spoligotype (0/1)">
+			<div class="form-text py-1">Enter a spoligotype using the binary format (0/1).</div>
+
+            </div>
+
+            <div class="col-md-3 d-flex align-items-center gap-3">
+              <button class="btn btn-primary btn-lg rounded-pill px-4" type="submit">Search samples</button>
+            </div>
+          </div>
+
+
+        </form>
+      </section>
+
+
 <hr>
 {% if data %}
-	{{ utils.drtype_box(data) }}
-
-	<div class="row justify-content-md-center">
-	    <div class="col-md-8">
-	        {{ utils.draw_map(geojson) }}
-	    </div>
-	</div>
 
 
 
-	<div class="row justify-content-md-center">
-		<div class="col-md-6">
-			{{ utils.counter_table(data,"lineage")}}
-		</div>
-		<div class="col-md-6">
-			{{ utils.counter_table(data,"spoligotype")}}
-		</div>
+<section class="pb-5" aria-labelledby="resistance-title">
+    <div class="dashboard-card">
+        <div class="row align-items-center g-4 mb-4">
+        <div class="col-lg-4">
+            <p class="text-uppercase text-muted small fw-semibold mb-2">Database size</p>
+            
+            <p class="total-samples mb-2">{{ total_samples }}</p>
+            <p class="mb-0 text-muted">Samples in the database</p>
+        </div>
+        <div class="col-lg-8">
+            <h2 id="resistance-title" class="h3 mb-2">Drug-resistance profile</h2>
+            <p class="mb-0 text-muted">
+            Sample counts grouped by reported drug-resistance type.
+            </p>
+        </div>
+        </div>
 
-	</div>
+        <dl class="resistance-grid">
+        <div>
+            <dt>Susceptible</dt>
+            <dd>{{dr_data["Susceptible"]}}</dd>
+        </div>
+        <div>
+            <dt>RR-TB</dt>
+            <dd>{{dr_data["RR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>HR-TB</dt>
+            <dd>{{dr_data["HR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>MDR-TB</dt>
+            <dd>{{dr_data["MDR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>Pre-XDR-TB</dt>
+            <dd>{{dr_data["Pre-XDR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>XDR-TB</dt>
+            <dd>{{dr_data["XDR-TB"]}}</dd>
+        </div>
+        <div>
+            <dt>Other</dt>
+            <dd>{{dr_data["Other"]}}</dd>
+        </div>
+        </dl>
+    </div>
+</section>
+	
 
-	<div class="row justify-content-md-center">
-		<div class="col-md-8">
-			{% if data|length >= 1000 %}
+	 <section class="row g-4 pb-5" aria-label="Sample distributions">
+    <div class="col-lg-6">
+        
 
-				<div class="card border-dark shadow">
-					<div class="card-header text-center bg-dark text-white">
-					  	<strong>Samples</strong>
-					</div>
-					<div class="card-body">
-						<div class="mb-3">
-							This table has <b>{{ data|length}}</b> rows and could cause your browser to crash if rendered.
-						</div>
-						<form method="post" enctype=multipart/form-data>
-							<input type="text" name="query_values" value="{{query}}" style="display: none;">
-							<button class="btn btn-primary" name="query" type="submit">
-								Download CSV
-							</button>
-						</form>
-					</div>
-				</div>
+        {{ utils.generic_table(lineage_counts,{"lineage": "Lineage", "count": "Count"},"Lineage") }}
 
-			{% else %}
-				{{ utils.generic_table(data,{"sample_link":"ID","drtype":"Drug resistance","country_code":"Country","lineage":"Lineage","spoligotype":"Spoligotype"},"Samples",buttons=True)}}
-			{% endif %}
-		<div>
-	<div>
+    </div>
+
+    <div class="col-lg-6">
+        
+        <article class="dashboard-card">
+        <h2 class="h3 mb-2">Collection year</h2>
+        <p class="text-muted mb-4">
+            Number of samples grouped by year of collection.
+        </p>
+        <figure class="mb-0">
+            <div id="date_vis"></div>
+            </div>
+            <figcaption class="small text-muted mt-3">
+            A line or column chart will show changes in sampling over time.
+            </figcaption>
+        </figure>
+        </article>
+    </div>
+    </section>
+
+    <section class="pb-5" aria-labelledby="strain-title">
+        
+        <article class="dashboard-card">
+        <h2 class="h3 mb-2">Sample locations</h2>
+        <p class="text-muted mb-4">
+            Geographic distribution of samples in the database.
+        </p>
+        <figure >
+            {{ utils.draw_map(geojson, '500px') }}
+            <figcaption class="small text-muted mt-3">
+            Samples can be mapped by country, region, or precise collection location.
+            </figcaption>
+        </figure>
+        </article>
+    </section>
+
+
+
+	<section class="pb-5" aria-labelledby="strain-title">
+	
+				{{ utils.bigtable(data,[{ 'data': 'sample_link', 'title': 'ID' },	{ 'data': 'drtype', 'title': 'Drug resistance' },{ 'data': 'lineage', 'title': 'Lineage' },	{ 'data': 'country_code', 'title': 'Country iso3' }],"Samples")}}
+	</section>
+
+<script>
+      // Assign the specification to a local variable vlSpec.
+      var vlSpec = {
+        
+        "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+        "description": "A simple bar chart with embedded data.",
+        "data": {
+            "values": {{year_of_collection | safe}}
+        },
+        "mark": "bar",
+        "encoding": {
+            "x": {"field": "year", "type": "quantitative"},
+            "y": {"field": "count", "type": "quantitative"}
+        }
+
+
+      };
+
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#date_vis', vlSpec);
+    </script>
+
+
+
+
+
 {% endif %}
 
 

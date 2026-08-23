@@ -78,7 +78,7 @@ import datetime
 # import pandas as pd
 # import plotly.express as px
 import tbprofiler
-conf = tbprofiler.get_conf_dict("tbdb")
+conf = tbprofiler.get_conf_dict("who_v2+")
 drugs2lt = tbprofiler.get_drugs2lt("/home/jody/github/tbdb/tbdb.bed")
 @bp.route('/tb-crowd/performance/<drug>')
 @login_required

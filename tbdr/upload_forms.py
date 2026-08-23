@@ -45,7 +45,7 @@ class AuthenicatedUploadForm(UploadForm):
         choices=[
             ("Not available","NA"),
             ("Resistant","R"),
-            ("Sensitive","S")
+            ("Susceptible","S")
         ],
     )
     delamanid  = SelectField(
@@ -53,7 +53,7 @@ class AuthenicatedUploadForm(UploadForm):
         choices=[
             ("Not available","NA"),
             ("Resistant","R"),
-            ("Sensitive","S")
+            ("Susceptible","S")
         ],
     )
 

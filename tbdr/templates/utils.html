@@ -1,12 +1,15 @@
 
 {% macro progress_bar(progress) -%}
-	{% set p = {"In queue":0,"Mapping":17,"Bam sorting":33,"Variant calling":50,"Variant annotation":67,"Lineage determination":83} %}
+	{% set p = {"In queue":0,"Mapping":17,"Variant calling":50,"Spoligotyping":67,"Coverage analysis":83} %}
 	<div class="text-center">
 		<h4>{{progress}}</h4>
 	</div>
-	<div class="progress">
-	  <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="{{p[progress]}}" aria-valuemin="0" aria-valuemax="100" style="width: {{p[progress]}}%"></div>
-	</div>
+	
+
+	<div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="{{p[progress]}}" aria-valuemin="0" aria-valuemax="100">
+		<div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{p[progress]}}%"></div>
+	  </div>
+	  
 {% endmacro %}
 
 {% macro row_val(val,i=0,total_rows=1,url=None) -%}
@@ -29,7 +32,7 @@
 {%- endmacro %}
 
 {% macro drtype_badge(text,drtype) -%}
-	{% if drtype=="Sensitive" %}
+	{% if drtype=="Susceptible" %}
 	<span class="badge" style="background-color: #28a745;">{{text}}</span>
 	{% elif drtype=="RR-TB" %}
 	<span class="badge" style="background-color: #007bff;">{{text}}</span>
@@ -47,7 +50,7 @@
 {%- endmacro %}
 
 {% macro get_dr_style(drtype) -%}
-	{% if drtype=="Sensitive" %}
+	{% if drtype=="Susceptible" %}
 background-color: #28a745;
 	{% elif drtype=="RR-TB" %}
 background-color: #007bff;
@@ -68,7 +71,7 @@ background-color: #f8f9fa;
 
 
 {% macro drtype_box(rows) -%}
-	{% set counts = {"Sensitive":0,"RR-TB":0,"HR-TB":0,"MDR-TB":0,"Pre-XDR-TB":0,"XDR-TB":0,"Other":0} %}
+	{% set counts = {"Susceptible":0,"RR-TB":0,"HR-TB":0,"MDR-TB":0,"Pre-XDR-TB":0,"XDR-TB":0,"Other":0} %}
 	{% for row in rows %}
 		{% set key = row["drtype"] %}
 		{% if key in counts %}
@@ -96,7 +99,7 @@ background-color: #f8f9fa;
 {%- endmacro %}
 
 
-{% macro counter_table(rows,var) -%}
+{% macro counter_table(rows,var,name,description=None) -%}
 	{% set rand_id = range(1, 5000) | random %}
 	{% set counts = dict() %}
 	{% for row in rows %}
@@ -108,11 +111,11 @@ background-color: #f8f9fa;
 		{% endif %}
 	{% endfor %}
 
-        <div class="card border-dark shadow">
-            <div class="card-header text-center bg-dark text-white">
-              <strong>{{var}} Counts</strong>
-            </div>
-			<div class="card-body">
+        <article class="info-card">
+				<h2 class="h3">{{name}}</h2>
+		{% if description %}
+			<p class="text-muted">{{ description }}</p>
+		{% endif %}
 				<table class="table table-hover" id="table-{{rand_id}}">
 					<thead>
 						<tr>
@@ -129,12 +132,11 @@ background-color: #f8f9fa;
 						{% endfor %}
 					</tbody>
 				</table>
-			</div>
-        </div>
+		</article>
 
 	<script type="text/javascript">
 	var table = $("#table-{{rand_id}}").DataTable( {
-		select: true,
+		select: false,
 		"scrollX": true,
 		"order": [[ 1, "desc" ]]
 	// dom: 'Blfrtip',
@@ -181,7 +183,7 @@ background-color: #f8f9fa;
 
 {% macro generic_tuple_table(rows,columns,name,buttons=False) -%}
 	{% set rand_id = range(1, 5000) | random %}
-	<div class="card border-dark shadow">
+	<div class="card border-dark">
 		<div class="card-header text-center bg-dark text-white">
 		  	{{name}}
 		</div>
@@ -224,15 +226,15 @@ background-color: #f8f9fa;
 
 {%- endmacro %}
 
-{% macro generic_table(rows,columns,name,buttons=False) -%}
+{% macro generic_table(rows,columns,name,description=None,datatables=True,searchable=False,buttons=False) -%}
 
 
 	{% set rand_id = range(1, 5000) | random %}
-	<div class="card border-dark shadow">
-		<div class="card-header text-center bg-dark text-white">
-		  	{{name}}
-		</div>
-		<div class="card-body">
+	<article class="info-card">
+		<h2 class="h3">{{name}}</h2>
+		{% if description %}
+			<p class="text-muted">{{ description }}</p>
+		{% endif %}
 			<table class="table table-hover" id="table-{{rand_id}}">
 				<thead>
 					<tr>
@@ -262,23 +264,74 @@ background-color: #f8f9fa;
 					{% endfor %}
 				</tbody>
 			</table>
-		</div>
-	</div>
+	</article>
 
+	{% if datatables %}
 	<script type="text/javascript">
+
 	var table = $("#table-{{rand_id}}").DataTable( {
-		select: true,
+		{% if searchable %}
+		layout: {
+			topStart: 'searchBuilder',
+			topEnd: 'search'
+		},
+		{% endif %}
+		select: false,
 		"scrollX": true,
 		{% if buttons %}
-		dom: 'Bfrtip',
-        buttons: [
-            'csv', 'excel', 'pdf'
+		buttons: [
+            'csv'
         ]
 		{% endif %}
 	})
 	</script>
+	{% endif %}
 
 {%- endmacro %}
+
+
+
+{% macro bigtable(rows,columns,name,description=None) -%}
+
+
+	{% set rand_id = range(1, 5000) | random %}
+	<article class="info-card">
+		<h2 class="h3">{{name}}</h2>
+		{% if description %}
+			<p class="text-muted">{{ description }}</p>
+		{% endif %}
+			<table class="table table-hover" id="table-{{rand_id}}">
+				
+			</table>
+	</article>
+
+
+	<script type="text/javascript">
+
+	tabledata = {{ rows|tojson|safe }}
+
+	var table = $("#table-{{rand_id}}").DataTable( {
+		data: tabledata,
+		columns: {{columns|tojson|safe}},
+		layout: {
+			topStart: 'searchBuilder',
+			topEnd: 'search'
+		},
+
+		select: false,
+		"scrollX": true,
+
+		buttons: [
+            'csv'
+        ]
+
+	})
+	</script>
+
+
+{%- endmacro %}
+
+
 
 {% macro gauge(val,max,min=0) -%}
 
@@ -364,15 +417,10 @@ background-color: #f8f9fa;
 	</script>
 {%- endmacro %}
 
-{% macro draw_map(geojson) -%}
+{% macro draw_map(geojson, height='500px') -%}
 
-<div class="card border-dark shadow">
-	<div class="card-header text-center bg-dark text-white">
-	  <strong>Geographic prevalence</strong>
-	</div>
-	<div id="mapid" class="card-body">
+<div id="mapid" class="card-body" style="height: {{height}};">
 
-	</div>
 </div>
 
 <script type="text/javascript">
@@ -382,8 +430,7 @@ background-color: #f8f9fa;
 
 	var map = L.map('mapid').setView([51.505, -0.09], 2);
 
-	L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}', {
-		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		subdomains: 'abcd',
 		minZoom: 0,
 		maxZoom: 20,
@@ -445,7 +492,7 @@ background-color: #f8f9fa;
 
 	function zoomToFeature(e) {
 		console.log(e.target)
-		window.open("{{ url_for('sra.country') }}/" + e.target.feature.properties.admin, "_self")
+		// window.open("{{ url_for('sra.country') }}/" + e.target.feature.properties.admin, "_self")
 		// map.fitBounds(e.target.getBounds());
 	}
 
@@ -465,6 +512,7 @@ background-color: #f8f9fa;
 
 	// method that we will use to update the control based on feature properties passed
 	info.update = function (props) {
+		console.log(props)
 		this._div.innerHTML = '<h4>Number of isolates</h4>' +  (props ?
 			'<b>' + props.admin + '</b><br />' + props.num_isolates + ' isolates '
 			: 'Hover over a Country');
@@ -483,7 +531,7 @@ background-color: #f8f9fa;
 		// loop through our density intervals and generate a label with a colored square for each interval
 		for (var i = 0; i < grades.length; i++) {
 			div.innerHTML +=
-				'<i style="background:' + getColor(grades[i] + 0.05) + '"></i> ' +
+				'<i style="background:' + getColor(grades[i] + 0.05) + '; width: 10px;"></i> ' +
 				grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
 		}
 

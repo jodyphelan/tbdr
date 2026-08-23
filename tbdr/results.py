@@ -15,12 +15,6 @@ from .models import Result
 def get_result(sample_id):
 	row =  Result.query.filter(Result.sample_id == sample_id).first()
 	if row:
-		if row.data:
-			print(row.data['dr_variants'])
-			# for var in row.data["dr_variants"]:
-			# 	var["drugs"] = ", ".join([d["drug"] for d in var["drugs"]])
-
-			
 		return row	
 
 	return None
@@ -44,12 +38,12 @@ def run_result_json(sample_id):
 @bp.route('/results/<sample_id>',methods=('GET', 'POST'))
 def run_result(sample_id):
 	result = get_result(sample_id)
-	print(result)
 	if result==None:
 		flash("Error! Result with ID:%s doesn't exist" % sample_id)
 		return redirect(url_for('home.index'))
 	
-	if sample_id[:3] not in ("DRR","SRR","ERR") and result.status!="Completed":
+	# print(result.data['migrated'])
+	if sample_id[:3] not in ("DRR","SRR","ERR","SAM") and result.status!="Completed":
 		log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".log"
 		progress = check_progress(log_file)
 		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
@@ -57,12 +51,34 @@ def run_result(sample_id):
 	
 
 	if request.method == 'POST':
-		csv_strings = tbp.get_csv_strings(result,tbp.get_conf_dict("tbdb"))
+		csv_strings = tbp.get_csv_strings(result,tbp.get_conf_dict("who_v2+"))
 		csv_text = tbp.load_csv(csv_strings)
 		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=%s.csv" % sample_id})
 
 
 	bam_found = os.path.isfile(app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".targets.bam")
+
+	result.data['non_associated_variants_table'] = []
+	for var in result.data['other_variants']:
+		for drug,confidence in var['grading'].items():
+		
+			row = var.copy()
+			row['change'] = '<a href="%s">%s</a>' % (url_for('variants.variant',gene=row['locus_tag'],variant=row['change']),row['change'])
+			row['drug'] = drug
+			row['confidence'] = confidence
+			result.data['non_associated_variants_table'].append(row)
+
+	result.data['associated_variants_table'] = []
+	for var in result.data['dr_variants']:
+		print(var)
+		for ann in var['drugs']:
+
+			row = var.copy()
+			row['change'] = '<a href="%s">%s</a>' % (url_for('variants.variant',gene=row['locus_tag'],variant=row['change']),row['change'])
+			row['drug'] = ann['drug']
+			row['confidence'] = ann['confidence']
+			row['comment'] = ann['comment']
+			result.data['associated_variants_table'].append(row)
 	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id)
 
 
@@ -72,16 +88,14 @@ def check_progress(filename):
 		progress = "In queue"
 		return progress
 	text = open(filename).read()
-	if "bwa mem" in text:
+	if "Mapping to reference genome" in text:
 		progress = "Mapping"
-	if "samtools fixmate"  in text:
-		progress = "Bam sorting"
-	if "samclip" in text:
+	if "Running variant calling" in text:
 		progress = "Variant calling"
-	if "bcftools csq" in text:
-		progress = "Variant annotation"
-	if "%CHROM\\t%POS\\t%REF\\t%ALT[\\t%GT\\t%AD]" in text:
-		progress = "Lineage determination"
+	if "Counting kmers" in text:
+		progress = "Spoligotyping"
+	if "Calculating bamstats" in text:
+		progress = "Coverage analysis"
 	if "Profiling complete!" in text:
 		progress = "Completed"
 	return progress

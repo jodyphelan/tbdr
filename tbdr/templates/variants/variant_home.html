@@ -52,95 +52,90 @@ $( function() {
 
 {% block content %}
 
-<div class="row justify-content-md-center">
-    <div class="col-md-8">
-        <div class="card border-dark">
-            <div class="card-header text-center">
-                <strong>Variant selector</strong>
-            </div>
-            <div class="card-body text-center">
-                <form method="post" enctype=multipart/form-data>
-					<div class="form-row">
-						<div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Gene</label>
-							    <select name="gene" multiple class="form-control" id="exampleFormControlSelect2">
-									{% for d in genes %}
-										<option>{{d}}</option>
-									{% endfor %}
-							    </select>
-						  	</div>
-						</div>
-                        <div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Locus tag</label>
-							    <select name="locus_tag" multiple class="form-control" id="exampleFormControlSelect2">
-									{% for d in locus_tags %}
-										<option>{{d}}</option>
-									{% endfor %}
-							    </select>
-						  	</div>
-						</div>
-                        <div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Variant types</label>
-							    <select name="type" multiple class="form-control" id="exampleFormControlSelect2">
-									{% for d in variant_types %}
-										<option>{{d["type"]}}</option>
-									{% endfor %}
-							    </select>
-						  	</div>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="col-md-4">
-							<div class="form-group">
-							    <label for="exampleFormControlSelect2">Mutation</label>
-							    <input name="change" multiple class="form-control" id="exampleFormControlSelect2" placeholder="p.Ser450Leu">
-                                <small class="form-text text-muted">
-                                    Mutations must follow the HGVS nomenclature. <a data-toggle="collapse" href="#mutation_format_collapse" role="button">More info?</a>
-                                </small>
-						  	</div>
-						</div>
-                        <div class="col-md-8 collapse multi-collapse" id="mutation_format_collapse">
-                            <div class="alert alert-primary text-left" style="font-size: 15px">
-                                <div class="">
-                                    Mutations must follow the HGVS nomenclature. Information on this format can be found <a href="https://varnomen.hgvs.org/">here</a>.
-                                </div>
-                                <div class="">
-                                    The following types of mutations are currently allowed:
-                                    <ul>
-                                        <li><b>Amino acid substitutions:</b> Example: S450L in rpoB would be p.Ser450Leu</li>
-                                        <li><b>Deletions in genes:</b> Example: Deletion of nucleotide 758 in tlyA would be c.758del</li>
-                                        <li><b>Insertion in genes:</b> Example: Insertion of GT between nucleotide 1850 and 1851 in katG would be c.1850_1851insGT</li>
-                                        <li><b>SNPs in non-coding RNAs:</b> Example: A to G at position 1401 in rrs would be r.1401a>g</li>
-                                        <li><b>SNPs in gene promoters:</b> Example: A to G 7 bases 5' of the start codon in pncA c.-7A>G</li>
-                                    </ul>
-                                    <b>Important! The mutations and resulting library files are in reference to the H37Rv (NC_000962.3/AL123456.3) reference genome.</b>
+<section class="variant-hero text-center pt-4 pb-5" aria-labelledby="page-title">
+        <h1 id="page-title" class="display-5 fw-bold mb-3">Variant explorer</h1>
+        <p class="lead text-muted mb-0">
+          Search <em>M. tuberculosis</em> variants by gene, locus tag, variant type, or HGVS mutation.
+        </p>
+      </section>
 
-                                </div>
-
-
-
-
-
-
-
-                            </div>
-                        </div>
-					</div>
-
-                    <button type="submit" class="btn btn-primary"  id="single_sample_submit">Submit</button>
-                </form>
-            </div>
+      <section class="info-card mb-4" aria-labelledby="filters-title">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+          <div>
+            <h2 id="filters-title" class="h3 mb-2">Filter variants</h2>
+            <p class="text-muted mb-0">Choose one or more values in any field to narrow the catalogue.</p>
+          </div>
+          <button class="btn btn-outline-primary rounded-pill px-4" type="reset" form="variant-filters">Clear filters</button>
         </div>
-    </div>
-</div>
+
+        <form id="variant-filters" method="post">
+          <div class="row g-4">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" for="gene">Gene</label>
+              <select id="gene" class="form-select variant-select" name="gene" multiple>
+                {% for d in genes %}
+					<option>{{d}}</option>
+				{% endfor %}
+              </select>
+              <div class="form-text">Hold Command or Control to choose more than one.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" for="locus-tag">Locus tag</label>
+              <select id="locus-tag" class="form-select variant-select" name="locus_tag" multiple>
+                {% for d in locus_tags %}
+					<option>{{d}}</option>
+				{% endfor %}
+              </select>
+              <div class="form-text">Use the reference-genome locus tag when available.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" for="variant-type">Variant type</label>
+              <select id="variant-type" class="form-select variant-select" name="type" multiple>
+                {% for d in variant_types %}
+					<option>{{d["type"]}}</option>
+				{% endfor %}
+              </select>
+              <div class="form-text">Variant-effect terms used in the catalogue.</div>
+            </div>
+		</div>
+		<div class="row g-4 py-3">
+
+            <div class="col-md-5">
+              <label class="form-label fw-semibold" for="mutation">Mutation</label>
+              <input id="mutation" class="form-control rounded-pill px-3" type="text" name="change" placeholder="e.g. p.Ser450Leu">
+              <div class="form-text py-1">Enter a mutation using <a href="" data-bs-toggle="collapse" data-bs-target="#mutation-guide">HGVS nomenclature.</a></div>
+
+            </div>
+
+            <div class="col-md-3 d-flex align-items-center gap-3">
+              <button class="btn btn-primary btn-lg rounded-pill px-4" type="submit">Search variants</button>
+            </div>
+          </div>
+
+          <div id="mutation-guide" class="collapse mt-4">
+            <div class="variant-guide">
+              <h3 class="h5">HGVS mutation format</h3>
+              <p class="mb-2">Use the H37Rv reference genome for mutations and catalogue entries.</p>
+              <ul class="mb-0">
+                <li>Amino-acid substitution: <code>p.Ser450Leu</code></li>
+                <li>Gene deletion: <code>c.758del</code></li>
+                <li>Gene insertion: <code>c.1850_1851insGT</code></li>
+                <li>Non-coding RNA SNP: <code>r.1401a&gt;g</code></li>
+                <li>Promoter SNP: <code>c.-7A&gt;G</code></li>
+              </ul>
+            </div>
+          </div>
+        </form>
+      </section>
+
+
 <hr>
 {% if data!=None %}
 	<div class="row justify-content-md-center">
 		<div class="col-md-8">
-			{{ utils.generic_table(data,{"gene":"Gene","locus_tag":"Locus tag","variant_link":"Change","type":"Type","drugs":"Associated resistance"},"Results")}}
+			{{ utils.generic_table(data,{"gene":"Gene","locus_tag":"Locus tag","variant_link":"Change","type":"Type","drugs":"Associated resistance"},"Results",True,True,True,True	)}}
 		<div>
 	<div>
 

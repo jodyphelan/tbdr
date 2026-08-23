@@ -2,7 +2,7 @@
 
 {% extends 'base.html' %}
 
-{% block header %}
+{% block head %}
 <!-- <script src="https://cdn.jsdelivr.net/npm/igv@2.7.4/dist/igv.min.js"></script> -->
 <script src="{{ url_for('static', filename='igv.min.js') }}"></script>
 
@@ -12,18 +12,33 @@
         height:500px;
         overflow:scroll;
     }
+	/* on hover over a card element */
+	.card:hover {
+		box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+		transform: scale(1.005);
+	}
+
+	/* limit column size to 150 px */
+	.table td {
+		max-width: 200px;
+	}
+	
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="mt-4 text-center">
 
-	<h4>TB-Profiler result</h4>
-	<div class="">
+
+
+
+<section class="text-center pb-5" aria-labelledby="page-title">
+	
+	<h1 id="page-title" class="display-5 fw-bold mb-3">TB-Profiler result</h1>
+	<p class="lead text-muted mb-0">
 		Run: {{sample_id}}
-	</div>
-	<hr>
-</div>
+	</p>
+
+</section>
 {% if result==None %}
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -32,14 +47,30 @@
     </div>
     <div class="row justify-content-center text-center">
         <div class="col-md-8">
-            Your files are being proessed, please come back later.
+            Your files are being processed, please come back later.
         </div>
     </div>
+
+	<div class="row justify-content-center">
+		<div class="col-md-8 text-center">
+			<section class="text-center py-2">
+
+			<h2 class="h5">We value your feedback</h2>
+			<p class="">
+				While you wait would you be willing to give some feedback on TB-Profiler? 
+			</p>
+			<p>
+				
+				<button class="btn btn-outline-primary rounded-pill px-4" data-tf-slider="lS4u9U0O" data-tf-position="right" data-tf-opacity="100" data-tf-iframe-props="title=TBDR feedback" data-tf-transitive-search-params data-tf-medium="snippet" class="btn btn-info p-1 m-2">Give feedback</button><script src="//embed.typeform.com/next/embed.js"></script>
+			</p>
+		</section>
+		</div>
+	</div>
     <div class="row justify-content-center text-center pt-4">
         <div class="col-mt-8">
             <div class="">
 
-                Want to know whats going on under the hood? <button class="btn btn-outline-dark p-1 m-2" type="button" data-toggle="collapse" data-target="#log" aria-expanded="false" aria-controls="log">Toggle log</button>
+                Want to know whats going on under the hood? <button class="btn btn-outline-dark p-1 m-2" type="button" data-bs-toggle="collapse" data-bs-target="#log" aria-expanded="false" aria-controls="log">Toggle log</button>
             </div>
             <div class="pt-4">
 
@@ -54,246 +85,181 @@
         </div>
     </div>
 
+	<script>
+		window.setTimeout( function() {
+			window.location.reload();
+		}, 10000);
+	</script>
+
 {% else %}
 
-
-    <div class="row justify-content-md-center">
-        <div class="col-md-10">
-    		<div class="card border-dark mb-3 shadow">
-    			<div class="card-header bg-dark text-white text-center">Summary</div>
-    			<div class="card-body text-dark">
-    				<p class="card-text"><b>Run ID:</b> {{ result["id"] }}</p>
-    				<p class="card-text"><b>Sample name:</b> {{ result["sample_name"] }}</p>
-                    <p class="card-text"><b>Date:</b> {{ result["timestamp"] }}</p>
-                    <p><b>Number of reads:</b> {{ result["qc"]["num_reads_mapped"]}}</p>
-                    <p><b>Percentage reads mapped:</b> {{ result["qc"]["percent_reads_mapped"]}}</p>
-                    <p><b>Median coverage:</b> {{ result["qc"]["target_median_depth"]}}</p>
-    				<p class="card-text"><b>Strain:</b> {{ result["sub_lineage"] }}</p>
-					{% if "spoligotype" in result %}
-						<p class="card-text"><b>Spoligotype:</b> {{ result["spoligotype"]["octal"] }}</p>
-					{% endif %}
-    				<p class="card-text"><b>Drug-resistance:</b> {{ utils.drtype_badge(result["drtype"],result["drtype"]) }}</p>
-
-    				<hr>
-					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.csv">Download CSV</a>
-					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.txt">Download TXT</a>
-					<a class="btn btn-outline-success" href="{{ url_for('static', filename='results/') + result['id']}}.results.json">Download JSON</a>
-					
-    			</div>
-    		</div>
-    	</div>
-    </div>
-
-
+	{% if result["migrated"]==True %}
 	<div class="row justify-content-md-center">
         <div class="col-md-10">
-			<div class="card border-dark shadow">
-    			<div class="card-header bg-dark text-white text-center">Lineage Table: The lineage is inferred by
-    				analysing lineage specific SNPs
-    			</div>
-    			<div class="card-body">
-    				<table class="table">
-    					<thead>
-    						<tr>
-    							<th scope="col">Lineage</th>
-    							<th scope="col">Family</th>
-    							<th scope="col">RDs</th>
-                                <th scope="col">Frequency</th>
-    						</tr>
-    					</thead>
-    					<tbody>
-    					{% for row in result["lineage"] %}
-    						<tr>
-    							<td>{{ row["lineage"] }}</td>
-    							<td>{{ row["family"] }}</td>
-    							<td>{{ row["rd"] }}</td>
-                                <td>{{ row["fraction"]|round(2)|float }}</td>
-    						</tr>
-    					{% endfor %}
-    					</tbody>
-    				</table>
-    			 </div>
-    		</div>
-    	</div>
-    </div>
 
-
-    <div class="row justify-content-md-center">
+					<div class="alert alert-danger" role="alert">
+						This result has been migrated from an older version of TB-Profiler. 
+						Some information may be missing, and it has not been profiled using 
+						the latest mutation database. It is advised to re-run the analysis.
+					</div>
+		</div>
+	</div>
+	{% endif %}
+	{% if result["qc"]["target_median_depth"] < 30 %}
+	<div class="row justify-content-md-center">
         <div class="col-md-10">
 
-    		<div class="card border-dark shadow">
-    			<div class="card-header bg-dark text-white text-center">
-                    Drug resistance: This table reports	drug-resistance associated
-                    mutations found in known resistance genes
-    			</div>
-    			 <div class="card-body">
-    				<table class="table">
-    				  <thead>
-    				    <tr>
-    				      <th scope="col">Drug</th>
-    				      <th scope="col">Resistance</th>
-    				      <th scope="col">Supporting mutations</th>
-    				      <th scope="col">WHO confidence</th>
-    				      <th scope="col">Comment</th>
-    				    </tr>
-    					</thead>
-    				  <tbody>
-    					{% for drug_row in result["drug_table"] %}
-    						<tr>
-								{% if 'drug-rowspan' in drug_row %}
-									{% if drug_row['drug-rowspan']>1 %}
-    									<td rowspan="2">{{ drug_row["drug"] }}</td>
-										{% else %}
-										<td>{{ drug_row["drug"] }}</td>
-									{% endif %}
-								{% endif %}
-								{% if 'gene-rowspan' in drug_row %}
-									{% if drug_row['gene-rowspan']>1 %}
-										<td rowspan="2">{{ drug_row["gene"] }}</td>
+					<div class="alert alert-danger" role="alert">
+						This average coverage of the target regions is below the recommended 30x.
+						Some mutations may not be detected due to low coverage.
+					</div>
+		</div>
+	</div>
+	{% endif %}
+
+	<section class="row g-4 mb-4" aria-label="Result overview">
+        <div class="col-lg-6">
+          <article class="result-card">
+            <h2 class="h3 mb-4">Run summary</h2>
+            <dl class="result-details">
+              <div>
+                <dt>Sample name</dt>
+                <dd>{{ result["id"] }}</dd>
+              </div>
+              <div>
+                <dt>Analysis date</dt>
+                <dd>{{ result["timestamp"] }}</dd>
+              </div>
+
+			  <div>
+                <dt>TB-Profiler version</dt>
+                <dd>{{ result["pipeline"]["software_version"] }}</dd>
+              </div>
+			  <div>
+                <dt>Database version</dt>
+                <dd>{{ result["pipeline"]["db_version"]["name"] }}</dd>
+              </div>
+            </dl>
+		</article>
+	</div>
+	
+	<div class="col-lg-6">
+		<article class="result-card">
+			<h2 class="h3 mb-4">Analysis summary</h2>
+            <dl class="result-details">
+				<div>
+				  <dt>Number of reads</dt>
+				  <dd>{{ result["qc"]["num_reads_mapped"]}}</dd>
+				</div>
+				<div>
+				  <dt>Reads mapped</dt>
+				  <dd>{{ result["qc"]["percent_reads_mapped"]}}</dd>
+				</div>
+				<div>
+					<dt>Median coverage</dt>
+					<dd>{{ result["qc"]["target_median_depth"]}}×</dd>
+				</div>
+				<div>
+					<dt>Lineage</dt>
+					<dd>{{ result["lineage"][0]["lineage"] if result["lineage"] else "" }}</dd>
+				</div>
+				<div>
+					<dt>Spoligotype</dt>
+					<dd>{{ result["spoligotype"]["octal"] if "spoligotype" in result else "" }}</dd>
+				</div>
+              <div>
+                <dt>Drug-resistance type</dt>
+                <dd>{{ result["drtype"] if "drtype" in result else "" }}</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+
+	  <section class="py-4" aria-labelledby="lineage-title">
+        
+		{{utils.generic_table(result["lineage"],{"lineage":"Lineage","family":"Family","rd":"RDs","fraction":"Frequency"},"Lineage calls","The lineage is inferred by
+    				analysing lineage specific SNPs",False,False)}}
+      </section>
+
+	
+	<section class="py-4" aria-labelledby="drug-table">
+		<article class="info-card">
+			<h2 id="drug-table" class="h3 mb-2">Resistance-associated mutations</h2>
+			<p class="text-muted mb-4">
+			Variants detected in the sample that are associated with drug resistance.
+			</p>
+			<div class="table-responsive">
+				<table class="table result-table align-middle mb-0">
+
+					<thead>
+					<tr>
+						<th scope="col">Drug</th>
+						<th scope="col">Resistance</th>
+						<th scope="col">Supporting mutations</th>
+						<th scope="col">WHO confidence</th>
+						<th scope="col">Comment</th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for drug_row in result["drug_table"] %}
+						<tr>
+							{% if 'drug-rowspan' in drug_row %}
+								{% if drug_row['drug-rowspan']>1 %}
+									<td rowspan="2">{{ drug_row["drug"] }}</td>
 									{% else %}
-    									<td>{{ drug_row["gene"] }}</td>
-									{% endif %}
+									<td>{{ drug_row["drug"] }}</td>
 								{% endif %}
+							{% endif %}
+							{% if 'gene-rowspan' in drug_row %}
+								{% if drug_row['gene-rowspan']>1 %}
+									<td rowspan="2">{{ drug_row["gene"] }}</td>
+								{% else %}
+									<td>{{ drug_row["gene"] }}</td>
+								{% endif %}
+							{% endif %}
+				
+							<td>{{ drug_row["change"] }}</td>
+							<td>{{ drug_row["confidence"] }}</td>
+							<td>{{ drug_row["comment"] }}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</article>
+	</section>
+	
 
-    							<td>{{ drug_row["change"] }}</td>
-    							<td>{{ drug_row["confidence"] }}</td>
-    							<td>{{ drug_row["comment"] }}</td>
-    						</tr>
-    					{% endfor %}
-    					</tbody>
-    				</table>
-    			 </div>
-    		</div>
-    	</div>
-    </div>
+	<section class="py-4">
+		{{utils.generic_table(result["associated_variants_table"],{"gene_name":"Gene","pos":"Genome position","change":"Mutation","type":"Type","freq":"Estimated fraction","drug":"Drugs","confidence":"Confidence","comment":"Comment"},"Drug Resistance-Associated Mutations","This table reports mutations found in candidate resistance genes which have been associated with drug resistance.",True,True,True)}}
+	</section>
 
-    
+	<section class="py-4" aria-labelledby="drug-table">
+		{{utils.generic_table(result["non_associated_variants_table"],{"gene_name":"Gene","pos":"Genome position","change":"Mutation","type":"Type","freq":"Estimated fraction","drug":"Drugs","confidence":"Confidence"},"Non-associated mutations","This table reports mutations found in candidate resistance genes which have not been associated with drug resistance.",True,True,True)}}
+	</section>
 
-    <div class="row justify-content-md-center">
-        <div class="col-md-10">
-    		<div class="card border-dark shadow">
-    			<div class="card-header bg-dark text-white text-center">
-                    Drug resistance-Associated Mutations: This table reports
-    				mutations found in candidate resistance genes which have been
-    				associated with drug resistance
-    			</div>
-    		  	<div class="card-body">
-    				<table class="table">
-    					<thead>
-    						<tr>
-    							<th scope="col">Gene</th>
-    							<th scope="col">Chromosome position</th>
-    							<th scope="col">Mutation</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Estimated fraction</th>
-                                <th scope="col">Drugs</th>
-                                <th scope="col">Confidence</th>
-                                <th scope="col">Comment</th>
-    						</tr>
-    					</thead>
-    					<tbody>
-    					{% for var in result["dr_variants"] %}
-							{% for d in var["drugs"] %}
-								<tr>
-									{{utils.row_val(var["gene_name"],loop.index,var["drugs"]|length) }}
-									{{ utils.row_val(var["pos"],loop.index,var["drugs"]|length) }}
-									{{ utils.row_val(var["change"],loop.index,var["drugs"]|length,url_for('variants.variant',gene=var['locus_tag'],variant=var['change']))}}
-									{{ utils.row_val(var["type"],loop.index,var["drugs"]|length) }}
-									{{ utils.row_val(var["freq"]|round(2)|float,loop.index,var["drugs"]|length) }}
-									{{ utils.row_val(d['drug'],loop.index,var["drugs"]|length) }}
-									{{ utils.row_val(d["confidence"]) }}
-									{{ utils.row_val(d["comment"]) }}
 
-								</tr>
-							{% endfor %}
-    					{% endfor %}
-    					</tbody>
-    				</table>
-    		  	</div>
-    		</div>
-    	</div>
-    </div>
-
-    <div class="row justify-content-md-center">
-        <div class="col-md-10">
-    		<div class="card border-dark shadow">
-    			<div class="card-header bg-dark text-white text-center">Non-Associated Mutations: This table reports
-    				mutations found in candidate resistance genes which have not been
-    				associated with drug resistance
-    			</div>
-    		  	<div class="card-body">
-    				<table class="table">
-    					<thead>
-    						<tr>
-    							<th scope="col">Gene</th>
-    							<th scope="col">Chromosome position</th>
-    							<th scope="col">Mutation</th>
-                                <th scope="col">Type</th>
-    							<th scope="col">
-									Estimated fraction
-									<span data-toggle="tooltip" data-placement="top" title="Tooltip on top">
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
-											<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-											<path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
-										  </svg>
-									</span>
-									
-								</th>
-    						</tr>
-    					</thead>
-    					<tbody>
-    					{% for var in result["other_variants"] %}
-							{% for ann in var["annotation"] %}
-								<tr>
-									{{utils.row_val(var["gene_name"],loop.index,var["annotation"]|length)}}
-									{{utils.row_val(var["pos"],loop.index,var["annotation"]|length)}}
-									{{utils.row_val(var["change"],loop.index,var["annotation"]|length,url_for('variants.variant',gene=var['locus_tag'],variant=var['change'])) }}
-									{{utils.row_val(var["type"],loop.index,var["annotation"]|length)}}
-									{{utils.row_val(var["freq"]|round(2)|float,loop.index,var["annotation"]|length)}}
-									{{utils.row_val(ann["drug"])}}
-									{{utils.row_val(ann["confidence"])}}
-								</tr>
-								{% endfor %}
-    					{% endfor %}
-    					</tbody>
-    				</table>
-    		  	</div>
-    		</div>
-    	</div>
-    </div>
 
     {% if bam_found %}
-        <div class="row justify-content-md-center">
-            <div class="col-md-10">
-                <div class="card border-dark mb-3 shadow">
-            		<div class="card-header bg-dark text-white text-center">Pileup</div>
-        			<div class="card-body text-dark">
-        				<div class="row">
-        					<div class="col-md-12" id="pileup-mutations">
-        						<div class="">
-        							The raw alignment can be visualised here.
-        							Click on a mutation to center and zoom the view to
-        							the correct genomic location. Drug resistant mutations
-        							are coloured in blue and non-associated mutations are
-        							coloured in green.
-        						</div>
-        						<hr>
-        						{% for var in result["dr_variants"]%}
-        							<button type="button" class="btn btn-outline-primary mb-3" onclick="setPileupView(this)" pos="{{ var['pos'] }}">{{ var["gene_name"] }} {{ var["change"] }}</button>
-        						{% endfor %}
-        						{% for var in result["other_variants"] %}
-        							<button type="button" class="btn btn-outline-success mb-3" onclick="setPileupView(this)" pos="{{ var['pos'] }}">{{ var["gene_name"] }} {{ var["change"] }}</button>
-        						{% endfor %}
-        					</div>
-
-        				</div>
-        				<hr>
-            			<div id="igvDiv"></div>
-            		</div>
-            	</div>
-            </div>
-        </div>
-
+		<section class="py-4" aria-labelledby="pileup-title">
+			<article class="result-card">
+			<h2 id="pileup-title" class="h3 mb-2">Pileup</h2>
+			<p class="text-muted mb-4">
+				The raw alignment can be visualised here. Click on a mutation to center and zoom the view to the correct genomic location. Drug resistant mutations are coloured in blue and non-associated mutations are coloured in green.
+			</p>
+			<hr>
+			{% for var in result["dr_variants"]%}
+				<button type="button" class="btn btn-outline-primary mb-3" onclick="setPileupView(this)" pos="{{ var['pos'] }}">{{ var["gene_name"] }} {{ var["change"] }}</button>
+			{% endfor %}
+			{% for var in result["other_variants"] %}
+				<button type="button" class="btn btn-outline-success mb-3" onclick="setPileupView(this)" pos="{{ var['pos'] }}">{{ var["gene_name"] }} {{ var["change"] }}</button>
+			{% endfor %}
+			<hr>
+			<div id="igvDiv"></div>
+			</article>
+		</section>
 
         <script type="text/javascript">
 
@@ -353,30 +319,16 @@
 
         </script>
 
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                {{utils.generic_table(result["qc"]["target_qc"],{"target":"Gene","percent_depth_pass":"% pass","median_depth":"Median depth"},"Gene coverage")}}
-            </div>
-			{% if "spoligotype" in result %}
-				<div class="col-md-5">
-					{{utils.generic_table(result["spoligotype"]["spacers"],{"name":"Name","seq":"Sequence","count":"Count"},"Spacer count")}}
-				</div>
-			{% endif %}
-        </div>
-		<div class="row justify-content-center">
-			<div class="col-md-5">
-                <div class="card border-dark mb-3 shadow">
-        			<div class="card-header bg-dark text-white text-center">Software</div>
-        			<div class="card-body text-dark">
-        				<p><b>TB-Profiler version:</b> {{ result["tbprofiler_version"] }}</p>
-                        <p><b>Database name:</b> {{ result["db_version"]["name"] }}</p>
-                        <p><b>Database version:</b> {{ result["db_version"]["commit"] }}</p>
+		<section class="row g-4 mb-4" aria-label="Result overview">
+        	<div class="col-lg-6">
+				{{utils.generic_table(result["qc"]["target_qc"],{"target":"Gene","percent_depth_pass":"% pass","median_depth":"Median depth"},"Gene coverage")}}
+			</div>
+			<div class="col-lg-6">
+				{{utils.generic_table(result["spoligotype"]["spacers"],{"name":"Name","seq":"Sequence","count":"Count"},"Spacer count")}}
+			</div>
+		</section>
 
-
-        			</div>
-        		</div>
-            </div>
-		</div>
+		
     {% endif %}
 {% endif %}
 {% endblock %}
