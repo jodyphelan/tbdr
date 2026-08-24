@@ -23,7 +23,7 @@ def run_sample(uniq_id,sample_name,platform,f1,f2=None):
     #     neo4j_db.write("CREATE (s:Sample:Processing { id:'%s', sampleName:'%s', timestamp:'%s'})" % (uniq_id,sample_name,datetime.now().isoformat()))
     # db.execute("INSERT INTO samples (id) VALUES ('%s')" % (uniq_id))
     # db.execute("INSERT INTO results (sample_id, status) VALUES ('%s', 'queueing')" % uniq_id)
-    db_session.add(Sample(id=uniq_id))
+    db_session.add(Sample(id=uniq_id, public=app.config["SAMPLES_PUBLIC"]))
     db_session.commit()
     db_session.add(Result(sample_id=uniq_id))
     db_session.commit()

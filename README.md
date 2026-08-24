@@ -31,6 +31,12 @@ tbdr web server and Celery worker from one `linux/amd64` image, with
 PostgreSQL and Redis as separate services. The supplied `who_v3` database is
 embedded in the image.
 
+New uploads inherit the global `UPLOADED_SAMPLES_PUBLIC` setting. Leave it as
+`false` to keep new samples out of the public SRA views, or set it to `true`
+to include new samples in those views. This setting affects new uploads only;
+existing samples retain their stored visibility. Private samples are not
+access-controlled by result ID.
+
 Docker Desktop on Apple Silicon can run the image through its amd64
 emulation. Bioinformatics jobs are CPU- and memory-intensive; the defaults
 use two TB-Profiler threads, 8 GB per job, and one Celery job at a time.

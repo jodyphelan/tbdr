@@ -16,6 +16,19 @@ from sqlalchemy.engine import URL
 
 from celery import Celery, Task
 
+
+def _parse_bool(value, *, default=False):
+    """Parse a strict environment boolean value."""
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in {'1', 'true', 'yes', 'on'}:
+        return True
+    if normalized in {'0', 'false', 'no', 'off'}:
+        return False
+    raise ValueError(f"Invalid boolean value: {value!r}")
+
+
 def celery_init_app(app: Flask) -> Celery:
     class FlaskTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
@@ -39,6 +52,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('TBDR_SECRET_KEY', 'dev'),
+        SAMPLES_PUBLIC=_parse_bool(os.environ.get('UPLOADED_SAMPLES_PUBLIC'), default=False),
         UPLOAD_FOLDER=os.environ.get('TBDR_UPLOAD_DIR', '/tmp'),
         APP_ROOT=os.path.dirname(os.path.abspath(__file__)),
         RESULTS_FOLDER=os.environ.get(
