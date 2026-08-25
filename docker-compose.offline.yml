@@ -1,0 +1,23 @@
+services:
+  postgres:
+    platform: linux/amd64
+    image: tbdr-postgres:offline
+
+  redis:
+    platform: linux/amd64
+    image: tbdr-redis:offline
+
+  init-db:
+    platform: linux/amd64
+    image: tbdr-web:offline
+    build: null
+
+  web:
+    platform: linux/amd64
+    image: tbdr-web:offline
+    build: null
+
+  worker:
+    platform: linux/amd64
+    image: tbdr-web:offline
+    build: null

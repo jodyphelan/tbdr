@@ -23,6 +23,9 @@ COPY --chown=$MAMBA_USER:$MAMBA_USER . /opt/tbdr
 RUN mkdir -p /opt/conda/envs/tbdr/share/tbprofiler \
     && python -m pip install --no-deps . \
     && cd /tmp \
+    && pip install --force-reinstall git+https://github.com/jodyphelan/TBProfiler.git@dev \
+    && pip install --force-reinstall git+https://github.com/jodyphelan/pathogen-profiler.git@dev \
+    && pip install --force-reinstall git+https://github.com/jodyphelan/is6110.git \
     && tb-profiler load_library /opt/tbdr/who_v3 \
         --db_dir /opt/conda/envs/tbdr/share/tbprofiler --force
 

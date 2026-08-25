@@ -1,6 +1,7 @@
 .git
 .gitignore
 .env
+tbdr-offline-bundle-*.tar.gz
 __pycache__
 *.py[cod]
 *.egg-info
