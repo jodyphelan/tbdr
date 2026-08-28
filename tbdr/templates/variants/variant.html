@@ -107,17 +107,26 @@
     </section>
 
 
-<section class="pb-5" aria-labelledby="resistance-title">
+    <section class="pb-5" aria-labelledby="resistance-title">
 
-    <div class="row justify-content-md-center">
-        <div class="col-md-6">
-            {{utils.counter_table(sample_data,"lineage",name="Lineage")}}
+        <div class="row justify-content-md-center">
+            <div class="col-md-6">
+                {{utils.counter_table(sample_data,"lineage",name="Lineage")}}
+            </div>
+            <div class="col-md-6">
+                {{utils.counter_table(sample_data,"spoligotype",name="Spoligotype")}}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{utils.counter_table(sample_data,"spoligotype",name="Spoligotype")}}
+    </section>
+
+    <section class="pb-5" aria-labelledby="resistance-title">
+
+        <div class="row justify-content-md-center">
+            <div class="col-md-8">
+                {{utils.generic_table(drug_data,{"drug_id":"Drug","confidence":"Confidence","source":"Source","comment":"Comment"},"Drug associations","Drug resistance confidence according to the WHO 3rd edition mutation catalogue.")}}
+            </div>
         </div>
-    </div>
-</section>
+    </section>
     
     <section class="pb-5" aria-labelledby="strain-title">
         

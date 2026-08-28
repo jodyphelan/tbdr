@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from flask import current_app
+# from .models import Submission, Result, Sample, Variant, SampleVariant
 
 # Create Base at module level (this is fine)
 Base = declarative_base()

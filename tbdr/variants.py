@@ -68,6 +68,9 @@ def browse():
 		data = query_variants(request.form.lists())
 	return render_template('variants/variant_home.html', genes = genes, locus_tags = locus_tags, variant_types=variant_types, data = data)
 
+def get_variant_drug_info(gene,variant):
+	data = db_session.execute(text("SELECT * FROM variant_drug_confidence WHERE variant_id = '%s:%s';" % (gene2locus_tag[gene],variant))).fetchall()
+	return data
 
 @bp.route('/variants/<gene>/<variant>',methods=('GET', 'POST'))
 def variant(gene,variant):
@@ -85,6 +88,9 @@ def variant(gene,variant):
 		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
 	data = get_variant_samples(gene,variant)
 	print(data)
+	drug_data = get_variant_drug_info(gene,variant)
+	drug_data = [d._asdict() for d in drug_data]
+	print(drug_data)
 	dr_counts = dict(Counter([d["drtype"] for d in data]))
 	dr_counts = {k:dr_counts.get(k,0) for k in ["Susceptible","RR-TB","HR-TB","MDR-TB","Pre-XDR-TB","XDR-TB","Other"]}
 	lineage_counts = dict(Counter([d["lineage"] for d in data]))
@@ -100,13 +106,12 @@ def variant(gene,variant):
 	isolates_with_country = 0
 	for f in raw_geojson["features"]:
 		country = f["properties"]["iso_a3"].upper()
-		print(country)
 		if country in country2variant_count:
 			f["properties"]["variant"] = country2variant_count[country] / country2total_count[country]
 			f['properties']['num_isolates'] = country2variant_count[country]
 			geojson["features"].append(f)
 			isolates_with_country += country2variant_count[country]
 
-	return render_template('variants/variant.html',gene=gene,variant = variant,dr_counts = dr_counts,geojson=geojson,lineage_counts = lineage_counts,isolates_with_country=isolates_with_country, sample_data = data)
+	return render_template('variants/variant.html',drug_data=drug_data,gene=gene,variant = variant,dr_counts = dr_counts,geojson=geojson,lineage_counts = lineage_counts,isolates_with_country=isolates_with_country, sample_data = data)
 
 

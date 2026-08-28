@@ -86,9 +86,34 @@
     </div>
 
 	<script>
-		window.setTimeout( function() {
-			window.location.reload();
-		}, 10000);
+		window.setInterval( function() {
+
+			fetch("{{url_for('results.get_log', result_id=sample_id)}}")
+				.then(response => response.text())
+				.then(text => {
+					console.log(text);
+					document.querySelector(".log_div code").textContent = text;
+					if (text.includes("Profiling finished sucessfully")) {
+						window.location.reload();
+					}
+				})
+
+		}, 5000);
+		window.setInterval( function() {
+
+			fetch("{{url_for('results.get_progress', result_id=sample_id)}}")
+				.then(response => response.text())
+				.then(progress => {
+					console.log(progress);
+					progress_mapping = {"In queue":0,"Mapping":17,"Variant calling":50,"Spoligotyping":67,"Coverage analysis":83}
+					progress_percent = progress_mapping[progress]
+					document.querySelector(".progress-bar").style.width = progress_percent + "%";
+					document.querySelector(".progress-bar").setAttribute("aria-valuenow", progress_percent);
+					document.querySelector(".progress-bar").textContent = progress_percent + "%";
+				})
+
+		}, 5000);
+
 	</script>
 
 {% else %}

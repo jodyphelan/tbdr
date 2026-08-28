@@ -118,6 +118,16 @@
             <div class="mb-4">
               <h3 class="h5">Uploaded files</h3>
               <ul id="review-files" class="upload-review-list" aria-live="polite"></ul>
+              <table id="review-table" class="table table-bordered" aria-live="polite">
+                <thead>
+                  <tr>
+                    <th scope="col">Sample Name</th>
+                    <th scope="col">R1</th>
+                    <th scope="col">R2</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
 
             <div class="mb-4">
@@ -434,6 +444,28 @@
         if (validateConfiguration()) {
           updateReview();
           setStage(3);
+          console.log("Stage 3: Review and submit");
+          // ajax call to get_sample_configuration endpoint to get the sample configuration and update the review section
+          fetch('{{ url_for("upload.get_sample_configuration", upload_id=upload_id) }}')
+            .then(response => response.json())
+            .then(data => {
+              console.log("Sample configuration data:", data);
+              // Update the review section with the sample configuration data
+              new DataTable('#review-table', {
+                data: data,
+                columns: [
+                  { data: 'sample_name', title: 'Sample Name' },
+                  { data: 'R1', title: 'R1' },
+                  { data: 'R2', title: 'R2' }
+                ],
+                paging: false,
+                searching: false,
+                info: false
+              });
+            })
+            .catch(error => {
+              console.error('Error fetching sample configuration:', error);
+            });
         }
       });
 

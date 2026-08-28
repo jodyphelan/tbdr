@@ -36,6 +36,7 @@ def sra():
 
 	country_counts = dict(db_session.execute(text("SELECT iso_a3, COUNT(*) FROM samples WHERE public = true GROUP BY iso_a3")).fetchall())
 	country_counts = {k.upper():v for k,v in country_counts.items() if k is not None}
+	print(country_counts)
 	dr_counts = db_session.execute(text("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype")).fetchall()
 	lineage_counts = db_session.execute(text("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage")).fetchall()
 	lineage_counts = [{"lineage": k, "count": v} for k, v in lineage_counts]
@@ -54,6 +55,7 @@ def sra():
 	for f in raw_geojson["features"]:
 		country = f["properties"]["iso_a3"].upper()
 
+		print(country, country_counts.get(country))
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
 			geojson["features"].append(f)

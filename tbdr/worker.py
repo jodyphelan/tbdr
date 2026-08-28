@@ -8,7 +8,7 @@ import os
 from flask import Flask
 from time import sleep
 from celery.utils.log import get_task_logger
-from .models import Result
+from .models import Result, add_sample_to_db
 from .db import db_session
 from celery import shared_task
 import sys
@@ -63,6 +63,7 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
 
     db_dir = current_app.config['TB_PROFILER_DB_DIR']
     db_name = current_app.config['TB_PROFILER_DB']
+    is_public = current_app.config['SAMPLES_PUBLIC']
     db_entry = Result.query.filter(Result.sample_id == uniq_id).first()
     try:
         run_tb_profiler_command(fq1, fq2, uniq_id, platform, result_file_dir)
@@ -105,6 +106,9 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
         os.remove(fq1)
         if fq2:
             os.remove(fq2)
+        if is_public:
+            add_sample_to_db(uniq_id, {"iso_a3": "IRL", "country": "Ireland", "year_of_collection": 2024})
+        
         return True
     except Exception:
         logger.exception("TB-Profiler failed for %s", uniq_id)

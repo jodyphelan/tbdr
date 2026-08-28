@@ -70,7 +70,6 @@ def run_result(sample_id):
 
 	result.data['associated_variants_table'] = []
 	for var in result.data['dr_variants']:
-		print(var)
 		for ann in var['drugs']:
 
 			row = var.copy()
@@ -99,3 +98,21 @@ def check_progress(filename):
 	if "Profiling complete!" in text:
 		progress = "Completed"
 	return progress
+
+@bp.route('/results/progress/<result_id>',methods=('GET', 'POST'))
+def get_progress(result_id):
+	log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + result_id + ".log"
+	progress = check_progress(log_file)
+	return progress
+
+def _get_log(result_id: str):
+	log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + result_id + ".log"
+	if not os.path.isfile(log_file):
+		return "Log file not found"
+	text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
+	return text
+
+@bp.route('/results/log/<result_id>',methods=('GET', 'POST'))
+def get_log(result_id):
+	log_text = _get_log(result_id)
+	return log_text

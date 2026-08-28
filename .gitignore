@@ -12,3 +12,5 @@ settings.cfg
 .env
 .DS_Store
 .vscode/
+who_v3/
+.env*
