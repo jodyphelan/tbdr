@@ -10,7 +10,7 @@ bp = Blueprint('results', __name__)
 import os
 from .db import db_session
 
-from .models import Result
+from .models import Result, Sample
 
 def get_result(sample_id):
 	row =  Result.query.filter(Result.sample_id == sample_id).first()
@@ -33,10 +33,15 @@ def run_result_json(sample_id):
 
 	return {"status":"OK","result":results}
 
-
+def get_sample_metadata(sample_id):
+	sample = Sample.query.filter(Sample.id == sample_id).first()
+	if sample:
+		return (sample.__dict__)
+	return None
 
 @bp.route('/results/<sample_id>',methods=('GET', 'POST'))
 def run_result(sample_id):
+	sample_metadata = get_sample_metadata(sample_id)
 	result = get_result(sample_id)
 	if result==None:
 		flash("Error! Result with ID:%s doesn't exist" % sample_id)
@@ -49,12 +54,6 @@ def run_result(sample_id):
 		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
 		return render_template('results/run_result.html',result = None,sample_id=sample_id,progress = progress,log_text=log_text)
 	
-
-	if request.method == 'POST':
-		csv_strings = tbp.get_csv_strings(result,tbp.get_conf_dict("who_v2+"))
-		csv_text = tbp.load_csv(csv_strings)
-		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=%s.csv" % sample_id})
-
 
 	bam_found = os.path.isfile(app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".targets.bam")
 
@@ -78,7 +77,7 @@ def run_result(sample_id):
 			row['confidence'] = ann['confidence']
 			row['comment'] = ann['comment']
 			result.data['associated_variants_table'].append(row)
-	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id)
+	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id,sample_metadata=sample_metadata)
 
 
 def check_progress(filename):

@@ -22,7 +22,20 @@ for l in open(genes_bed):
 
 
 def get_variant_samples(gene,variant,add_links=True):
-	sample_data =  db_session.execute(text("SELECT * FROM sample_variants LEFT JOIN samples ON sample_variants.sample_id = samples.id WHERE variant_id = '%s:%s';" % (gene2locus_tag[gene],variant))).fetchall()
+	query = """
+				SELECT s.*
+				FROM sample_variants sv
+				JOIN samples s
+					ON sv.sample_id = s.id
+				JOIN sample_collection_link scl
+					ON scl.sample_id = s.id
+				JOIN collections c
+					ON c.id = scl.collection_id
+				WHERE sv.variant_id = '%s:%s'
+				AND c.name = 'Public'
+			""" % (gene2locus_tag[gene],variant)
+	print(query)
+	sample_data =  db_session.execute(text(query)).fetchall()
 	if add_links:
 		for i,d in enumerate(sample_data):
 			d = d._asdict()
@@ -74,18 +87,7 @@ def get_variant_drug_info(gene,variant):
 
 @bp.route('/variants/<gene>/<variant>',methods=('GET', 'POST'))
 def variant(gene,variant):
-	if "query" in request.form:
-		query =request.form["query_values"]
-		print(query)
-		tmp = query.split("_")
-		gene = tmp[0]
-		variant = "_".join(tmp[1:])
-		data = get_variant_samples(gene,variant,add_links=False)
-		print(data)
-		csv_strings = [",".join([str(x[i]) for i in [1,0,2,7,8,10]]) for x in data]
-		csv_strings.insert(0,",".join(['Accession','Genome position','Variant','DR type','Lineage','Country code']))
-		csv_text = "\n".join(csv_strings)
-		return Response(csv_text,mimetype="text/csv",headers={"Content-disposition": "attachment; filename=test.csv"})
+
 	data = get_variant_samples(gene,variant)
 	print(data)
 	drug_data = get_variant_drug_info(gene,variant)

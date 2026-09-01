@@ -60,26 +60,7 @@ class AuthenicatedUploadForm(UploadForm):
 
 class MultiFileUpload(FlaskForm):
     
-    platform  = SelectField(
-        'Platform',
-        choices=[
-            ("Illumina","Illumina"),
-            ("Nanopore","Nanopore")
-        ],
-        validators=[
-            DataRequired(),
-        ]
-    )
-    pairing  = SelectField(
-        'Pariring',
-        choices=[
-            ("Paired","Paired"),
-            ("Single","Single")
-        ],
-        validators=[
-            DataRequired(),
-        ]
-    )
+    
     upload_id = HiddenField()
     forward_suffix = StringField(
         'Forward File Suffix',

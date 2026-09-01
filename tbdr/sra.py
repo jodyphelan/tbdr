@@ -27,27 +27,60 @@ def get_geojson(country_counts):
 	print(geojson)
 	return geojson
 
+def get_sample_data(collection_id):
+	query = """
+				WITH collection_samples AS (
+					SELECT s.*
+					FROM samples s
+					JOIN sample_collection_link scl
+						ON scl.sample_id = s.id
+					JOIN collections c
+						ON c.id = scl.collection_id
+					WHERE c.name = '%s'
+				)
+				SELECT 'iso_a3' AS field, iso_a3 AS value, COUNT(*) AS count
+				FROM collection_samples
+				GROUP BY iso_a3
+
+				UNION ALL
+
+				SELECT 'year_of_collection', year_of_collection::text, COUNT(*)
+				FROM collection_samples
+				GROUP BY year_of_collection
+
+				UNION ALL
+
+				SELECT 'drtype', drtype, COUNT(*)
+				FROM collection_samples
+				GROUP BY drtype
+
+				UNION ALL
+
+				SELECT 'lineage', lineage, COUNT(*)
+				FROM collection_samples
+				GROUP BY lineage
+
+				ORDER BY field, count DESC;
+	""" % (collection_id)
+	return db_session.execute(text(query)).fetchall()
 
 @bp.route('/sra',methods=('GET', 'POST'))
 def sra():
 	if request.method == 'POST':
 		if "result_id" in request.form: # navbar search
 			return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))
-
-	country_counts = dict(db_session.execute(text("SELECT iso_a3, COUNT(*) FROM samples WHERE public = true GROUP BY iso_a3")).fetchall())
-	country_counts = {k.upper():v for k,v in country_counts.items() if k is not None}
-	print(country_counts)
-	dr_counts = db_session.execute(text("SELECT drtype, COUNT(*) FROM samples WHERE public = true GROUP BY drtype")).fetchall()
-	lineage_counts = db_session.execute(text("SELECT lineage, COUNT(*) FROM samples WHERE public = true GROUP BY lineage")).fetchall()
-	lineage_counts = [{"lineage": k, "count": v} for k, v in lineage_counts]
-	dr_order = {"Susceptible":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
-	year_of_collection = db_session.execute(text("SELECT year_of_collection, COUNT(*) FROM samples WHERE public = true GROUP BY year_of_collection")).fetchall()
-	year_of_collection = [{'year':int(k),'count':v} for k,v in year_of_collection if k]
-	print(year_of_collection)
 	
-	dr_data = sorted(dr_counts ,key=lambda x:dr_order[x._asdict()["drtype"]])
+	sample_data = get_sample_data("Public")
+
+	print(sample_data)
+	country_counts = {row[1]: row[2] for row in sample_data if row[0]=="iso_a3" and row[1] is not None}
+	dr_counts = {row[1]: row[2] for row in sample_data if row[0]=="drtype" and row[1] is not None}
+	lineage_counts = [{'lineage': row[1], 'count': row[2]} for row in sample_data if row[0]=="lineage" and row[1] is not None]
+	year_of_collection = [{'year': int(row[1]), 'count': row[2]} for row in sample_data if row[0]=="year_of_collection" and row[1] is not None]
+	dr_order = {"Susceptible":1,"RR-TB":2,"HR-TB":3,"MDR-TB":4,"Pre-XDR-TB":5,"XDR-TB":6,"Other":7}
 	dr_data = {d:dict(dr_counts).get(d,0) for d in dr_order}
-	total_samples = sum(dr_data.values())
+	total_samples = sum(dr_counts.values())
+
 	
 	raw_geojson = json.load(open(app.config["APP_ROOT"]+url_for('static', filename='custom.geo.json')))
 	geojson = {"type":"FeatureCollection", "features":[]}
@@ -55,7 +88,7 @@ def sra():
 	for f in raw_geojson["features"]:
 		country = f["properties"]["iso_a3"].upper()
 
-		print(country, country_counts.get(country))
+
 		if country in country_counts:
 			f["properties"]["num_isolates"] = country_counts[country]
 			geojson["features"].append(f)
@@ -97,9 +130,25 @@ def query_samples(raw_queries,sample_links = True):
 		else:
 			if len([x for x in t[1] if x!=""])>0:
 				queries.append("(%s)" %" OR ".join(["%s='%s'" % (t[0],x) for x in t[1]]))
-	query = "WHERE "+" AND ".join(queries) if len(queries)>0 else ""
-
-	data = db_session.execute(text("SELECT id, iso_a3 as country_code, drtype, lineage, year_of_collection FROM SAMPLES %s AND public = true" % query)).fetchall()
+	where_query = "WHERE "+" AND ".join(queries) if len(queries)>0 else ""
+	query = "SELECT id, iso_a3 as country_code, drtype, lineage, year_of_collection FROM SAMPLES %s AND public = true" % where_query
+	query = """
+				SELECT
+					s.id,
+					s.iso_a3 AS country_code,
+					s.drtype,
+					s.lineage,
+					s.year_of_collection
+				FROM samples s
+				JOIN sample_collection_link scl
+					ON scl.sample_id = s.id
+				JOIN collections c
+					ON c.id = scl.collection_id
+				%s
+				AND c.name = 'Public'
+			""" % where_query
+	print(query)
+	data = db_session.execute(text(query)).fetchall()
 
 	data = [x._asdict() for x in data]
 	if sample_links:

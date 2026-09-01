@@ -106,8 +106,8 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
         os.remove(fq1)
         if fq2:
             os.remove(fq2)
-        if is_public:
-            add_sample_to_db(uniq_id, {"iso_a3": "IRL", "country": "Ireland", "year_of_collection": 2024})
+
+        add_sample_to_db(uniq_id)
         
         return True
     except Exception:

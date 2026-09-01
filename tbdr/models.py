@@ -24,8 +24,8 @@ class Sample(Base):
     public = Column('public', Boolean, nullable=False, default=False)
     iso_a3 = Column('iso_a3', String)
     country = Column('country', String)
-    year_of_collection = Column('year_of_collection', String)
-    drtype = Column('drtype', String)
+    year_of_collection = Column('year_of_collection', Integer)
+    drtype = Column('drtype', String, )
     lineage = Column('lineage', String)
     spoligotype = Column('spoligotype', String)
 
@@ -61,7 +61,23 @@ class VariantDrugConfidence(Base):
         UniqueConstraint('variant_id', 'drug_id'),
     )
 
-def add_sample_to_db(sample_id: str, sample_data: dict):
+class SampleCollectionLink(Base):
+    __tablename__ = 'sample_collection_link'
+    id = Column(Integer, primary_key=True)
+    sample_id = Column(String, ForeignKey('samples.id'), nullable=False)
+    collection_id = Column(Integer, ForeignKey('collections.id'), nullable=False)
+    __table_args__ = (
+        UniqueConstraint('sample_id', 'collection_id'),
+    )
+
+class Collection(Base):
+    __tablename__ = 'collections'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    
+
+def add_sample_to_db(sample_id: str):
     """Add a new Sample entry to the database."""
     result = Result.query.filter(Result.sample_id == sample_id).first()
     sample = Sample.query.filter(Sample.id == sample_id).first()
@@ -69,10 +85,6 @@ def add_sample_to_db(sample_id: str, sample_data: dict):
         data = result.data
         db_session = get_db_session()
         # update the sample entry with the provided data
-        sample.public = True
-        sample.iso_a3 = sample_data.get('iso_a3')
-        sample.country = sample_data.get('country')
-        sample.year_of_collection = sample_data.get('year_of_collection')
         sample.drtype = data.get('drtype')
         sample.lineage = data.get('sub_lineage')
         sample.spoligotype = data.get('spoligotype')

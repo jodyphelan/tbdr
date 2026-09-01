@@ -10,12 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="page-intro text-center pt-4 pb-5" aria-labelledby="page-title">
-        <h1 id="page-title" class="display-5 fw-bold mb-3">Submit a sequencing sample</h1>
-        <p class="lead text-muted mb-0">
-          Upload one or two <em>M. tuberculosis</em> FASTQ files to begin analysis.
-        </p>
-      </section>
+
 
       <ol class="upload-stepper" aria-label="Submission progress">
         <li class="is-active" data-step-indicator="1" aria-current="step">
@@ -53,7 +48,7 @@
           </div>
         </div>
 
-        <form id="batch-form" method="post">
+      <form id="batch-form" method="post">
 			{{ form.csrf_token }}
 
 
@@ -64,7 +59,7 @@
             <div class="row g-3 mb-4">
               <div class="col-md-6">
                 <label class="form-label" for="platform">Sequencing platform</label>
-                <select id="platform" class="form-select rounded-pill px-3" name="platform" aria-describedby="configuration-validation" required>
+                <select id="platform" class="form-select rounded-pill px-3" name="platform" aria-describedby="configuration-validation">
                   <option value="" selected disabled>Select a platform</option>
                   <option value="Illumina">Illumina</option>
                   <option value="Nanopore">Oxford Nanopore</option>
@@ -72,7 +67,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="pairing">Read type</label>
-                <select id="pairing" class="form-select rounded-pill px-3" name="pairing" aria-describedby="configuration-validation" required>
+                <select id="pairing" class="form-select rounded-pill px-3" name="pairing" aria-describedby="configuration-validation">
                   <option value="" selected disabled>Select a read type</option>
                   <option value="Paired">Paired-end</option>
                   <option value="Single">Single-end</option>
@@ -118,18 +113,9 @@
             <div class="mb-4">
               <h3 class="h5">Uploaded files</h3>
               <ul id="review-files" class="upload-review-list" aria-live="polite"></ul>
-              <table id="review-table" class="table table-bordered" aria-live="polite">
-                <thead>
-                  <tr>
-                    <th scope="col">Sample Name</th>
-                    <th scope="col">R1</th>
-                    <th scope="col">R2</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
 
+            </div>
+            
             <div class="mb-4">
               <h3 class="h5">Analysis settings</h3>
               <dl class="review-details">
@@ -148,12 +134,22 @@
               </dl>
             </div>
 
+            <div class="mb-4">
+              <h3 class="h5">Sample sheet</h3>
+              <p class="text-muted mb-2">Please check your files have been correctly assigned to a sample.</p>
+              <table id="review-table" class="table table-bordered" aria-live="polite"></table>
+            </div>
+            <div id="sample-error" class="alert alert-danger" role="alert" hidden>
+              
+              There was an error generating the sample sheet. Please check your uploaded files and analysis settings, then try again.
+            </div>
+
             <div id="review-validation" class="stage-validation" role="alert" hidden></div>
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
               <button class="btn btn-outline-primary btn-lg rounded-pill px-4 upload-action" type="button" data-previous-step="2">Back</button>
               <div class="text-end">
                 {{form.upload_id}}
-			  	{{form.submit(class="btn btn-primary rounded-pill px-4 upload-action")}}
+			  	      {{form.submit(class="btn btn-primary rounded-pill px-4 upload-action")}}
                 <p class="small text-muted mt-2 mb-0">Maximum file size: 4 GB. Each submission receives a unique result ID.</p>
               </div>
             </div>
@@ -180,6 +176,7 @@
       const pairedOptions = document.getElementById("paired-options");
       const advancedOptions = document.getElementById("advanced-options");
       const nanoporeReadTypeHelp = document.getElementById("nanopore-read-type-help");
+      const sampleError = document.getElementById("sample-error");
       const suffixInputs = [
         document.getElementById("forward-suffix"),
         document.getElementById("reverse-suffix")
@@ -243,6 +240,11 @@
         } else {
           uploadStatus.textContent = "Upload at least one FASTQ file to continue.";
         }
+      }
+
+      function setPlatformAndPairing(platformValue, pairingValue) {
+        document.getElementById("review-platform").textContent = platformValue;
+        document.getElementById("review-pairing").textContent = pairingValue;
       }
 
       function setStage(stageNumber) {
@@ -336,13 +338,17 @@
         pairing.classList.toggle("is-invalid", missingPairing);
         suffixInputs.forEach((input) => input.classList.toggle("is-invalid", isPaired && !input.value.trim()));
 
-        if (missingPlatform || missingPairing || missingSuffix) {
-          showValidation("configuration", "Choose a sequencing platform and read type. Paired-end submissions also need both read suffixes.");
-          return false;
-        }
+        // if (missingPlatform || missingPairing || missingSuffix) {
+        //   showValidation("configuration", "Choose a sequencing platform and read type. Paired-end submissions also need both read suffixes.");
+        //   return false;
+        // }
 
         clearValidation("configuration");
         return true;
+      }
+
+      function disableSubmitButton() {
+        submitButton.disabled = true;
       }
 
       function updateReview() {
@@ -420,7 +426,17 @@
 
       uploadNextButton.addEventListener("click", () => {
         if (validateUploadStage()) {
-          setStage(2);
+          // check if sample sheet exists for the upload_id
+          fetch('{{ url_for("upload.check_for_sample_sheet", upload_id=upload_id) }}')
+            .then(response => {
+              if (response.ok) {
+                updateReview();
+                setStage(3);
+                readSampleConfiguration();
+              } else {
+                setStage(2);
+              }
+            });
         }
       });
 
@@ -440,32 +456,75 @@
         });
       });
 
+      function update_error(message) {
+        sampleError.textContent = message;
+        sampleError.hidden = false;
+      }
+
+      function readSampleConfiguration() {
+        fetch('{{ url_for("upload.get_sample_configuration", upload_id=upload_id) }}')
+              .then(response => {
+                if (!response.ok) {
+                  response.text().then(text => {
+                    console.log("Response body:", text);
+                    update_error(text);
+                    disableSubmitButton();
+                  });
+                } else {
+
+                  return response.json();
+                }
+              })
+              .then(data => {
+                console.log("Sample configuration data:", data);
+                setPlatformAndPairing("From sample sheet", "From sample sheet");
+                new DataTable("#review-table", {
+                  data: data,
+                  columns: [
+                    { title: "Sample Name", data: "sample_name" },
+                    { title: "R1", data: "R1" },
+                    { title: "R2", data: "R2" }
+                  ],
+                  paging: false,
+                  searching: false,
+                  info: false,
+                  destroy: true
+                });
+                submitButton.disabled = false;                
+                sampleError.hidden = true; // hide the error message if it was previously shown
+              })
+
+      }
+
       configurationNextButton.addEventListener("click", () => {
         if (validateConfiguration()) {
           updateReview();
           setStage(3);
-          console.log("Stage 3: Review and submit");
-          // ajax call to get_sample_configuration endpoint to get the sample configuration and update the review section
-          fetch('{{ url_for("upload.get_sample_configuration", upload_id=upload_id) }}')
-            .then(response => response.json())
-            .then(data => {
-              console.log("Sample configuration data:", data);
-              // Update the review section with the sample configuration data
-              new DataTable('#review-table', {
-                data: data,
-                columns: [
-                  { data: 'sample_name', title: 'Sample Name' },
-                  { data: 'R1', title: 'R1' },
-                  { data: 'R2', title: 'R2' }
-                ],
-                paging: false,
-                searching: false,
-                info: false
-              });
-            })
-            .catch(error => {
-              console.error('Error fetching sample configuration:', error);
-            });
+
+          // post to /set_run_parameters
+          const formData = new FormData(batchForm);
+          console.log(formData);
+          fetch('{{ url_for("upload.set_run_parameters", upload_id=upload_id) }}', {
+            method: "POST",
+            body: JSON.stringify(Object.fromEntries(formData)),
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Failed to set run parameters");
+            }
+          })
+
+          .then(() => {
+            // ajax call to get_sample_configuration endpoint to get the sample configuration and update the review section
+            readSampleConfiguration();
+          })
+          .catch(error => {
+            console.error("Error setting run parameters:", error);
+            showValidation("configuration", "Failed to set run parameters. Please try again.");
+          });
         }
       });
 

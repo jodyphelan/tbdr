@@ -4,7 +4,7 @@
 
 {% block head %}
 <!-- <script src="https://cdn.jsdelivr.net/npm/igv@2.7.4/dist/igv.min.js"></script> -->
-<script src="{{ url_for('static', filename='igv.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/igv.min.js') }}"></script>
 
 <style media="screen">
     .log_div {
@@ -149,7 +149,7 @@
             <dl class="result-details">
               <div>
                 <dt>Sample name</dt>
-                <dd>{{ result["id"] }}</dd>
+                <dd>{{ sample_metadata["sample_name"] }}</dd>
               </div>
               <div>
                 <dt>Analysis date</dt>

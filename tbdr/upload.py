@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, Response, make_response, session
 )
@@ -12,29 +14,48 @@ import re
 bp = Blueprint('upload', __name__)
 from flask_login import current_user
 import json
-from .models import Result, Sample, Submission
+from .models import Result, Sample, Submission, SampleCollectionLink, Collection
 from .db import db_session
 import csv
 
 
-def run_sample(uniq_id,sample_name,platform,f1,f2=None):
-    # if current_user.is_authenticated:
-    #     neo4j_db.write("CREATE (s:Sample:Private:Processing { id:'%s', sampleName:'%s', timestamp:'%s', userID:'%s'})" % (uniq_id,sample_name,datetime.now().isoformat(),current_user.id))
-    # else:
-    #     neo4j_db.write("CREATE (s:Sample:Processing { id:'%s', sampleName:'%s', timestamp:'%s'})" % (uniq_id,sample_name,datetime.now().isoformat()))
-    # db.execute("INSERT INTO samples (id) VALUES ('%s')" % (uniq_id))
-    # db.execute("INSERT INTO results (sample_id, status) VALUES ('%s', 'queueing')" % uniq_id)
-    db_session.add(Sample(id=uniq_id, public=app.config["SAMPLES_PUBLIC"]))
+
+def run_sample(uniq_id,sample_data,platform,f1,f2=None):
+    valid_keys = {
+        column.name
+        for column in Sample.__table__.columns
+    }
+    sample_data = {
+        key: value
+        for key, value in sample_data.items()
+        if key in valid_keys
+    }
+
+    db_session.add(Sample(id=uniq_id, **sample_data))
     db_session.commit()
+    if app.config["SAMPLES_PUBLIC"]:
+        collection = Collection.query.filter(Collection.name == "Public").first()
+        if not collection:
+            collection = Collection(name="Public", description="Public samples")
+            db_session.add(collection)
+            db_session.commit()
+        db_session.add(SampleCollectionLink(sample_id=uniq_id, collection_id=collection.id))
+        db_session.commit()
     db_session.add(Result(sample_id=uniq_id))
     db_session.commit()
     tbprofiler.delay(fq1=f1,fq2=f2,uniq_id=uniq_id,upload_dir=app.config["UPLOAD_FOLDER"],platform=platform,result_file_dir=app.config["APP_ROOT"]+url_for('static', filename='results'))
 
 
+@bp.route('/check_for_samplesheet/<uuid:upload_id>',methods=('GET',))
+def check_for_sample_sheet(upload_id):
+    if os.path.exists(os.path.join(app.config["UPLOAD_FOLDER"],str(upload_id),"sample_sheet.csv")):
+        return make_response(("Sample sheet found", 200))
+    else:
+        return make_response(("Sample sheet not found", 404))
 
 
 def sort_out_paried_files(upload_id,r1_suffix,r2_suffix):
-    files = os.listdir(os.path.join(app.config["UPLOAD_FOLDER"],upload_id))
+    files = os.listdir(os.path.join(app.config["UPLOAD_FOLDER"],str(upload_id)))
     prefixes = set()
     for f in files:
         tmp1 = re.search("(.+)%s" % r1_suffix,f)
@@ -75,96 +96,153 @@ def upload():
     form = MultiFileUpload()
     if request.method=="GET":
         upload_id = str(uuid.uuid4())
-        session[upload_id] = "Pending"
         form.upload_id.data = upload_id
     if "result_id" in request.form: # navbar search
         return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))
     if form.validate_on_submit():
-        session[form.upload_id.data+"_form"] = json.dumps({"pairing":form.pairing.data,"platform":form.platform.data,"R1_suffix":form.forward_suffix.data,"R2_suffix":form.reverse_suffix.data})
-        return redirect(url_for('upload.submit_runs',upload_id=form.upload_id.data))
+        # session[form.upload_id.data+"_form"] = json.dumps({"pairing":form.pairing.data,"platform":form.platform.data,"R1_suffix":form.forward_suffix.data,"R2_suffix":form.reverse_suffix.data})
+        # return redirect(url_for('upload.submit_runs',upload_id=form.upload_id.data))
+        return submit_runs(form.upload_id.data)
 
     return render_template('upload/upload_alt.html',form=form,upload_id=upload_id)
+
+@bp.route('/set_run_parameters/<uuid:upload_id>',methods=('POST',))
+def set_run_parameters(upload_id):
+
+    parameters = request.json
+
+    upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],str(upload_id))
+    with open(os.path.join(upload_dir,"run_parameters.json"), 'w') as f:
+        json.dump(parameters, f)
+
+    return make_response(("Run parameters saved successfully", 200))
+
 
 @bp.route('/submit_runs/<uuid:upload_id>',methods=('GET','POST'))
 def submit_runs(upload_id):
     upload_id = str(upload_id)
-    upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],upload_id)
-    fd = json.loads(session[upload_id+"_form"])
     
-    if session[upload_id]!="Submitted":
-        if fd['pairing']=="Paired":
-            runs = sort_out_paried_files(upload_id, fd["R1_suffix"] ,fd["R2_suffix"])
-        else:
-            runs = sort_out_single_files(upload_id, fd["R1_suffix"])
-        if isinstance(runs, str):
-            flash(runs)
-            return redirect(url_for('upload.upload'))
+    if request.method=="POST":
+        print("Submitting runs for upload ID:", upload_id)
+        submission = db_session.query(Submission).filter(Submission.id==upload_id).first()
+        if not submission:
+            upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],upload_id)
+            # run_parameters = json.load(open(os.path.join(upload_dir,"run_parameters.json")))
+            sample_sheet_file = os.path.join(upload_dir,"sample_sheet.csv") if os.path.exists(os.path.join(upload_dir,"sample_sheet.csv")) else os.path.join(upload_dir,"auto_sample_sheet.csv")
+            sample_configuration = [row for row in csv.DictReader(open(sample_sheet_file))]
+            for run in sample_configuration:
+                run["unique_id"] = str(uuid.uuid4())
+            for run in sample_configuration:
+                r1 = "%s/%s" % (upload_dir,run["R1"])
+                r2 = "%s/%s" % (upload_dir,run["R2"]) if run["R2"] else None
+                run_sample(run["unique_id"],run,run["platform"],r1,r2)
+            entry = Submission(id=upload_id,runs=sample_configuration)
+            db_session.add(entry)
+            db_session.commit()
 
-        for run in runs:
-            r1 = "%s/%s" % (upload_dir,run["R1"])
-            r2 = "%s/%s" % (upload_dir,run["R2"]) if run["R2"] else None
-            print(r1,r2)
-            run_sample(run["ID"],run["sample_name"],fd["platform"],r1,r2)
-        entry = Submission(id=upload_id,runs=runs)
-        db_session.add(entry)
-        db_session.commit()
-        session[upload_id] = "Submitted"
-    else:
-        print("Run already submitted")
+
     runs = db_session.query(Submission).filter(Submission.id==upload_id).first().runs
     for run in runs:
-        run["link"] = '<a href="'+url_for('results.run_result',sample_id=run["ID"])+'">'+run["ID"]+'</a>'
+        run["link"] = '<a href="'+url_for('results.run_result',sample_id=run["unique_id"])+'">'+run["unique_id"]+'</a>'
     return render_template('upload/upload_complete.html',runs=runs)
 
 def write_sample_sheet(upload_id):
     import fastq_files
     # samples = fastq_files.find_paired_fastq_samples(['/tmp/c2f7c70e-812e-4b20-9c78-f602c3081612'],r1_pattern='(.+)_1.fastq.gz', r2_pattern='(.+)_2.fastq.gz')
-    print(upload_id)
-    print(session)
-    form_data = json.loads(session[str(upload_id)+"_form"])
+    upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],str(upload_id))
+    form_data = json.load(open(os.path.join(upload_dir,"run_parameters.json")))
     upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],str(upload_id))
 
     pairing = form_data['pairing']
     
     if pairing=="Paired":
-        r1_suffix = form_data["R1_suffix"]
-        r2_suffix = form_data["R2_suffix"]
+        r1_suffix = form_data["forward_suffix"]
+        r2_suffix = form_data["reverse_suffix"]
         samples = fastq_files.find_paired_fastq_samples([upload_dir],r1_pattern='(.+)%s' % r1_suffix, r2_pattern='(.+)%s' % r2_suffix)
-        fd = json.loads(session[upload_id+"_form"])
         
-        samples = fastq_files.find_paired_fastq_samples([upload_dir],r1_pattern='(.+)%s' % fd["R1_suffix"], r2_pattern='(.+)%s' % fd["R2_suffix"])
+        samples = fastq_files.find_paired_fastq_samples([upload_dir],r1_pattern='(.+)%s' % form_data["forward_suffix"], r2_pattern='(.+)%s' % form_data["reverse_suffix"])
     else:
-        samples = fastq_files.find_single_fastq_samples([upload_dir],r1_pattern='(.+)%s' % fd["R1_suffix"])
+        samples = fastq_files.find_single_fastq_samples([upload_dir],r1_pattern='(.+)%s' % form_data["forward_suffix"])
 
     rows = []
     for s in samples:
         row = {
             "sample_name": s.prefix,
-            "R1": s.r1[0] if s.r1 else None,
-            "R2": s.r2[0] if s.r2 else None
+            "platform": form_data.get("platform"),
+            "layout": form_data.get("pairing"),
+            "R1": s.r1[0].split("/")[-1] if s.r1 else None,
+            "R2": s.r2[0].split("/")[-1] if hasattr(s, "r2") and s.r2 else None
         }
         rows.append(row)
-    sample_sheet_path = os.path.join(upload_dir,"sample_sheet.csv")
+    sample_sheet_path = os.path.join(upload_dir,"auto_sample_sheet.csv")
     with open(sample_sheet_path, 'w', newline='') as csvfile:
-        fieldnames = ["sample_name", "R1", "R2"]
+        fieldnames = rows[0].keys() 
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
 
-@bp.route('/get_sample_configuration/<uuid:upload_id>',methods=('GET',))
-def get_sample_configuration(upload_id):
-    upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],str(upload_id))
-    sample_sheet_path = os.path.join(upload_dir,"sample_sheet.csv")
-    if not os.path.exists(sample_sheet_path):
-        write_sample_sheet(upload_id)
+def is_empty(value):
+    if value is None:
+        return True
+    if isinstance(value, str) and value.strip() == "":
+        return True
+    if isinstance(value, (list, dict)) and len(value) == 0:
+        return True
+    return False
+
+def validate_sample_sheet(upload_id):
+    upload_dir = Path(app.config["UPLOAD_FOLDER"]) / upload_id
+    sample_sheet_path = upload_dir / "sample_sheet.csv"
+    if not sample_sheet_path.exists():
+        sample_sheet_path = upload_dir / "auto_sample_sheet.csv"
+    if not sample_sheet_path.exists():
+        raise FileNotFoundError(f"Sample sheet not found at {sample_sheet_path}")
     with open(sample_sheet_path, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
+        required_fields = ["sample_name", "platform", "layout", "R1"]
+        for field in required_fields:
+            if field not in reader.fieldnames:
+                raise ValueError(f"Sample sheet is missing required column: {field}")
+        for row in reader:
+            if is_empty(row["sample_name"]) or is_empty(row["R1"]):
+                raise ValueError(f"Sample sheet row is missing required data: {row}")
+            if row["layout"] == "paired" and is_empty(row.get("R2")):
+                raise ValueError(f"Sample sheet row is missing R2 for paired layout: {row}")
+            r1_file = upload_dir / row["R1"]
+            if not r1_file.exists():
+                raise FileNotFoundError(f"R1 file not found: {row["R1"]}")
+            if not is_empty(row.get("R2")):
+                r2_file = upload_dir / row["R2"]
+                if not r2_file.exists():
+                    raise FileNotFoundError(f"R2 file not found: {row["R2"]}")
+
+@bp.route('/get_sample_configuration/<upload_id>',methods=('GET',))
+def get_sample_configuration(upload_id):
+    upload_dir = Path(app.config["UPLOAD_FOLDER"]) / str(upload_id)
+    sample_sheet_path = upload_dir / "sample_sheet.csv"
+    auto_sample_sheet_path = upload_dir / "auto_sample_sheet.csv"
+    if not sample_sheet_path.exists():
+        try:
+            write_sample_sheet(upload_id)
+            validate_sample_sheet(upload_id)
+        except Exception as e:
+            print(f"Error generating or validating sample sheet: {str(e)}")
+            return make_response((f"Error generating sample sheet: {str(e)}", 500))
+    else:
+        try:
+            validate_sample_sheet(upload_id)
+        except Exception as e:
+            print(f"Error validating sample sheet: {str(e)}")
+            return make_response((f"Error validating sample sheet: {str(e)}", 500))
+    chosen_sample_sheet_path = sample_sheet_path if sample_sheet_path.exists() else auto_sample_sheet_path
+    with open(chosen_sample_sheet_path, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
         rows = [row for row in reader]
-    return json.dumps(rows)
+    print(rows)
+    return make_response((json.dumps(rows), 200, {'Content-Type': 'application/json'}))
 
 @bp.route('/parse_sample_sheet/<uuid:upload_id>',methods=('GET','POST'))
 def parse_sample_sheet(upload_id):
-    print(session)
     upload_id = str(upload_id)
     upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],upload_id)
     sample_sheet_path = os.path.join(upload_dir,"sample_sheet.csv")
@@ -202,9 +280,9 @@ def file_upload(upload_id):
     upload_id = str(upload_id)
     file = request.files['file']
     upload_dir = os.path.join(app.config["UPLOAD_FOLDER"],upload_id)
-    if upload_id in session:
-        if not os.path.isdir(upload_dir):
-            os.mkdir(upload_dir)
+    
+    if not os.path.isdir(upload_dir):
+        os.mkdir(upload_dir)
     save_path = os.path.join(upload_dir, file.filename)
     current_chunk = int(request.form['dzchunkindex'])
     # If the file already exists it's ok if we are appending to it,
