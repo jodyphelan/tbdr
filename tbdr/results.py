@@ -41,6 +41,11 @@ def get_sample_metadata(sample_id):
 
 @bp.route('/results/<sample_id>',methods=('GET', 'POST'))
 def run_result(sample_id):
+	log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".log"
+	progress = check_progress(log_file)
+	log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
+	if progress<"Completed":
+		return render_template('results/result_processing.html')
 	sample_metadata = get_sample_metadata(sample_id)
 	result = get_result(sample_id)
 	if result==None:
@@ -49,13 +54,12 @@ def run_result(sample_id):
 	
 	# print(result.data['migrated'])
 	if sample_id[:3] not in ("DRR","SRR","ERR","SAM") and result.status!="Completed":
-		log_file = app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".log"
 		progress = check_progress(log_file)
-		log_text = open(log_file).read().replace(app.config["UPLOAD_FOLDER"]+"/","") if os.path.isfile(log_file) else ""
 		return render_template('results/run_result.html',result = None,sample_id=sample_id,progress = progress,log_text=log_text)
 	
 
 	bam_found = os.path.isfile(app.config["APP_ROOT"]+url_for('static', filename='results/') + sample_id + ".targets.bam")
+
 
 	result.data['non_associated_variants_table'] = []
 	for var in result.data['other_variants']:
@@ -77,7 +81,12 @@ def run_result(sample_id):
 			row['confidence'] = ann['confidence']
 			row['comment'] = ann['comment']
 			result.data['associated_variants_table'].append(row)
-	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id,sample_metadata=sample_metadata)
+
+	result_files = {
+		'json': url_for('static', filename='results/%s.results.json' % sample_id),
+		'text': url_for('static', filename='results/%s.results.txt' % sample_id),
+	}
+	return render_template('results/run_result.html',result = result.data, bam_found = bam_found, sample_id=sample_id,sample_metadata=sample_metadata, result_files=result_files)
 
 
 def check_progress(filename):

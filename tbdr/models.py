@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Float
 from sqlalchemy.dialects.postgresql import JSONB
 from tbdr.db import Base, get_db_session
 from sqlalchemy import UniqueConstraint
@@ -21,7 +21,6 @@ class Sample(Base):
     __tablename__ = 'samples'
     id = Column(String, primary_key=True)
     sample_name = Column('sample_name', String)
-    public = Column('public', Boolean, nullable=False, default=False)
     iso_a3 = Column('iso_a3', String)
     country = Column('country', String)
     year_of_collection = Column('year_of_collection', Integer)
@@ -42,6 +41,11 @@ class SampleVariant(Base):
     id = Column(Integer, primary_key=True)
     sample_id = Column(String, ForeignKey('samples.id'), nullable=False)
     variant_id = Column(String, ForeignKey('variants.id'), nullable=False)
+    frequency = Column(Float, nullable=True)
+    depth = Column(Integer, nullable=True)
+    __table_args__ = (
+        UniqueConstraint('sample_id', 'variant_id'),
+    )
 
 class Drug(Base):
     __tablename__ = 'drugs'
@@ -75,10 +79,13 @@ class Collection(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    __table_args__ = (
+        UniqueConstraint('name'),
+    )
     
 
-def add_sample_to_db(sample_id: str):
-    """Add a new Sample entry to the database."""
+def update_sample_data(sample_id: str, additional_data: dict = None, collections: list = None) -> None:
+    """Update an existing Sample entry in the database."""
     result = Result.query.filter(Result.sample_id == sample_id).first()
     sample = Sample.query.filter(Sample.id == sample_id).first()
     if result and sample:
@@ -88,6 +95,21 @@ def add_sample_to_db(sample_id: str):
         sample.drtype = data.get('drtype')
         sample.lineage = data.get('sub_lineage')
         sample.spoligotype = data.get('spoligotype')
+
+        if additional_data:
+            valid_keys = {
+                    column.name
+                    for column in Sample.__table__.columns
+                }
+            sample_data = {
+                key: value
+                for key, value in additional_data.items()
+                if key in valid_keys
+            }
+
+            for key, value in sample_data.items():
+                setattr(sample, key, value)
+
         db_session.add(sample)
         db_session.commit()
 
@@ -137,6 +159,23 @@ def add_sample_to_db(sample_id: str):
                 'sample_id': sample_id,
                 'variant_id': f"{var['gene_id']}:{var['change']}"
             })
+
+
+        if collections==None:
+            collections = []
+        sample_collection_links = []
+        for collection_name in collections:
+            collection = Collection.query.filter(Collection.name == collection_name).first()
+            if collection:
+                sample_collection_links.append({
+                    'sample_id': sample_id,
+                    'collection_id': collection.id
+                })
+
+        # Insert sample-collection relationships into the sample_collections table
+        db_session.bulk_insert_mappings(SampleCollectionLink, sample_collection_links)  
+
+
 
         # Insert variants into the variants table, ignoring duplicates
         stmt = insert(Variant).values(variant_rows)

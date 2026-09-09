@@ -5,10 +5,27 @@ import json
 import argparse
 import csv
 from copy import copy
+import os
 import sys
 import pathogenprofiler as pp
 from glob import glob
 from tqdm import tqdm
+from tbdr import create_app
+from tbdr.models import Result, Sample, Variant, SampleVariant, Drug, VariantDrugConfidence, Collection, SampleCollectionLink
+from tbdr.db import get_db_session, init_db
+from sqlalchemy.dialects.postgresql import insert
+
+
+
+# Set up the parser
+parser = argparse.ArgumentParser(description='tbprofiler script',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--dir',type=str,help='Folder with samples',required = True)
+parser.add_argument('--db',default="who_v3",type=str,help='Database name')
+parser.add_argument('--metadata', '--metadata-csv', dest='metadata_csv', type=str, help='Metadata CSV file', required=True)
+parser.add_argument('--public',action='store_true',help='Use the public database')
+parser.add_argument('--batch-size',type=int,default=100,help='Batch size for processing JSON files')
+args = parser.parse_args()
+
 
 
 def get_drug_table(dr_variants,conf):
@@ -49,98 +66,137 @@ def get_drug_table(dr_variants,conf):
     return new_table
 
 
-def main(args):
-    from sqlalchemy import create_engine
-    engine = create_engine(f"postgresql+psycopg2://{args.db_user}:{args.db_pass}@localhost/tbdr", echo=False)
-    from sqlalchemy.dialects.postgresql import insert
-    from sqlalchemy import select
-    from sqlalchemy import MetaData
-    from sqlalchemy import Table
-    metadata_obj = MetaData()
-    samples_table = Table("samples", metadata_obj, autoload_with=engine)
-    results_table = Table("results", metadata_obj, autoload_with=engine)
-    variant_table = Table("variants", metadata_obj, autoload_with=engine)
-    sample_variants_table = Table("sample_variants", metadata_obj, autoload_with=engine)
+db_dir = os.path.join(sys.base_prefix, 'share', 'tbprofiler')
+conf = pp.get_db(db_dir,args.db)
 
-    def add_sample(data):
-        with engine.connect() as conn:
-            if conn.execute(select(samples_table).where(samples_table.c.id == data["id"])).fetchone() != None:
-                # remove existing results
-                print("Removing existing results")
-                conn.execute(results_table.delete().where(results_table.c.sample_id == data["id"]))
-                conn.execute(sample_variants_table.delete().where(sample_variants_table.c.sample_id == data["id"]))
-                conn.execute(samples_table.delete().where(samples_table.c.id == data["id"]))
-                # conn.execute(variant_table.delete().where(variant_table.c.sample_id == data["id"]))
-                conn.commit()
+meta = {}
+
+app = create_app()
+
+with app.app_context():
+    db_session = get_db_session()
 
 
-            json_data = copy(data)
-            data['lineage'] = data['sub_lineage']
-            sample_id = data['id']
-            result = conn.execute(insert(samples_table),data)
-            conn.commit()
-            stmt = insert(results_table).values(data=json_data,sample_id=sample_id,status="Completed")
-            result = conn.execute(stmt)
-            conn.commit()
-            rows = [
-                {
-                    'id': "%(locus_tag)s_%(change)s" % var,
-                    'gene':var['gene_name'],
-                    'change':var['change'],
-                    'type':var['type'],
-                    'locus_tag':var['locus_tag'],
-                    'drugs': ", ".join([d['drug'] for d in var['drugs']]) if 'drugs' in var else None,
-                } for var in data['dr_variants']+data['other_variants']]
-            if rows==[]: return
-            result = conn.execute(insert(variant_table).on_conflict_do_nothing(index_elements=['id']),rows)
-            conn.commit()
-            rows = [{'variant_id': "%(locus_tag)s_%(change)s" % var,'sample_id': data['id']} for var in data['dr_variants'] + data['other_variants']]
-            result = conn.execute(insert(sample_variants_table),rows)
-            conn.commit()
-
-    meta = {}
-    for row in csv.DictReader(open(args.metadata_csv)):
-        row['id'] = row['wgs_id']
-        row['country'] = row['country_code']
-        row['date'] = row['year_of_collection']
-        if row['country']=="N/A": del row['country']
-        meta[row['wgs_id']] = row
 
 
-    for json_file in tqdm(glob(f"{args.dir}/*.json")):
-        data = json.load(open(json_file))
-        sys.stderr.write(f"Adding {data['id']}\n")  
-        m = meta.get(data['id'])
-        if m:
-            data.update(m)
+    collection_row = {
+        'name': 'public',
+        'description': 'Public collection of samples'
+    }
+    # add the public collection if it doesn't exist
+    if not Collection.query.filter_by(name='public').first():
+        db_session.add(Collection(**collection_row)) 
+        db_session.commit()
+    public_collection_id = Collection.query.filter_by(name='public').first().id
+
+    json_files = glob(args.dir + "/*.json")
+    print(f"Found {len(json_files)} JSON files in {args.dir}. Processing in batches of {args.batch_size}.")
+
+    batches = [json_files[i:i + args.batch_size] for i in range(0, len(json_files), args.batch_size)]
+    for batch in tqdm(batches):
+        result_rows = []
+        sample_rows = []
+        variant_rows = set()
+        sample_variant_rows = []
+        drug_rows = set()
+        variant_drugs_rows = []
+        sample_collection_rows = []
+        for json_file in batch:
+            with open(json_file) as f:
+                data = json.load(f)
+            data['drug_table'] = get_drug_table(data['dr_variants'],conf)
+            for var in data['other_variants']:
+                var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
+
+            sample_meta = meta.get(data['id'],{})
+            result_row = {
+                'data': data,
+                'sample_id': data['id'],
+                'status': 'completed'
+            }
+            result_rows.append(result_row)
+
+            sample_row = {
+                'id': data['id'],
+                'sample_name': data['id'],
+                'lineage': data['main_lineage'],
+                'drtype': data['drtype']
+            }
+            sample_rows.append(sample_row)
+
+            for var in data['dr_variants']+data['other_variants']:
+                variant_row = {
+                    'id': f"{var['locus_tag']}:{var['change']}",
+                    'gene': var['gene_name'],
+                    'locus_tag': var['gene_id'],
+                    'type': var['type'],
+                    'change': var['change'],
+                }
+                variant_rows.add(json.dumps(variant_row))
+
+                sample_variant_row = {
+                    'sample_id': data['id'],
+                    'variant_id': variant_row['id'],
+                    'frequency': var['freq'],
+                    'depth': var['depth']
+                }
+                sample_variant_rows.append(sample_variant_row)
+
+                if 'drugs' in var:
+                    for d in var['drugs']:
+                        confidence_row = {
+                            'variant_id': variant_row['id'],
+                            'drug_id': d['drug'],
+                            'confidence': d['confidence'],
+                            'source': d['source'],
+                            'comment': d['comment'] if d['comment']!="" else None
+                        }
+                        drug_rows.add(json.dumps({'id': d['drug']}))
+                        variant_drugs_rows.append(confidence_row)
+                elif 'annotation' in var:
+                    for a in var['annotation']:
+                        if a['type'] == 'who_confidence':
+                            confidence_row = {
+                                'variant_id': variant_row['id'],
+                                'drug_id': a['drug'],
+                                'confidence': a['confidence'],
+                                'source': a['source'],
+                                'comment': a['comment'] if a['comment']!="" else None
+                            }
+                            drug_rows.add(json.dumps({'id': a['drug']}))
+                            variant_drugs_rows.append(confidence_row)
 
 
-        conf = pp.get_db('tbprofiler',args.db)
-        data['drug_table'] = get_drug_table(data['dr_variants'],conf)
-        for var in data['other_variants']:
-            var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
-        
-        for l in data['lineage']:
-            del l['support']
-        for var in data['dr_variants'] + data['other_variants'] + data['qc_fail_variants']:
-            if 'annotation' in var:
-                del var['annotation']
-            if 'consequences' in var:
-                del var['consequences']
-        
-        data['public'] = args.public
+            if args.public:
+                sample_collection_row = {
+                    'sample_id': data['id'],
+                    'collection_id': public_collection_id
+                }
+                sample_collection_rows.append(sample_collection_row)
 
-        add_sample(data)
+        rehydrated_variant_rows = [json.loads(v) for v in variant_rows]
+        rehydrated_drug_rows = [json.loads(d) for d in drug_rows]
 
-# Set up the parser
-parser = argparse.ArgumentParser(description='tbprofiler script',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--dir',type=str,help='File with samples',required = True)
-parser.add_argument('--db',default="tbdb",type=str,help='Database name')
-parser.add_argument('--metadata-csv',type=str,help='Database name',required = True)
-parser.add_argument('--db-pass',type=str,help='Database name',required = True)
-parser.add_argument('--db-user',type=str,help='Database name',required = True)
-parser.add_argument('--public',action='store_true',help='Database name')
-parser.set_defaults(func=main)
+        print(f"Inserting {len(result_rows)} results, {len(sample_rows)} samples, {len(variant_rows)} variants, {len(sample_variant_rows)} sample-variant links, {len(drug_rows)} drugs, {len(variant_drugs_rows)} variant-drug confidence links, and {len(sample_collection_rows)} sample-collection links.")
+        stmt = insert(Sample).values(sample_rows).on_conflict_do_nothing(index_elements=['id'])
+        db_session.execute(stmt)
+        stmt = insert(Result).values(result_rows).on_conflict_do_nothing(index_elements=['id'])
+        db_session.execute(stmt)
+        stmt = insert(Variant).values(rehydrated_variant_rows).on_conflict_do_nothing(index_elements=['id'])
+        db_session.execute(stmt)
+        stmt = insert(SampleVariant).values(sample_variant_rows).on_conflict_do_nothing(index_elements=['sample_id', 'variant_id'])
+        db_session.execute(stmt)
+        stmt = insert(Drug).values(rehydrated_drug_rows).on_conflict_do_nothing(index_elements=['id'])
+        db_session.execute(stmt)
+        stmt = insert(VariantDrugConfidence).values(variant_drugs_rows).on_conflict_do_nothing(index_elements=['variant_id', 'drug_id'])
+        db_session.execute(stmt)
 
-args = parser.parse_args()
-args.func(args)
+        if len(sample_collection_rows) > 0:
+            stmt = insert(SampleCollectionLink).values(sample_collection_rows).on_conflict_do_nothing(index_elements=['sample_id', 'collection_id'])
+            db_session.execute(stmt)
+
+        db_session.commit()
+
+
+
+            

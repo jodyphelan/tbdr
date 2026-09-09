@@ -33,14 +33,7 @@ def run_sample(uniq_id,sample_data,platform,f1,f2=None):
 
     db_session.add(Sample(id=uniq_id, **sample_data))
     db_session.commit()
-    if app.config["SAMPLES_PUBLIC"]:
-        collection = Collection.query.filter(Collection.name == "Public").first()
-        if not collection:
-            collection = Collection(name="Public", description="Public samples")
-            db_session.add(collection)
-            db_session.commit()
-        db_session.add(SampleCollectionLink(sample_id=uniq_id, collection_id=collection.id))
-        db_session.commit()
+    
     db_session.add(Result(sample_id=uniq_id))
     db_session.commit()
     tbprofiler.delay(fq1=f1,fq2=f2,uniq_id=uniq_id,upload_dir=app.config["UPLOAD_FOLDER"],platform=platform,result_file_dir=app.config["APP_ROOT"]+url_for('static', filename='results'))
@@ -210,11 +203,11 @@ def validate_sample_sheet(upload_id):
                 raise ValueError(f"Sample sheet row is missing R2 for paired layout: {row}")
             r1_file = upload_dir / row["R1"]
             if not r1_file.exists():
-                raise FileNotFoundError(f"R1 file not found: {row["R1"]}")
+                raise FileNotFoundError(f"R1 file not found: {row['R1']}")
             if not is_empty(row.get("R2")):
                 r2_file = upload_dir / row["R2"]
                 if not r2_file.exists():
-                    raise FileNotFoundError(f"R2 file not found: {row["R2"]}")
+                    raise FileNotFoundError(f"R2 file not found: {row['R2']}")
 
 @bp.route('/get_sample_configuration/<upload_id>',methods=('GET',))
 def get_sample_configuration(upload_id):

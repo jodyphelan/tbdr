@@ -8,7 +8,7 @@ import os
 from flask import Flask
 from time import sleep
 from celery.utils.log import get_task_logger
-from .models import Result, add_sample_to_db
+from .models import Result, update_sample_data
 from .db import db_session
 from celery import shared_task
 import sys
@@ -107,7 +107,10 @@ def tbprofiler(fq1,fq2,uniq_id,upload_dir,platform,result_file_dir):
         if fq2:
             os.remove(fq2)
 
-        add_sample_to_db(uniq_id)
+        collections = []
+        if is_public:
+            collections.append('public')
+        update_sample_data(uniq_id, collections=collections)
         
         return True
     except Exception:

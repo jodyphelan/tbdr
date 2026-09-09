@@ -149,7 +149,7 @@ def main(args):
 # Set up the parser
 parser = argparse.ArgumentParser(description='tbprofiler script',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--json',type=str,help='File with samples',required = True)
-parser.add_argument('--db',default="tbdb",type=str,help='Database name')
+parser.add_argument('--db',default="who_v3",type=str,help='Database name')
 parser.add_argument('--metadata-csv',type=str,help='Database name',required = True)
 parser.add_argument('--db-pass',type=str,help='Database name',required = True)
 parser.add_argument('--db-user',type=str,help='Database name',required = True)

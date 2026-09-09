@@ -2,22 +2,33 @@ services:
   postgres:
     platform: linux/amd64
     image: tbdr-postgres:offline
+    pull_policy: never
 
   redis:
     platform: linux/amd64
     image: tbdr-redis:offline
+    pull_policy: never
 
   init-db:
     platform: linux/amd64
     image: tbdr-web:offline
     build: null
+    pull_policy: never
+
+  seed-example-results:
+    platform: linux/amd64
+    image: tbdr-web:offline
+    build: null
+    pull_policy: never
 
   web:
     platform: linux/amd64
     image: tbdr-web:offline
     build: null
+    pull_policy: never
 
   worker:
     platform: linux/amd64
     image: tbdr-web:offline
     build: null
+    pull_policy: never

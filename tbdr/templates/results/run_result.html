@@ -129,7 +129,23 @@
 					</div>
 		</div>
 	</div>
+	<div>
+
 	{% endif %}
+	<div class="row justify-content-md-center mb-4">
+		<div class="col-auto">
+			<a class="btn btn-outline-primary"
+			href="{{ result_files['json'] }}">
+				Download JSON report
+			</a>
+			<a class="btn btn-outline-primary"
+			href="{{ result_files['text'] }}">
+				Download text report
+			</a>
+		</div>
+	</div>
+
+
 	{% if result["qc"]["target_median_depth"] < 30 %}
 	<div class="row justify-content-md-center">
         <div class="col-md-10">
@@ -164,6 +180,7 @@
                 <dt>Database version</dt>
                 <dd>{{ result["pipeline"]["db_version"]["name"] }}</dd>
               </div>
+			  
             </dl>
 		</article>
 	</div>
@@ -211,9 +228,9 @@
 	
 	<section class="py-4" aria-labelledby="drug-table">
 		<article class="info-card">
-			<h2 id="drug-table" class="h3 mb-2">Resistance-associated mutations</h2>
+			<h2 id="drug-table" class="h3 mb-2">Resistance mutation summary</h2>
 			<p class="text-muted mb-4">
-			Variants detected in the sample that are associated with drug resistance.
+			This table displays variants detected that are associated with drug resistance in the 3rd Edition of the WHO mutation catalogue. 
 			</p>
 			<div class="table-responsive">
 				<table class="table result-table align-middle mb-0">
@@ -258,11 +275,41 @@
 	
 
 	<section class="py-4">
-		{{utils.generic_table(result["associated_variants_table"],{"gene_name":"Gene","pos":"Genome position","change":"Mutation","type":"Type","freq":"Estimated fraction","drug":"Drugs","confidence":"Confidence","comment":"Comment"},"Drug Resistance-Associated Mutations","This table reports mutations found in candidate resistance genes which have been associated with drug resistance.",True,True,True)}}
+		{{utils.generic_table(
+			result["associated_variants_table"],
+			{
+				"gene_name":"Gene",
+				"pos":"Genome position",
+				"change":"Mutation",
+				"type":"Type",
+				"freq":"Estimated fraction",
+				"drug":"Drugs",
+				"confidence":"Confidence",
+				"comment":"Comment"
+			},
+			"Resistance-Associated Mutations",
+			"This table displays additional information on the variants detailed above.",
+			True,
+			True,
+			True
+		)}}
 	</section>
 
 	<section class="py-4" aria-labelledby="drug-table">
-		{{utils.generic_table(result["non_associated_variants_table"],{"gene_name":"Gene","pos":"Genome position","change":"Mutation","type":"Type","freq":"Estimated fraction","drug":"Drugs","confidence":"Confidence"},"Non-associated mutations","This table reports mutations found in candidate resistance genes which have not been associated with drug resistance.",True,True,True)}}
+		{{utils.generic_table(
+			result["non_associated_variants_table"],
+			{"gene_name":"Gene",
+			"pos":"Genome position",
+			"change":"Mutation",
+			"type":"Type",
+			"freq":"Estimated fraction",
+			"drug":"Drugs","confidence":"Confidence"},
+			"Non-associated mutations",
+			"This table reports mutations found in candidate resistance genes which have not been associated with drug resistance.",
+			True,
+			True,
+			True
+		)}}
 	</section>
 
 
@@ -344,16 +391,16 @@
 
         </script>
 
-		<section class="row g-4 mb-4" aria-label="Result overview">
-        	<div class="col-lg-6">
-				{{utils.generic_table(result["qc"]["target_qc"],{"target":"Gene","percent_depth_pass":"% pass","median_depth":"Median depth"},"Gene coverage")}}
-			</div>
-			<div class="col-lg-6">
-				{{utils.generic_table(result["spoligotype"]["spacers"],{"name":"Name","seq":"Sequence","count":"Count"},"Spacer count")}}
-			</div>
-		</section>
 
-		
-    {% endif %}
+
+	{% endif %}
+	<section class="row g-4 mb-4" aria-label="Result overview">
+		<div class="col-lg-6">
+			{{utils.generic_table(result["qc"]["target_qc"],{"target":"Gene","percent_depth_pass":"% pass","median_depth":"Median depth"},"Gene coverage")}}
+		</div>
+		<div class="col-lg-6">
+			{{utils.generic_table(result["spoligotype"]["spacers"],{"name":"Name","seq":"Sequence","count":"Count"},"Spacer count")}}
+		</div>
+	</section>
 {% endif %}
 {% endblock %}

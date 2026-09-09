@@ -1,0 +1,20 @@
+services:
+  web:
+    volumes:
+      - .:/opt/tbdr
+      - uploads:/data/uploads
+      - results:/opt/tbdr/tbdr/static/results
+    command:
+      - gunicorn
+      - --bind
+      - 0.0.0.0:8000
+      - --workers
+      - "1"
+      - --reload
+      - tbdr:create_app()
+
+  worker:
+    volumes:
+      - .:/opt/tbdr
+      - uploads:/data/uploads
+      - results:/opt/tbdr/tbdr/static/results

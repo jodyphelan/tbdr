@@ -60,6 +60,32 @@ services:
       redis:
         condition: service_healthy
 
+  seed-example-results:
+    platform: linux/amd64
+    build:
+      context: .
+    environment: *tbdr-environment
+    command:
+      [
+        "python",
+        "bin/insert_results_bulk.py",
+        "--dir",
+        "/opt/tbdr/examples/test",
+        "--metadata",
+        "/opt/tbdr/examples/test/meta.csv",
+        "--batch-size",
+        "20",
+        "--public",
+      ]
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
   web:
     platform: linux/amd64
     build:
@@ -72,6 +98,8 @@ services:
       - uploads:/data/uploads
       - results:/opt/tbdr/tbdr/static/results
     depends_on:
+      seed-example-results:
+        condition: service_completed_successfully
       init-db:
         condition: service_completed_successfully
       postgres:
@@ -97,6 +125,8 @@ services:
       - uploads:/data/uploads
       - results:/opt/tbdr/tbdr/static/results
     depends_on:
+      seed-example-results:
+        condition: service_completed_successfully
       init-db:
         condition: service_completed_successfully
       postgres:

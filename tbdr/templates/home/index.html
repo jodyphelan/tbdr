@@ -8,7 +8,7 @@
           Analyse your data with TB-Profiler
         </h1>
         <p class="lead text-muted mb-4">
-          Upload next generation sequencing data to detect drug resistance mutations and infer lineage of <em>M. tuberculosis</em> using the WHO v3 mutation catalogue.
+          Upload next generation sequencing data to detect drug resistance mutations and infer lineage of <em>M. tuberculosis</em> samples using the WHO v3 mutation catalogue.
         </p>
         <div class="d-flex flex-wrap justify-content-center gap-3">
           <a class="btn btn-primary btn-lg rounded-pill px-4" href="{{ url_for('upload.upload') }}">Analyse a FASTQ file</a>
@@ -58,5 +58,21 @@
             </article>
           </li>
         </ol>
+      </section>
+
+
+      <section class="hero text-center py-5" aria-labelledby="explore-data">
+        
+        <article class="step-card">
+          <h2 id="explore-data" class="text-center mb-4">Explore publicly available data</h2>
+          <p class="mb-2 text-muted">
+            TB-Profiler has been used to analyse thousands of publicly available <em>M. tuberculosis</em> samples. 
+            You can browse these results from the sample or variant perspective.
+          </p>
+          <a class="btn btn-primary btn-lg rounded-pill px-4" href="{{ url_for('sra.sra') }}">Explore</a>
+        </article>
+
+
+
       </section>
 	  {% endblock %}

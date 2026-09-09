@@ -64,13 +64,24 @@ def get_sample_data(collection_id):
 	""" % (collection_id)
 	return db_session.execute(text(query)).fetchall()
 
+@bp.route('/get_colection_size/<collection_name>',methods=('GET',))
+def get_collection_size(collection_name):
+	query = """
+				SELECT COUNT(*) from sample_collection_link 
+				WHERE collection_id IN (
+					SELECT id FROM collections WHERE collections.name = '%s'
+				)
+			""" % collection_name
+	data = db_session.execute(text(query)).fetchall()
+	print(data)
+
 @bp.route('/sra',methods=('GET', 'POST'))
 def sra():
 	if request.method == 'POST':
 		if "result_id" in request.form: # navbar search
 			return redirect(url_for('results.run_result',sample_id=request.form["result_id"]))
 	
-	sample_data = get_sample_data("Public")
+	sample_data = get_sample_data("public")
 
 	print(sample_data)
 	country_counts = {row[1]: row[2] for row in sample_data if row[0]=="iso_a3" and row[1] is not None}
@@ -145,7 +156,7 @@ def query_samples(raw_queries,sample_links = True):
 				JOIN collections c
 					ON c.id = scl.collection_id
 				%s
-				AND c.name = 'Public'
+				AND c.name = 'public'
 			""" % where_query
 	print(query)
 	data = db_session.execute(text(query)).fetchall()

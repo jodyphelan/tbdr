@@ -32,7 +32,7 @@ def get_variant_samples(gene,variant,add_links=True):
 				JOIN collections c
 					ON c.id = scl.collection_id
 				WHERE sv.variant_id = '%s:%s'
-				AND c.name = 'Public'
+				AND c.name = 'public'
 			""" % (gene2locus_tag[gene],variant)
 	print(query)
 	sample_data =  db_session.execute(text(query)).fetchall()
