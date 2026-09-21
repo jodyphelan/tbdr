@@ -5,7 +5,7 @@ Use the normal `docker-compose.yml` together with `docker-compose.dev.yml` while
 ## Start the development stack
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 The development override bind-mounts the local repository at `/opt/tbdr` inside the `web` and `worker` containers.

@@ -1,0 +1,2960 @@
+{
+    "schema_version": "1.0.0",
+    "id": "SAMEA115745570",
+    "timestamp": "2026-08-15T06:43:07.258017",
+    "pipeline": {
+        "software_version": "6.8.0",
+        "db_version": {
+            "name": "who_v3",
+            "repo": "git@github.com:jodyphelan/tbdb.git",
+            "branch": "master",
+            "commit": "618cf0ff",
+            "status": "modified",
+            "author": "jodyphelan",
+            "date": "Wed Mar 11 19:33:35 2026 +0100",
+            "db-schema-version": "2.1.0",
+            "tb-profiler-version": ">=6.6.0,<7.0.0"
+        },
+        "software": [
+            {
+                "process": "variant_calling",
+                "software": "freebayes"
+            },
+            {
+                "process": "depth_calculation",
+                "software": "samtools"
+            }
+        ]
+    },
+    "notes": [],
+    "lineage": [
+        {
+            "fraction": 100.0,
+            "lineage": "lineage4",
+            "family": "Euro-American",
+            "rd": "None",
+            "support": [
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 206481,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 498531,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 546357,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 599868,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 662911,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 931123,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 1250340,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 2825466,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 2994187,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4",
+                    "chrom": "Chromosome",
+                    "pos": 3830695,
+                    "target_allele_count": 50,
+                    "other_allele_count": 0,
+                    "all_allele_count": 50,
+                    "target_allele_percent": 100.0
+                }
+            ]
+        },
+        {
+            "fraction": 100.0,
+            "lineage": "lineage4.3",
+            "family": "Euro-American (LAM)",
+            "rd": "None",
+            "support": [
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 14251,
+                    "target_allele_count": 267,
+                    "other_allele_count": 0,
+                    "all_allele_count": 267,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 162581,
+                    "target_allele_count": 208,
+                    "other_allele_count": 1,
+                    "all_allele_count": 209,
+                    "target_allele_percent": 99.52153110047847
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 534691,
+                    "target_allele_count": 175,
+                    "other_allele_count": 1,
+                    "all_allele_count": 176,
+                    "target_allele_percent": 99.43181818181817
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 773809,
+                    "target_allele_count": 212,
+                    "other_allele_count": 0,
+                    "all_allele_count": 212,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 1142266,
+                    "target_allele_count": 119,
+                    "other_allele_count": 0,
+                    "all_allele_count": 119,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 1452071,
+                    "target_allele_count": 225,
+                    "other_allele_count": 0,
+                    "all_allele_count": 225,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 2053682,
+                    "target_allele_count": 169,
+                    "other_allele_count": 0,
+                    "all_allele_count": 169,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 2503625,
+                    "target_allele_count": 170,
+                    "other_allele_count": 0,
+                    "all_allele_count": 170,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 3191027,
+                    "target_allele_count": 174,
+                    "other_allele_count": 0,
+                    "all_allele_count": 174,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3",
+                    "chrom": "Chromosome",
+                    "pos": 3418330,
+                    "target_allele_count": 209,
+                    "other_allele_count": 0,
+                    "all_allele_count": 209,
+                    "target_allele_percent": 100.0
+                }
+            ]
+        },
+        {
+            "fraction": 100.0,
+            "lineage": "lineage4.3.4",
+            "family": "Euro-American (LAM)",
+            "rd": "RD174",
+            "support": [
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 571943,
+                    "target_allele_count": 137,
+                    "other_allele_count": 0,
+                    "all_allele_count": 137,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 1037355,
+                    "target_allele_count": 149,
+                    "other_allele_count": 0,
+                    "all_allele_count": 149,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 1297327,
+                    "target_allele_count": 196,
+                    "other_allele_count": 0,
+                    "all_allele_count": 196,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 1847811,
+                    "target_allele_count": 120,
+                    "other_allele_count": 0,
+                    "all_allele_count": 120,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 2527676,
+                    "target_allele_count": 145,
+                    "other_allele_count": 0,
+                    "all_allele_count": 145,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 2599821,
+                    "target_allele_count": 246,
+                    "other_allele_count": 0,
+                    "all_allele_count": 246,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4",
+                    "chrom": "Chromosome",
+                    "pos": 3612009,
+                    "target_allele_count": 187,
+                    "other_allele_count": 0,
+                    "all_allele_count": 187,
+                    "target_allele_percent": 100.0
+                }
+            ]
+        },
+        {
+            "fraction": 100.0,
+            "lineage": "lineage4.3.4.2",
+            "family": "Euro-American (LAM)",
+            "rd": "RD174",
+            "support": [
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 632330,
+                    "target_allele_count": 198,
+                    "other_allele_count": 0,
+                    "all_allele_count": 198,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 784440,
+                    "target_allele_count": 166,
+                    "other_allele_count": 0,
+                    "all_allele_count": 166,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 990533,
+                    "target_allele_count": 312,
+                    "other_allele_count": 0,
+                    "all_allele_count": 312,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 1132368,
+                    "target_allele_count": 182,
+                    "other_allele_count": 1,
+                    "all_allele_count": 183,
+                    "target_allele_percent": 99.4535519125683
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 1724120,
+                    "target_allele_count": 223,
+                    "other_allele_count": 0,
+                    "all_allele_count": 223,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 1771320,
+                    "target_allele_count": 108,
+                    "other_allele_count": 0,
+                    "all_allele_count": 108,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 2443188,
+                    "target_allele_count": 180,
+                    "other_allele_count": 0,
+                    "all_allele_count": 180,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 3504930,
+                    "target_allele_count": 154,
+                    "other_allele_count": 0,
+                    "all_allele_count": 154,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 4043365,
+                    "target_allele_count": 213,
+                    "other_allele_count": 0,
+                    "all_allele_count": 213,
+                    "target_allele_percent": 100.0
+                },
+                {
+                    "id": "lineage4.3.4.2",
+                    "chrom": "Chromosome",
+                    "pos": 4373475,
+                    "target_allele_count": 236,
+                    "other_allele_count": 0,
+                    "all_allele_count": 236,
+                    "target_allele_percent": 100.0
+                }
+            ]
+        }
+    ],
+    "main_lineage": "lineage4",
+    "sub_lineage": "lineage4.3.4.2",
+    "spoligotype": null,
+    "drtype": "MDR-TB",
+    "dr_variants": [
+        {
+            "chrom": "Chromosome",
+            "pos": 761155,
+            "ref": "C",
+            "alt": "T",
+            "depth": 196,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 112,
+            "reverse_reads": 84,
+            "sv_len": null,
+            "gene_id": "Rv0667",
+            "gene_name": "rpoB",
+            "feature_id": "transcript:Rv0667",
+            "type": "missense_variant",
+            "change": "p.Ser450Leu",
+            "nucleotide_change": "c.1349C>T",
+            "protein_change": "p.Ser450Leu",
+            "annotation": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "rifampicin",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "drug_resistance",
+                    "drug": "rifapentine",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0667",
+                    "gene_name": "rpoB",
+                    "feature_id": "transcript:Rv0667",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.1349C>T",
+                    "protein_change": "p.Ser450Leu",
+                    "sequence_hgvs": "Chromosome:g.761155C>T",
+                    "annotation": [
+                        {
+                            "type": "drug_resistance",
+                            "drug": "rifampicin",
+                            "confidence": "Assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "drug_resistance",
+                            "drug": "rifapentine",
+                            "confidence": "Assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "drugs": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "rifampicin",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "drug_resistance",
+                    "drug": "rifapentine",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "locus_tag": "Rv0667",
+            "gene_associated_drugs": [
+                "rifampicin",
+                "rifapentine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 2155168,
+            "ref": "C",
+            "alt": "G",
+            "depth": 183,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 90,
+            "reverse_reads": 93,
+            "sv_len": null,
+            "gene_id": "Rv1908c",
+            "gene_name": "katG",
+            "feature_id": "transcript:Rv1908c",
+            "type": "missense_variant",
+            "change": "p.Ser315Thr",
+            "nucleotide_change": "c.944G>C",
+            "protein_change": "p.Ser315Thr",
+            "annotation": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "isoniazid",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": "High-level resistance"
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1908c",
+                    "gene_name": "katG",
+                    "feature_id": "transcript:Rv1908c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.944G>C",
+                    "protein_change": "p.Ser315Thr",
+                    "sequence_hgvs": "Chromosome:g.2155168C>G",
+                    "annotation": [
+                        {
+                            "type": "drug_resistance",
+                            "drug": "isoniazid",
+                            "confidence": "Assoc w R",
+                            "source": "WHOv3",
+                            "comments": "High-level resistance"
+                        }
+                    ]
+                }
+            ],
+            "drugs": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "isoniazid",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": "High-level resistance"
+                }
+            ],
+            "locus_tag": "Rv1908c",
+            "gene_associated_drugs": [
+                "isoniazid"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4327034,
+            "ref": "TA",
+            "alt": "T",
+            "depth": 172,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 61,
+            "reverse_reads": 111,
+            "sv_len": null,
+            "gene_id": "Rv3854c",
+            "gene_name": "ethA",
+            "feature_id": "transcript:Rv3854c",
+            "type": "frameshift_variant",
+            "change": "c.439delT",
+            "nucleotide_change": "c.439delT",
+            "protein_change": "p.Tyr147fs",
+            "annotation": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "ethionamide",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "drug_resistance",
+                    "drug": "prothionamide",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3854c",
+                    "gene_name": "ethA",
+                    "feature_id": "transcript:Rv3854c",
+                    "type": "frameshift_variant",
+                    "nucleotide_change": "c.439delT",
+                    "protein_change": "p.Tyr147fs",
+                    "sequence_hgvs": "Chromosome:g.4327034TA>T",
+                    "annotation": [
+                        {
+                            "type": "drug_resistance",
+                            "drug": "ethionamide",
+                            "confidence": "Assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "drug_resistance",
+                            "drug": "ethionamide",
+                            "confidence": "Assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "drug_resistance",
+                            "drug": "prothionamide",
+                            "confidence": "Assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "drug_resistance",
+                            "drug": "prothionamide",
+                            "confidence": "Assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                },
+                {
+                    "gene_id": "Rv3855",
+                    "gene_name": "ethR",
+                    "feature_id": "transcript:Rv3855",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-514delA",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.4327034TA>T",
+                    "annotation": []
+                }
+            ],
+            "drugs": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "ethionamide",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "drug_resistance",
+                    "drug": "prothionamide",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "locus_tag": "Rv3854c",
+            "gene_associated_drugs": [
+                "ethionamide",
+                "prothionamide"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4408087,
+            "ref": "CG",
+            "alt": "C",
+            "depth": 361,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 197,
+            "reverse_reads": 164,
+            "sv_len": null,
+            "gene_id": "Rv3919c",
+            "gene_name": "gid",
+            "feature_id": "transcript:Rv3919c",
+            "type": "frameshift_variant",
+            "change": "c.115delC",
+            "nucleotide_change": "c.115delC",
+            "protein_change": "p.Arg39fs",
+            "annotation": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "streptomycin",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3919c",
+                    "gene_name": "gid",
+                    "feature_id": "transcript:Rv3919c",
+                    "type": "frameshift_variant",
+                    "nucleotide_change": "c.115delC",
+                    "protein_change": "p.Arg39fs",
+                    "sequence_hgvs": "Chromosome:g.4408087CG>C",
+                    "annotation": [
+                        {
+                            "type": "drug_resistance",
+                            "drug": "streptomycin",
+                            "confidence": "Assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "drug_resistance",
+                            "drug": "streptomycin",
+                            "confidence": "Assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "drugs": [
+                {
+                    "type": "drug_resistance",
+                    "drug": "streptomycin",
+                    "confidence": "Assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "locus_tag": "Rv3919c",
+            "gene_associated_drugs": [
+                "streptomycin"
+            ]
+        }
+    ],
+    "other_variants": [
+        {
+            "chrom": "Chromosome",
+            "pos": 6140,
+            "ref": "G",
+            "alt": "T",
+            "depth": 322,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 164,
+            "reverse_reads": 158,
+            "sv_len": null,
+            "gene_id": "Rv0005",
+            "gene_name": "gyrB",
+            "feature_id": "transcript:Rv0005",
+            "type": "missense_variant",
+            "change": "p.Val301Leu",
+            "nucleotide_change": "c.901G>T",
+            "protein_change": "p.Val301Leu",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "levofloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "moxifloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0005",
+                    "gene_name": "gyrB",
+                    "feature_id": "transcript:Rv0005",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.901G>T",
+                    "protein_change": "p.Val301Leu",
+                    "sequence_hgvs": "Chromosome:g.6140G>T",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "levofloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "moxifloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0005",
+            "gene_associated_drugs": [
+                "levofloxacin",
+                "moxifloxacin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 7362,
+            "ref": "G",
+            "alt": "C",
+            "depth": 319,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 173,
+            "reverse_reads": 146,
+            "sv_len": null,
+            "gene_id": "Rv0006",
+            "gene_name": "gyrA",
+            "feature_id": "transcript:Rv0006",
+            "type": "missense_variant",
+            "change": "p.Glu21Gln",
+            "nucleotide_change": "c.61G>C",
+            "protein_change": "p.Glu21Gln",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "levofloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "moxifloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0006",
+                    "gene_name": "gyrA",
+                    "feature_id": "transcript:Rv0006",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.61G>C",
+                    "protein_change": "p.Glu21Gln",
+                    "sequence_hgvs": "Chromosome:g.7362G>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "levofloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "moxifloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0006",
+            "gene_associated_drugs": [
+                "levofloxacin",
+                "moxifloxacin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 7585,
+            "ref": "G",
+            "alt": "C",
+            "depth": 418,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 219,
+            "reverse_reads": 199,
+            "sv_len": null,
+            "gene_id": "Rv0006",
+            "gene_name": "gyrA",
+            "feature_id": "transcript:Rv0006",
+            "type": "missense_variant",
+            "change": "p.Ser95Thr",
+            "nucleotide_change": "c.284G>C",
+            "protein_change": "p.Ser95Thr",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "levofloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "moxifloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0006",
+                    "gene_name": "gyrA",
+                    "feature_id": "transcript:Rv0006",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.284G>C",
+                    "protein_change": "p.Ser95Thr",
+                    "sequence_hgvs": "Chromosome:g.7585G>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "levofloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "moxifloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0006",
+            "gene_associated_drugs": [
+                "levofloxacin",
+                "moxifloxacin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 9304,
+            "ref": "G",
+            "alt": "A",
+            "depth": 310,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 169,
+            "reverse_reads": 141,
+            "sv_len": null,
+            "gene_id": "Rv0006",
+            "gene_name": "gyrA",
+            "feature_id": "transcript:Rv0006",
+            "type": "missense_variant",
+            "change": "p.Gly668Asp",
+            "nucleotide_change": "c.2003G>A",
+            "protein_change": "p.Gly668Asp",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "levofloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "moxifloxacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0006",
+                    "gene_name": "gyrA",
+                    "feature_id": "transcript:Rv0006",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.2003G>A",
+                    "protein_change": "p.Gly668Asp",
+                    "sequence_hgvs": "Chromosome:g.9304G>A",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "levofloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "moxifloxacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0006",
+            "gene_associated_drugs": [
+                "levofloxacin",
+                "moxifloxacin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 764995,
+            "ref": "C",
+            "alt": "G",
+            "depth": 232,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 134,
+            "reverse_reads": 98,
+            "sv_len": null,
+            "gene_id": "Rv0668",
+            "gene_name": "rpoC",
+            "feature_id": "transcript:Rv0668",
+            "type": "synonymous_variant",
+            "change": "c.1626C>G",
+            "nucleotide_change": "c.1626C>G",
+            "protein_change": "p.Ala542Ala",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "rifampicin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "rifapentine",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0668",
+                    "gene_name": "rpoC",
+                    "feature_id": "transcript:Rv0668",
+                    "type": "synonymous_variant",
+                    "nucleotide_change": "c.1626C>G",
+                    "protein_change": "p.Ala542Ala",
+                    "sequence_hgvs": "Chromosome:g.764995C>G",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "rifampicin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "rifapentine",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0668",
+            "gene_associated_drugs": [
+                "rifampicin",
+                "rifapentine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 775639,
+            "ref": "T",
+            "alt": "C",
+            "depth": 159,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 60,
+            "reverse_reads": 99,
+            "sv_len": null,
+            "gene_id": "Rv0676c",
+            "gene_name": "mmpL5",
+            "feature_id": "transcript:Rv0676c",
+            "type": "missense_variant",
+            "change": "p.Ile948Val",
+            "nucleotide_change": "c.2842A>G",
+            "protein_change": "p.Ile948Val",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "bedaquiline",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "clofazimine",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0676c",
+                    "gene_name": "mmpL5",
+                    "feature_id": "transcript:Rv0676c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.2842A>G",
+                    "protein_change": "p.Ile948Val",
+                    "sequence_hgvs": "Chromosome:g.775639T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "bedaquiline",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "clofazimine",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0676c",
+            "gene_associated_drugs": [
+                "bedaquiline",
+                "clofazimine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 781395,
+            "ref": "T",
+            "alt": "C",
+            "depth": 209,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 99,
+            "reverse_reads": 110,
+            "sv_len": null,
+            "gene_id": "Rv0682",
+            "gene_name": "rpsL",
+            "feature_id": "transcript:Rv0682",
+            "type": "upstream_gene_variant",
+            "change": "c.-165T>C",
+            "nucleotide_change": "c.-165T>C",
+            "protein_change": "",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "streptomycin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv0682",
+                    "gene_name": "rpsL",
+                    "feature_id": "transcript:Rv0682",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-165T>C",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.781395T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "streptomycin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv0682",
+            "gene_associated_drugs": [
+                "streptomycin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1471659,
+            "ref": "C",
+            "alt": "T",
+            "depth": 462,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 250,
+            "reverse_reads": 212,
+            "sv_len": null,
+            "gene_id": "EBG00000313325",
+            "gene_name": "rrs",
+            "feature_id": "transcript:EBG00000313325",
+            "type": "upstream_gene_variant",
+            "change": "n.-187C>T",
+            "nucleotide_change": "n.-187C>T",
+            "protein_change": "",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "amikacin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "capreomycin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "kanamycin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "streptomycin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "EBG00000313325",
+                    "gene_name": "rrs",
+                    "feature_id": "transcript:EBG00000313325",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "n.-187C>T",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.1471659C>T",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "EBG00000313325",
+            "gene_associated_drugs": [
+                "amikacin",
+                "capreomycin",
+                "kanamycin",
+                "streptomycin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1639594,
+            "ref": "C",
+            "alt": "A",
+            "depth": 125,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 70,
+            "reverse_reads": 55,
+            "sv_len": null,
+            "gene_id": "Rv1453",
+            "gene_name": "Rv1453",
+            "feature_id": "transcript:Rv1453",
+            "type": "missense_variant",
+            "change": "p.Pro405Gln",
+            "nucleotide_change": "c.1214C>A",
+            "protein_change": "p.Pro405Gln",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "clofazimine",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1453",
+                    "gene_name": "Rv1453",
+                    "feature_id": "transcript:Rv1453",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.1214C>A",
+                    "protein_change": "p.Pro405Gln",
+                    "sequence_hgvs": "Chromosome:g.1639594C>A",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "clofazimine",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv1453",
+            "gene_associated_drugs": [
+                "clofazimine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1834281,
+            "ref": "A",
+            "alt": "T",
+            "depth": 123,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 60,
+            "reverse_reads": 63,
+            "sv_len": null,
+            "gene_id": "Rv1630",
+            "gene_name": "rpsA",
+            "feature_id": "transcript:Rv1630",
+            "type": "missense_variant",
+            "change": "p.His247Leu",
+            "nucleotide_change": "c.740A>T",
+            "protein_change": "p.His247Leu",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "pyrazinamide",
+                    "confidence": "Uncertain significance",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1630",
+                    "gene_name": "rpsA",
+                    "feature_id": "transcript:Rv1630",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.740A>T",
+                    "protein_change": "p.His247Leu",
+                    "sequence_hgvs": "Chromosome:g.1834281A>T",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "pyrazinamide",
+                            "confidence": "Uncertain significance",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv1630",
+            "gene_associated_drugs": [
+                "pyrazinamide"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1854300,
+            "ref": "T",
+            "alt": "C",
+            "depth": 237,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 114,
+            "reverse_reads": 123,
+            "sv_len": null,
+            "gene_id": "Rv1644",
+            "gene_name": "tsnR",
+            "feature_id": "transcript:Rv1644",
+            "type": "missense_variant",
+            "change": "p.Leu232Pro",
+            "nucleotide_change": "c.695T>C",
+            "protein_change": "p.Leu232Pro",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "linezolid",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1644",
+                    "gene_name": "tsnR",
+                    "feature_id": "transcript:Rv1644",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.695T>C",
+                    "protein_change": "p.Leu232Pro",
+                    "sequence_hgvs": "Chromosome:g.1854300T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "linezolid",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv1644",
+            "gene_associated_drugs": [
+                "linezolid"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1917972,
+            "ref": "A",
+            "alt": "G",
+            "depth": 198,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 110,
+            "reverse_reads": 88,
+            "sv_len": null,
+            "gene_id": "Rv1694",
+            "gene_name": "tlyA",
+            "feature_id": "transcript:Rv1694",
+            "type": "synonymous_variant",
+            "change": "c.33A>G",
+            "nucleotide_change": "c.33A>G",
+            "protein_change": "p.Leu11Leu",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "capreomycin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1694",
+                    "gene_name": "tlyA",
+                    "feature_id": "transcript:Rv1694",
+                    "type": "synonymous_variant",
+                    "nucleotide_change": "c.33A>G",
+                    "protein_change": "p.Leu11Leu",
+                    "sequence_hgvs": "Chromosome:g.1917972A>G",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "capreomycin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv1694",
+            "gene_associated_drugs": [
+                "capreomycin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1931179,
+            "ref": "C",
+            "alt": "A",
+            "depth": 107,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 60,
+            "reverse_reads": 47,
+            "sv_len": null,
+            "gene_id": "Rv1704c",
+            "gene_name": "cycA",
+            "feature_id": "transcript:Rv1704c",
+            "type": "missense_variant",
+            "change": "p.Arg93Leu",
+            "nucleotide_change": "c.278G>T",
+            "protein_change": "p.Arg93Leu",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "cycloserine",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "terizidone",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1704c",
+                    "gene_name": "cycA",
+                    "feature_id": "transcript:Rv1704c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.278G>T",
+                    "protein_change": "p.Arg93Leu",
+                    "sequence_hgvs": "Chromosome:g.1931179C>A",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "cycloserine",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "terizidone",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv1704c",
+            "gene_associated_drugs": [
+                "cycloserine",
+                "terizidone"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 2223293,
+            "ref": "T",
+            "alt": "C",
+            "depth": 242,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 136,
+            "reverse_reads": 106,
+            "sv_len": null,
+            "gene_id": "Rv1979c",
+            "gene_name": "Rv1979c",
+            "feature_id": "transcript:Rv1979c",
+            "type": "upstream_gene_variant",
+            "change": "c.-129A>G",
+            "nucleotide_change": "c.-129A>G",
+            "protein_change": "",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "bedaquiline",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "clofazimine",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv1979c",
+                    "gene_name": "Rv1979c",
+                    "feature_id": "transcript:Rv1979c",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-129A>G",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.2223293T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "bedaquiline",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "clofazimine",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv1979c",
+            "gene_associated_drugs": [
+                "bedaquiline",
+                "clofazimine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 3086788,
+            "ref": "T",
+            "alt": "C",
+            "depth": 171,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 75,
+            "reverse_reads": 96,
+            "sv_len": null,
+            "gene_id": "Rv2780",
+            "gene_name": "ald",
+            "feature_id": "transcript:Rv2780",
+            "type": "upstream_gene_variant",
+            "change": "c.-32T>C",
+            "nucleotide_change": "c.-32T>C",
+            "protein_change": "",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "cycloserine",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "terizidone",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv2780",
+                    "gene_name": "ald",
+                    "feature_id": "transcript:Rv2780",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-32T>C",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.3086788T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "cycloserine",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "terizidone",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv2780",
+            "gene_associated_drugs": [
+                "cycloserine",
+                "terizidone"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 3336825,
+            "ref": "T",
+            "alt": "C",
+            "depth": 182,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 86,
+            "reverse_reads": 96,
+            "sv_len": null,
+            "gene_id": "Rv2981c",
+            "gene_name": "ddlA",
+            "feature_id": "transcript:Rv2981c",
+            "type": "missense_variant",
+            "change": "p.Thr365Ala",
+            "nucleotide_change": "c.1093A>G",
+            "protein_change": "p.Thr365Ala",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "cycloserine",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "terizidone",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv2981c",
+                    "gene_name": "ddlA",
+                    "feature_id": "transcript:Rv2981c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.1093A>G",
+                    "protein_change": "p.Thr365Ala",
+                    "sequence_hgvs": "Chromosome:g.3336825T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "cycloserine",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "terizidone",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv2981c",
+            "gene_associated_drugs": [
+                "cycloserine",
+                "terizidone"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 3612009,
+            "ref": "C",
+            "alt": "T",
+            "depth": 187,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 90,
+            "reverse_reads": 97,
+            "sv_len": null,
+            "gene_id": "Rv3236c",
+            "gene_name": "Rv3236c",
+            "feature_id": "transcript:Rv3236c",
+            "type": "missense_variant",
+            "change": "p.Ala370Thr",
+            "nucleotide_change": "c.1108G>A",
+            "protein_change": "p.Ala370Thr",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "pyrazinamide",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3236c",
+                    "gene_name": "Rv3236c",
+                    "feature_id": "transcript:Rv3236c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.1108G>A",
+                    "protein_change": "p.Ala370Thr",
+                    "sequence_hgvs": "Chromosome:g.3612009C>T",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "pyrazinamide",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv3236c",
+            "gene_associated_drugs": [
+                "pyrazinamide"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 3625065,
+            "ref": "T",
+            "alt": "G",
+            "depth": 142,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 59,
+            "reverse_reads": 83,
+            "sv_len": null,
+            "gene_id": "Rv3245c",
+            "gene_name": "mtrB",
+            "feature_id": "transcript:Rv3245c",
+            "type": "missense_variant",
+            "change": "p.Met517Leu",
+            "nucleotide_change": "c.1549A>C",
+            "protein_change": "p.Met517Leu",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "bedaquiline",
+                    "confidence": "Uncertain significance",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "rifampicin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "rifapentine",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3245c",
+                    "gene_name": "mtrB",
+                    "feature_id": "transcript:Rv3245c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.1549A>C",
+                    "protein_change": "p.Met517Leu",
+                    "sequence_hgvs": "Chromosome:g.3625065T>G",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "bedaquiline",
+                            "confidence": "Uncertain significance",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "rifampicin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "rifapentine",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                },
+                {
+                    "gene_id": "Rv3244c",
+                    "gene_name": "lpqB",
+                    "feature_id": "transcript:Rv3244c",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-155A>C",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.3625065T>G",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "Rv3245c",
+            "gene_associated_drugs": [
+                "bedaquiline",
+                "rifampicin",
+                "rifapentine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 3840719,
+            "ref": "T",
+            "alt": "C",
+            "depth": 242,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 121,
+            "reverse_reads": 121,
+            "sv_len": null,
+            "gene_id": "Rv3423c",
+            "gene_name": "alr",
+            "feature_id": "transcript:Rv3423c",
+            "type": "synonymous_variant",
+            "change": "c.630A>G",
+            "nucleotide_change": "c.630A>G",
+            "protein_change": "p.Leu210Leu",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "cycloserine",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "terizidone",
+                    "confidence": "Not assoc w R - Interim",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3423c",
+                    "gene_name": "alr",
+                    "feature_id": "transcript:Rv3423c",
+                    "type": "synonymous_variant",
+                    "nucleotide_change": "c.630A>G",
+                    "protein_change": "p.Leu210Leu",
+                    "sequence_hgvs": "Chromosome:g.3840719T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "cycloserine",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "terizidone",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv3423c",
+            "gene_associated_drugs": [
+                "cycloserine",
+                "terizidone"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4038287,
+            "ref": "G",
+            "alt": "A",
+            "depth": 180,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 96,
+            "reverse_reads": 84,
+            "sv_len": null,
+            "gene_id": "Rv3596c",
+            "gene_name": "clpC1",
+            "feature_id": "transcript:Rv3596c",
+            "type": "synonymous_variant",
+            "change": "c.2418C>T",
+            "nucleotide_change": "c.2418C>T",
+            "protein_change": "p.Asn806Asn",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "pyrazinamide",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3596c",
+                    "gene_name": "clpC1",
+                    "feature_id": "transcript:Rv3596c",
+                    "type": "synonymous_variant",
+                    "nucleotide_change": "c.2418C>T",
+                    "protein_change": "p.Asn806Asn",
+                    "sequence_hgvs": "Chromosome:g.4038287G>A",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "pyrazinamide",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv3596c",
+            "gene_associated_drugs": [
+                "pyrazinamide"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4242643,
+            "ref": "C",
+            "alt": "T",
+            "depth": 214,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 88,
+            "reverse_reads": 126,
+            "sv_len": null,
+            "gene_id": "Rv3793",
+            "gene_name": "embC",
+            "feature_id": "transcript:Rv3793",
+            "type": "synonymous_variant",
+            "change": "c.2781C>T",
+            "nucleotide_change": "c.2781C>T",
+            "protein_change": "p.Arg927Arg",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "ethambutol",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3793",
+                    "gene_name": "embC",
+                    "feature_id": "transcript:Rv3793",
+                    "type": "synonymous_variant",
+                    "nucleotide_change": "c.2781C>T",
+                    "protein_change": "p.Arg927Arg",
+                    "sequence_hgvs": "Chromosome:g.4242643C>T",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "ethambutol",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                },
+                {
+                    "gene_id": "Rv3794",
+                    "gene_name": "embA",
+                    "feature_id": "transcript:Rv3794",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-590C>T",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.4242643C>T",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "Rv3793",
+            "gene_associated_drugs": [
+                "ethambutol"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4338521,
+            "ref": "T",
+            "alt": "C",
+            "depth": 193,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 79,
+            "reverse_reads": 114,
+            "sv_len": null,
+            "gene_id": "Rv3862c",
+            "gene_name": "whiB6",
+            "feature_id": "transcript:Rv3862c",
+            "type": "initiator_codon_variant",
+            "change": "c.1A>G",
+            "nucleotide_change": "c.1A>G",
+            "protein_change": "p.Met1?",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "amikacin",
+                    "confidence": "Uncertain significance",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "capreomycin",
+                    "confidence": "Uncertain significance",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "kanamycin",
+                    "confidence": "Uncertain significance",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3862c",
+                    "gene_name": "whiB6",
+                    "feature_id": "transcript:Rv3862c",
+                    "type": "initiator_codon_variant",
+                    "nucleotide_change": "c.1A>G",
+                    "protein_change": "p.Met1?",
+                    "sequence_hgvs": "Chromosome:g.4338521T>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "amikacin",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "amikacin",
+                            "confidence": "Uncertain significance",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "capreomycin",
+                            "confidence": "Not assoc w R - Interim",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "capreomycin",
+                            "confidence": "Uncertain significance",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "kanamycin",
+                            "confidence": "Uncertain significance",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv3862c",
+            "gene_associated_drugs": [
+                "amikacin",
+                "capreomycin",
+                "kanamycin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4338595,
+            "ref": "GC",
+            "alt": "G",
+            "depth": 218,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 95,
+            "reverse_reads": 123,
+            "sv_len": null,
+            "gene_id": "Rv3862c",
+            "gene_name": "whiB6",
+            "feature_id": "transcript:Rv3862c",
+            "type": "upstream_gene_variant",
+            "change": "c.-75delG",
+            "nucleotide_change": "c.-75delG",
+            "protein_change": "",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "amikacin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "capreomycin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "kanamycin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3862c",
+                    "gene_name": "whiB6",
+                    "feature_id": "transcript:Rv3862c",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-75delG",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.4338595GC>G",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "amikacin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "capreomycin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        },
+                        {
+                            "type": "who_confidence",
+                            "drug": "kanamycin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv3862c",
+            "gene_associated_drugs": [
+                "amikacin",
+                "capreomycin",
+                "kanamycin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4338732,
+            "ref": "G",
+            "alt": "A",
+            "depth": 192,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 82,
+            "reverse_reads": 110,
+            "sv_len": null,
+            "gene_id": "Rv3862c",
+            "gene_name": "whiB6",
+            "feature_id": "transcript:Rv3862c",
+            "type": "upstream_gene_variant",
+            "change": "c.-211C>T",
+            "nucleotide_change": "c.-211C>T",
+            "protein_change": "",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "amikacin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "capreomycin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                },
+                {
+                    "type": "who_confidence",
+                    "drug": "kanamycin",
+                    "confidence": "Uncertain significance",
+                    "comment": "Not found in WHO catalogue",
+                    "comments": "",
+                    "source": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3862c",
+                    "gene_name": "whiB6",
+                    "feature_id": "transcript:Rv3862c",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-211C>T",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.4338732G>A",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "Rv3862c",
+            "gene_associated_drugs": [
+                "amikacin",
+                "capreomycin",
+                "kanamycin"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 4408156,
+            "ref": "A",
+            "alt": "C",
+            "depth": 434,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "pass",
+            "forward_reads": 219,
+            "reverse_reads": 215,
+            "sv_len": null,
+            "gene_id": "Rv3919c",
+            "gene_name": "gid",
+            "feature_id": "transcript:Rv3919c",
+            "type": "missense_variant",
+            "change": "p.Leu16Arg",
+            "nucleotide_change": "c.47T>G",
+            "protein_change": "p.Leu16Arg",
+            "annotation": [
+                {
+                    "type": "who_confidence",
+                    "drug": "streptomycin",
+                    "confidence": "Not assoc w R",
+                    "source": "WHOv3",
+                    "comments": ""
+                }
+            ],
+            "consequences": [
+                {
+                    "gene_id": "Rv3919c",
+                    "gene_name": "gid",
+                    "feature_id": "transcript:Rv3919c",
+                    "type": "missense_variant",
+                    "nucleotide_change": "c.47T>G",
+                    "protein_change": "p.Leu16Arg",
+                    "sequence_hgvs": "Chromosome:g.4408156A>C",
+                    "annotation": [
+                        {
+                            "type": "who_confidence",
+                            "drug": "streptomycin",
+                            "confidence": "Not assoc w R",
+                            "source": "WHOv3",
+                            "comments": ""
+                        }
+                    ]
+                }
+            ],
+            "locus_tag": "Rv3919c",
+            "gene_associated_drugs": [
+                "streptomycin"
+            ]
+        }
+    ],
+    "qc_fail_variants": [
+        {
+            "chrom": "Chromosome",
+            "pos": 1638020,
+            "ref": "T",
+            "alt": "C",
+            "depth": 50,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "soft_fail",
+            "forward_reads": 50,
+            "reverse_reads": 0,
+            "sv_len": null,
+            "gene_id": "Rv1453",
+            "gene_name": "Rv1453",
+            "feature_id": "transcript:Rv1453",
+            "type": "upstream_gene_variant",
+            "change": "c.-361T>C",
+            "nucleotide_change": "c.-361T>C",
+            "protein_change": "",
+            "annotation": [],
+            "consequences": [
+                {
+                    "gene_id": "Rv1453",
+                    "gene_name": "Rv1453",
+                    "feature_id": "transcript:Rv1453",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-361T>C",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.1638020T>C",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "Rv1453",
+            "gene_associated_drugs": [
+                "clofazimine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 1638125,
+            "ref": "T",
+            "alt": "C",
+            "depth": 9,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "soft_fail",
+            "forward_reads": 9,
+            "reverse_reads": 0,
+            "sv_len": null,
+            "gene_id": "Rv1453",
+            "gene_name": "Rv1453",
+            "feature_id": "transcript:Rv1453",
+            "type": "upstream_gene_variant",
+            "change": "c.-256T>C",
+            "nucleotide_change": "c.-256T>C",
+            "protein_change": "",
+            "annotation": [],
+            "consequences": [
+                {
+                    "gene_id": "Rv1453",
+                    "gene_name": "Rv1453",
+                    "feature_id": "transcript:Rv1453",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-256T>C",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.1638125T>C",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "Rv1453",
+            "gene_associated_drugs": [
+                "clofazimine"
+            ]
+        },
+        {
+            "chrom": "Chromosome",
+            "pos": 2784613,
+            "ref": "A",
+            "alt": "G",
+            "depth": 5,
+            "freq": 1.0,
+            "sv": false,
+            "filter": "soft_fail",
+            "forward_reads": 4,
+            "reverse_reads": 1,
+            "sv_len": null,
+            "gene_id": "Rv2477c",
+            "gene_name": "Rv2477c",
+            "feature_id": "transcript:Rv2477c",
+            "type": "upstream_gene_variant",
+            "change": "c.-571T>C",
+            "nucleotide_change": "c.-571T>C",
+            "protein_change": "",
+            "annotation": [],
+            "consequences": [
+                {
+                    "gene_id": "Rv2477c",
+                    "gene_name": "Rv2477c",
+                    "feature_id": "transcript:Rv2477c",
+                    "type": "upstream_gene_variant",
+                    "nucleotide_change": "c.-571T>C",
+                    "protein_change": "",
+                    "sequence_hgvs": "Chromosome:g.2784613A>G",
+                    "annotation": []
+                }
+            ],
+            "locus_tag": "Rv2477c",
+            "gene_associated_drugs": [
+                "amikacin",
+                "ethambutol",
+                "kanamycin",
+                "levofloxacin",
+                "moxifloxacin",
+                "rifampicin",
+                "rifapentine",
+                "streptomycin"
+            ]
+        }
+    ],
+    "qc": {
+        "percent_reads_mapped": 99.16,
+        "num_reads_mapped": 6342739,
+        "target_median_depth": 178.5,
+        "genome_median_depth": 180.0,
+        "target_qc": [
+            {
+                "target": "dnaA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 621.0
+            },
+            {
+                "target": "gyrB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 363.0
+            },
+            {
+                "target": "gyrA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 315.0
+            },
+            {
+                "target": "Rv0010c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 209.0
+            },
+            {
+                "target": "Rv0077c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 201.0
+            },
+            {
+                "target": "Rv0078",
+                "percent_depth_pass": 100.0,
+                "median_depth": 201.0
+            },
+            {
+                "target": "fgd1",
+                "percent_depth_pass": 100.0,
+                "median_depth": 288.0
+            },
+            {
+                "target": "mshA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 241.0
+            },
+            {
+                "target": "ccsA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 188.0
+            },
+            {
+                "target": "Rv0565c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 155.0
+            },
+            {
+                "target": "hadA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 117.0
+            },
+            {
+                "target": "nusG",
+                "percent_depth_pass": 100.0,
+                "median_depth": 150.0
+            },
+            {
+                "target": "mmaA3",
+                "percent_depth_pass": 100.0,
+                "median_depth": 136.0
+            },
+            {
+                "target": "rpoB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 168.0
+            },
+            {
+                "target": "rpoC",
+                "percent_depth_pass": 100.0,
+                "median_depth": 176.0
+            },
+            {
+                "target": "mmpL5",
+                "percent_depth_pass": 100.0,
+                "median_depth": 141.0
+            },
+            {
+                "target": "mmpS5",
+                "percent_depth_pass": 100.0,
+                "median_depth": 154.0
+            },
+            {
+                "target": "mmpR5",
+                "percent_depth_pass": 100.0,
+                "median_depth": 162.0
+            },
+            {
+                "target": "rpsL",
+                "percent_depth_pass": 100.0,
+                "median_depth": 169.0
+            },
+            {
+                "target": "rplC",
+                "percent_depth_pass": 100.0,
+                "median_depth": 194.0
+            },
+            {
+                "target": "Rv1129c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 143.0
+            },
+            {
+                "target": "fbiC",
+                "percent_depth_pass": 100.0,
+                "median_depth": 186.0
+            },
+            {
+                "target": "sigE",
+                "percent_depth_pass": 100.0,
+                "median_depth": 137.0
+            },
+            {
+                "target": "Rv1258c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 169.0
+            },
+            {
+                "target": "embR",
+                "percent_depth_pass": 100.0,
+                "median_depth": 178.0
+            },
+            {
+                "target": "atpE",
+                "percent_depth_pass": 100.0,
+                "median_depth": 149.0
+            },
+            {
+                "target": "rrs",
+                "percent_depth_pass": 100.0,
+                "median_depth": 346.0
+            },
+            {
+                "target": "rrl",
+                "percent_depth_pass": 100.0,
+                "median_depth": 272.0
+            },
+            {
+                "target": "Rv1453",
+                "percent_depth_pass": 100.0,
+                "median_depth": 131.0
+            },
+            {
+                "target": "inhA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 181.0
+            },
+            {
+                "target": "rpsA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 128.0
+            },
+            {
+                "target": "tsnR",
+                "percent_depth_pass": 100.0,
+                "median_depth": 199.0
+            },
+            {
+                "target": "tlyA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 211.0
+            },
+            {
+                "target": "cycA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 126.0
+            },
+            {
+                "target": "bacA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 120.0
+            },
+            {
+                "target": "ndh",
+                "percent_depth_pass": 100.0,
+                "median_depth": 147.0
+            },
+            {
+                "target": "katG",
+                "percent_depth_pass": 100.0,
+                "median_depth": 164.0
+            },
+            {
+                "target": "PPE35",
+                "percent_depth_pass": 100.0,
+                "median_depth": 296.0
+            },
+            {
+                "target": "Rv1979c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 227.5
+            },
+            {
+                "target": "pncA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 177.0
+            },
+            {
+                "target": "Rv2073c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 207.0
+            },
+            {
+                "target": "mshC",
+                "percent_depth_pass": 100.0,
+                "median_depth": 189.0
+            },
+            {
+                "target": "eis",
+                "percent_depth_pass": 100.0,
+                "median_depth": 180.0
+            },
+            {
+                "target": "ahpC",
+                "percent_depth_pass": 100.0,
+                "median_depth": 168.0
+            },
+            {
+                "target": "Rv2477c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 133.0
+            },
+            {
+                "target": "pepQ",
+                "percent_depth_pass": 100.0,
+                "median_depth": 179.0
+            },
+            {
+                "target": "Rv2680",
+                "percent_depth_pass": 100.0,
+                "median_depth": 198.0
+            },
+            {
+                "target": "Rv2681",
+                "percent_depth_pass": 100.0,
+                "median_depth": 207.0
+            },
+            {
+                "target": "Rv2752c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 137.0
+            },
+            {
+                "target": "ald",
+                "percent_depth_pass": 100.0,
+                "median_depth": 192.0
+            },
+            {
+                "target": "ddlA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 181.0
+            },
+            {
+                "target": "fbiD",
+                "percent_depth_pass": 100.0,
+                "median_depth": 214.0
+            },
+            {
+                "target": "Rv3083",
+                "percent_depth_pass": 100.0,
+                "median_depth": 171.0
+            },
+            {
+                "target": "whiB7",
+                "percent_depth_pass": 100.0,
+                "median_depth": 161.0
+            },
+            {
+                "target": "Rv3236c",
+                "percent_depth_pass": 100.0,
+                "median_depth": 142.0
+            },
+            {
+                "target": "lpqB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 183.0
+            },
+            {
+                "target": "mtrB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 160.0
+            },
+            {
+                "target": "mtrA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 157.0
+            },
+            {
+                "target": "fbiA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 182.5
+            },
+            {
+                "target": "fbiB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 190.0
+            },
+            {
+                "target": "alr",
+                "percent_depth_pass": 100.0,
+                "median_depth": 201.0
+            },
+            {
+                "target": "rpoA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 167.0
+            },
+            {
+                "target": "ddn",
+                "percent_depth_pass": 100.0,
+                "median_depth": 209.5
+            },
+            {
+                "target": "clpC1",
+                "percent_depth_pass": 100.0,
+                "median_depth": 159.0
+            },
+            {
+                "target": "panD",
+                "percent_depth_pass": 100.0,
+                "median_depth": 149.0
+            },
+            {
+                "target": "glpK",
+                "percent_depth_pass": 100.0,
+                "median_depth": 151.0
+            },
+            {
+                "target": "dprE2",
+                "percent_depth_pass": 100.0,
+                "median_depth": 156.0
+            },
+            {
+                "target": "embC",
+                "percent_depth_pass": 100.0,
+                "median_depth": 205.0
+            },
+            {
+                "target": "embA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 196.0
+            },
+            {
+                "target": "embB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 202.0
+            },
+            {
+                "target": "aftB",
+                "percent_depth_pass": 100.0,
+                "median_depth": 163.0
+            },
+            {
+                "target": "ubiA",
+                "percent_depth_pass": 100.0,
+                "median_depth": 178.0
+            },
+            {
+                "target": "ethA",
+                "percent_depth_pass": 99.93,
+                "median_depth": 158.0
+            },
+            {
+                "target": "ethR",
+                "percent_depth_pass": 100.0,
+                "median_depth": 212.0
+            },
+            {
+                "target": "whiB6",
+                "percent_depth_pass": 100.0,
+                "median_depth": 209.0
+            },
+            {
+                "target": "gid",
+                "percent_depth_pass": 100.0,
+                "median_depth": 395.0
+            }
+        ]
+    },
+    "linked_samples": [],
+    "gene_name2locus_tag": {
+        "dnaA": "Rv0001",
+        "gyrB": "Rv0005",
+        "gyrA": "Rv0006",
+        "Rv0010c": "Rv0010c",
+        "Rv0077c": "Rv0077c",
+        "Rv0078": "Rv0078",
+        "fgd1": "Rv0407",
+        "mshA": "Rv0486",
+        "ccsA": "Rv0529",
+        "Rv0565c": "Rv0565c",
+        "hadA": "Rv0635",
+        "nusG": "Rv0639",
+        "mmaA3": "Rv0643c",
+        "rpoB": "Rv0667",
+        "rpoC": "Rv0668",
+        "mmpL5": "Rv0676c",
+        "mmpS5": "Rv0677c",
+        "mmpR5": "Rv0678",
+        "rpsL": "Rv0682",
+        "rplC": "Rv0701",
+        "Rv1129c": "Rv1129c",
+        "fbiC": "Rv1173",
+        "sigE": "Rv1221",
+        "Rv1258c": "Rv1258c",
+        "embR": "Rv1267c",
+        "atpE": "Rv1305",
+        "rrs": "EBG00000313325",
+        "rrl": "EBG00000313339",
+        "Rv1453": "Rv1453",
+        "inhA": "Rv1484",
+        "rpsA": "Rv1630",
+        "tsnR": "Rv1644",
+        "tlyA": "Rv1694",
+        "cycA": "Rv1704c",
+        "bacA": "Rv1819c",
+        "ndh": "Rv1854c",
+        "katG": "Rv1908c",
+        "PPE35": "Rv1918c",
+        "Rv1979c": "Rv1979c",
+        "pncA": "Rv2043c",
+        "Rv2073c": "Rv2073c",
+        "mshC": "Rv2130c",
+        "eis": "Rv2416c",
+        "ahpC": "Rv2428",
+        "Rv2477c": "Rv2477c",
+        "pepQ": "Rv2535c",
+        "Rv2680": "Rv2680",
+        "Rv2681": "Rv2681",
+        "Rv2752c": "Rv2752c",
+        "ald": "Rv2780",
+        "ddlA": "Rv2981c",
+        "fbiD": "Rv2983",
+        "Rv3083": "Rv3083",
+        "whiB7": "Rv3197A",
+        "Rv3236c": "Rv3236c",
+        "lpqB": "Rv3244c",
+        "mtrB": "Rv3245c",
+        "mtrA": "Rv3246c",
+        "fbiA": "Rv3261",
+        "fbiB": "Rv3262",
+        "alr": "Rv3423c",
+        "rpoA": "Rv3457c",
+        "ddn": "Rv3547",
+        "clpC1": "Rv3596c",
+        "panD": "Rv3601c",
+        "glpK": "Rv3696c",
+        "dprE2": "Rv3791",
+        "embC": "Rv3793",
+        "embA": "Rv3794",
+        "embB": "Rv3795",
+        "aftB": "Rv3805c",
+        "ubiA": "Rv3806c",
+        "ethA": "Rv3854c",
+        "ethR": "Rv3855",
+        "whiB6": "Rv3862c",
+        "gid": "Rv3919c"
+    }
+}

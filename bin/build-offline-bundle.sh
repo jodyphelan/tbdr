@@ -35,10 +35,9 @@ docker save --output "$STAGING_DIR/images.tar" \
 
 cp docker-compose.yml docker-compose.offline.yml .env.example README.md \
     "$STAGING_DIR/"
-cp "launch-tbdr-macOS.command" "$STAGING_DIR/"
-chmod +x "$STAGING_DIR/launch-tbdr-macOS.command"
-mkdir -p "$STAGING_DIR/tests"
-cp tests/test_launcher.sh "$STAGING_DIR/tests/"
+
+
+
 
 mkdir -p "$(dirname "$OUTPUT_PATH")"
 tar -czf "$OUTPUT_PATH" -C "$WORK_DIR" "tbdr-offline-bundle"

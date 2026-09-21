@@ -4,7 +4,6 @@
 import json
 import argparse
 import csv
-from copy import copy
 import os
 import sys
 import pathogenprofiler as pp
@@ -12,7 +11,7 @@ from glob import glob
 from tqdm import tqdm
 from tbdr import create_app
 from tbdr.models import Result, Sample, Variant, SampleVariant, Drug, VariantDrugConfidence, Collection, SampleCollectionLink
-from tbdr.db import get_db_session, init_db
+from tbdr.db import get_db_session
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -21,7 +20,7 @@ from sqlalchemy.dialects.postgresql import insert
 parser = argparse.ArgumentParser(description='tbprofiler script',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--dir',type=str,help='Folder with samples',required = True)
 parser.add_argument('--db',default="who_v3",type=str,help='Database name')
-parser.add_argument('--metadata', '--metadata-csv', dest='metadata_csv', type=str, help='Metadata CSV file', required=True)
+parser.add_argument('--metadata', dest='metadata', type=str, help='Metadata CSV file', required=True)
 parser.add_argument('--public',action='store_true',help='Use the public database')
 parser.add_argument('--batch-size',type=int,default=100,help='Batch size for processing JSON files')
 args = parser.parse_args()
@@ -70,6 +69,13 @@ db_dir = os.path.join(sys.base_prefix, 'share', 'tbprofiler')
 conf = pp.get_db(db_dir,args.db)
 
 meta = {}
+for row in csv.DictReader(open(args.metadata,encoding='utf-8-sig')):
+    for key in ['iso_a3','country','year_of_collection']:
+        if row[key] == '':
+            row[key] = None
+
+
+    meta[row['id']] = row
 
 app = create_app()
 
@@ -103,7 +109,7 @@ with app.app_context():
         sample_collection_rows = []
         for json_file in batch:
             with open(json_file) as f:
-                data = json.load(f)
+                data = json.loads(f.read().replace("comments","comment"))
             data['drug_table'] = get_drug_table(data['dr_variants'],conf)
             for var in data['other_variants']:
                 var['grading'] = {a['drug']:a['confidence'] for a in var['annotation']}
@@ -120,7 +126,10 @@ with app.app_context():
                 'id': data['id'],
                 'sample_name': data['id'],
                 'lineage': data['main_lineage'],
-                'drtype': data['drtype']
+                'drtype': data['drtype'],
+                'iso_a3': sample_meta.get('iso_a3',None),
+                'country': sample_meta.get('country',None),
+                'year_of_collection': sample_meta.get('year_of_collection',None),
             }
             sample_rows.append(sample_row)
 
@@ -177,7 +186,6 @@ with app.app_context():
         rehydrated_variant_rows = [json.loads(v) for v in variant_rows]
         rehydrated_drug_rows = [json.loads(d) for d in drug_rows]
 
-        print(f"Inserting {len(result_rows)} results, {len(sample_rows)} samples, {len(variant_rows)} variants, {len(sample_variant_rows)} sample-variant links, {len(drug_rows)} drugs, {len(variant_drugs_rows)} variant-drug confidence links, and {len(sample_collection_rows)} sample-collection links.")
         stmt = insert(Sample).values(sample_rows).on_conflict_do_nothing(index_elements=['id'])
         db_session.execute(stmt)
         stmt = insert(Result).values(result_rows).on_conflict_do_nothing(index_elements=['id'])
